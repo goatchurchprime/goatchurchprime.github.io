@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="description" content="Experimental SVG lattice hinge generator" />
+<script src="http://cdnjs.cloudflare.com/ajax/libs/processing.js/1.4.1/processing-api.min.js"></script>
+  <meta charset="utf-8">
+  <title>JS Bin</title>
+<script>
+// "Constants" - i.e. values that won't change unless you use
+// a different cutter or different material
+var material_thickness = 3;
+var laser_kerf = 0.2;
+
+// "Variables" - i.e. the factors that will change based on what
+// your particular project requires
+var height = 120;
+var bend_angle = Math.PI/2; // in radians - 90deg = PI/2
+var bend_inner_radius = 50;
+// How long the cuts will be (the pattern will be a combination of
+// cuts this length, and most cuts *double* this length)
+// Longer cuts allow for tighter radius bends
+var torsion_link_length = 25;
+// How much space to leave between links when
+// there's more than one link in a column
+// (This is a minimum as it may vary in order to
+// space links uniformly in the total height)
+var min_link_spacing = 5;
+
+function calculate() {
+  // Work out how many links are needed for the desired bend
+  var param = (laser_kerf+material_thickness)/(2*Math.sqrt(material_thickness*material_thickness/2));
+  var min_col_count = Math.ceil(bend_angle / (Math.PI/4 - Math.acos(param)));
+
+  // Check whether the curve is too tight
+  var min_inner_radius = (2*min_col_count*material_thickness/bend_angle)-(material_thickness/2);
+  if ( min_inner_radius > bend_inner_radius)
+  {
+    window.alert("Bend is too tight - minimum is "+min_inner_radius);
+  }
+  
+  // min_col_count gives us the minimum number of links for the bend
+  // angle, but that might  not be enough to cover the arc for the
+  // given bend_inner_radius
+  var width = (2*bend_inner_radius/bend_angle);
+  var n = Math.floor(width/material_thickness);
+  var padding = (width-(n*material_thickness))/2;
+  console.log(padding);
+  
+  // Now work out what the actual link spacing is
+  var link_count = Math.floor(height/(torsion_link_length+min_link_spacing/2.0));
+  var link_spacing = (height-(torsion_link_length*link_count))/link_count;
+  
+  
+  //
+  // Draw the elements
+  //
+  
+  var svg = document.getElementById('output'); 
+  var svgNS = "http://www.w3.org/2000/svg";
+  
+  var bounding_box = document.createElementNS(svgNS, 'rect');
+  bounding_box.setAttribute("x", 0);
+  bounding_box.setAttribute("y", 0);
+  bounding_box.setAttribute("width", width);
+  bounding_box.setAttribute("height", height);
+  bounding_box.setAttribute("stroke", "red");
+  bounding_box.setAttribute("stroke-width", laser_kerf);
+  bounding_box.setAttribute("transform", "scale(3.543)");
+
+  var cuts = document.createElementNS(svgNS, 'g');
+  cuts.setAttribute("stroke", "blue");
+  cuts.setAttribute("transform", "scale(3.543)");
+
+  for (i =1; i < n; i++)
+  {
+    for (j = 0; j < link_count; j++)
+    {
+      var el = document.createElementNS(svgNS, 'line');
+      el.setAttribute("stroke", (i % 2 ? "orange" : "green"));
+      el.setAttribute("x1", padding+i*material_thickness);
+      el.setAttribute("x2", padding+i*material_thickness);
+      el.setAttribute("stroke-width", laser_kerf);
+      var offset = j*(torsion_link_length+link_spacing);
+      if (i % 2 == j % 2)
+      {
+        // link-then-spacer
+        el.setAttribute("y1", offset);
+        el.setAttribute("y2", offset+torsion_link_length); 
+        //console.log("lts - j "+j+" offset "+offset+" y1 "+offset+" y2 "+(offset+torsion_link_length));
+      }
+      else
+      {
+        // spacer-then-link
+        el.setAttribute("y1", offset+link_spacing);
+        el.setAttribute("y2", offset+link_spacing+torsion_link_length);
+        //console.log("stl - j "+j+" offset "+offset+" y1 "+(offset+link_spacing)+" y2 "+(offset+link_spacing+torsion_link_length));
+      }
+      cuts.appendChild(el);
+    }
+  }
+
+  svg.appendChild(bounding_box);
+  svg.appendChild(cuts);
+
+  var elNumberOfLinks = document.getElementById("number_of_links");
+  elNumberOfLinks.value = n;
+  var elLinkSpacing = document.getElementById("link_spacing");
+  elLinkSpacing.value = link_spacing;
+}
+
+function update()
+{
+  var elInnerRadius = document.getElementById("inner_radius");
+  elInnerRadius.value = (2*height/bend_angle)-(material_thickness/2);
+  var elOuterRadius = document.getElementById("outer_radius");
+  elOuterRadius.value = (2*height/bend_angle)+(material_thickness/2);
+}
+
+function exportSVG()
+{
+  var xs = new XMLSerializer();
+  var data = document.getElementById("output");
+  var details = xs.serializeToString(data);
+  //window.alert(details);
+  document.getElementById("text_output").value = details;
+}
+</script>
+
+
+</head>
+<body bgcolor="gray">
+  <svg id="output" width="950" height="300">
+  </svg>
+  
+  <p>(Half-)Link spacing: <input type="text" id="link_spacing"><br/>
+  Number of links: <input type="text" id="number_of_links"><br/>
+  Inner radius: <input type="text" id="inner_radius"><br/>
+  Outer radius: <input type="text" id="outer_radius"></p>
+  <p><input type="button" value="recalc" id="recalc" onclick="calculate();"> <input type="button" value="export" name="Export" onclick="exportSVG();" /></p>
+    <p><textarea id="text_output" width="80" length="23">hello
+      </textarea></p>
+</body>
+</html>

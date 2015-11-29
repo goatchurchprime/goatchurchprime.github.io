@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="jquery-1.11.3.min.js"></script>
+  <meta charset="utf-8">
+  <title>Experimental SVG lattice hinge generator</title>
+<script>
+
+var material_thickness = 3;
+var laser_kerf = 0.2;
+
+
+function calculate() {
+    var bend_inner_radius = parseFloat($("#inner_radius").val()); 
+    var height = parseFloat($("#hinge_height").val()); 
+    var torsion_link_length = parseFloat($("#torsion_link_length").val()); 
+    var min_link_spacing = parseFloat($("#min_link_spacing").val()); 
+    var bend_angle = parseFloat($("#bend_angle_degrees").val()*Math.PI/180)
+
+    var param = (laser_kerf+material_thickness)/(2*Math.sqrt(material_thickness*material_thickness/2));
+    var min_col_count = Math.ceil(bend_angle / (Math.PI/4 - Math.acos(param)));
+
+    // Check whether the curve is too tight
+    var min_inner_radius = (2*min_col_count*material_thickness/bend_angle)-(material_thickness/2);
+    if (min_inner_radius > bend_inner_radius) {
+        $("#err").text("Bend is too tight - minimum is "+min_inner_radius);
+    }
+
+    // min_col_count gives us the minimum number of links for the bend
+    // angle, but that might  not be enough to cover the arc for the
+    // given bend_inner_radius
+    var width = (2*bend_inner_radius/bend_angle);
+    var n = Math.floor(width/material_thickness);
+    var padding = (width-(n*material_thickness))/2;
+  
+    // Now work out what the actual link spacing is
+    var link_count = Math.floor(height/(torsion_link_length+min_link_spacing/2.0));
+    var link_spacing = (height-(torsion_link_length*link_count))/link_count;
+  
+  
+    //
+    // Draw the elements
+    // (there's probably a library to make this a lot moe concise!)
+    var svgstuff = $("svg#output"); 
+    svgstuff.empty(); 
+
+    var svgNS = "http://www.w3.org/2000/svg";
+    var bounding_box = document.createElementNS(svgNS, 'rect');
+    bounding_box.setAttribute("x", 0);
+    bounding_box.setAttribute("y", 0);
+    bounding_box.setAttribute("width", width);
+    bounding_box.setAttribute("height", height);
+    bounding_box.setAttribute("stroke", "red");
+    bounding_box.setAttribute("stroke-width", laser_kerf);
+    bounding_box.setAttribute("transform", "scale(3.543)");
+
+    var cuts = document.createElementNS(svgNS, 'g');
+    cuts.setAttribute("stroke", "blue");
+    cuts.setAttribute("transform", "scale(3.543)");
+
+    for (i =1; i < n; i++) {
+        for (j = 0; j < link_count; j++) {
+            var el = document.createElementNS(svgNS, 'line');
+            el.setAttribute("stroke", (i % 2 ? "orange" : "green"));
+            el.setAttribute("x1", padding+i*material_thickness);
+            el.setAttribute("x2", padding+i*material_thickness);
+            el.setAttribute("stroke-width", laser_kerf);
+            var offset = j*(torsion_link_length+link_spacing);
+            if ((i % 2) == (j % 2)) {
+                // link-then-spacer
+                el.setAttribute("y1", offset);
+                el.setAttribute("y2", offset+torsion_link_length); 
+                //console.log("lts - j "+j+" offset "+offset+" y1 "+offset+" y2 "+(offset+torsion_link_length));
+            } else {
+                // spacer-then-link
+                el.setAttribute("y1", offset+link_spacing);
+                el.setAttribute("y2", offset+link_spacing+torsion_link_length);
+                //console.log("stl - j "+j+" offset "+offset+" y1 "+(offset+link_spacing)+" y2 "+(offset+link_spacing+torsion_link_length));
+            }
+            cuts.appendChild(el);
+        }
+    }
+    
+    svgstuff.append(bounding_box);
+    svgstuff.append(cuts);
+    // set the values back into the dialog
+    $("#number_of_links").val(n);
+    $("#link_spacing").val(link_spacing);
+}
+
+function makefun()
+{
+    var svgstuff = $("svg#output"); 
+    svgstuff.empty(); 
+    var svgNS = "http://www.w3.org/2000/svg";
+
+    var elpath = document.createElementNS(svgNS, 'path');
+    elpath.setAttribute("stroke", "#00ffff");
+    elpath.setAttribute("fill", "none");
+    elpath.setAttribute("stroke-width", "6");
+    
+    var motions = [ "M0 0" ]; 
+    for (var i = 0; i < 200; i++) {
+        motions.push("L"); 
+        motions.push(i*2); 
+        motions.push(" "); 
+        motions.push(Math.sin(i*0.23)*80+100-i*0.08); 
+    }
+    elpath.setAttribute("d", motions.join(""));
+    svgstuff.append(elpath);
+    
+}
+
+function exportSVG()
+{
+    var xs = new XMLSerializer();
+    var data = document.getElementById("output");
+    var details = xs.serializeToString(data);
+    $("#text_output").text(details);
+}
+
+function setup()
+{
+    // assign the events to the buttons
+    $("#recalc").click(calculate); 
+    $("#export").click(exportSVG); 
+    $("#fun").click(makefun); 
+}
+
+$(document).ready(setup);   // function to call only *after* page has finished loading
+
+</script>
+<style>
+input[type="text"] { width:6em }
+#err { color:red }
+#text_output { height: 50px; width: 250px }
+</style>
+
+</head>
+<body bgcolor="#dedede">
+  
+  <svg id="output" style="float:left; width:500; height:300; border:thin blue solid"></svg>
+  
+  <div style="width:350px; margin-left:504px">
+  <table>
+    <tr>
+      <th>Inner radius:</th>
+      <td><input type="text" id="inner_radius" value="90"></td>
+    </tr>
+    <tr>
+      <th>Hinge height:</th>
+      <td><input type="text" id="hinge_height" value="120"></td>
+    </tr>
+    <tr>
+      <th>Torsion:</th>
+      <td><input type="text" id="torsion_link_length" value="25" title="Longer cuts allow for tighter radius bends"></td>
+    </tr>
+    <tr>
+      <th>Min link spacing:</th>
+      <td><input type="text" id="min_link_spacing" value="5" title="This is a minimum as it may vary in order to space links uniformly in the total height"></td>
+    </tr>
+    <tr>
+      <th>Bend angle degrees:</th>
+      <td><input type="text" id="bend_angle_degrees" value="90"></td>
+    </tr>
+    <tr>
+      <th>Link spacing:</th>
+      <td><input type="text" id="link_spacing" value="50" disabled></td>
+    </tr>
+    <tr>
+      <th>Number of links:</th>
+      <td><input type="text" id="number_of_links" value="10" disabled></td>
+    </tr>
+  </table>
+  
+  <input type="button" value="recalc" id="recalc">
+  <input type="button" value="export" id="export"/>
+  <input type="button" value="FUN!" id="fun"/>
+  <br/><textarea id="text_output">*output here*</textarea>
+  <br/><span id="err">.</span>
+  
+</div>  
+</body>
+</html>
