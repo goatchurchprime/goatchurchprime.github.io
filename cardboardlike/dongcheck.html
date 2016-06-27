@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Ding</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+      body { margin: 0px; overflow: hidden; }
+      #viz { position: absolute; top: 0; left: 0; right: 0; bottom: 0; }
+      #postext { position: absolute; right:0; top: 0; width: 75%; border: thin black solid; background:#ddf }
+    </style>
+    <link rel="manifest" href="manifest.json">
+    <script src="three.js"></script>
+    <script src="DeviceOrientationControls.js"></script>
+    <script src="OrbitControls.js"></script>
+    <script src="dachflightgps.js"></script>
+    <script src="all3d.js"></script>
+    <script src="jquery-2.1.4.min.js"></script>
+  </head>
+  <body>
+    <div id="main">
+      <div id="viz"></div>
+      <div id="postext">
+        <div>A:<span id="alpha">Dalpha</span> B: <span id="beta">Dbeta</span> C:<span id="gamma">Dgamma</span> #<span id="count">Dcount</span></div>
+        <div>
+            <span id="latitude">Dlatitude</span>,<span id="longitude">Dlongitude</span> (~<span id="accuracy">Daccuracy</span>m)
+            <span id="altitude">Daltitude</span>m (~<span id="altitudeaccuracy">Daltitudeaccuracy</span>m)
+            dir:<span id="heading">Dheading</span> <span id="speed">Dspeed</span>m/s  #<span id="wcount">Dwcount</span>
+            compasscalibrate:<span id="compasscalibrate">Dcompasscalibrate</span>
+        </div>
+        <div>
+            <input type="button" value="Fog+" id="fogplus"/>
+            <input type="button" value="Fog-" id="fogminus"/>
+            <input type="button" value="FOV+" id="fovplus"/>
+            <input type="button" value="FOV-" id="fovminus"/>
+            <input type="button" value="Hop" id="camerahop"/>
+            <input type="button" value="31" id="reset31"/>
+            <span id="fovdegrees"></span>
+            <span id="camerapos"></span>
+        </div>
+      </div>
+    </div>
+  <script>
+
+var basepositionOrigin, latR, lngR, altR, latG, lngG, altG; 
+var nyfac, nxfac, eyfac, exfac, lat0, lng0, alt0, camera3JSAlt; 
+var gfac = 0.1; // scale applied to all elements in the scene 
+function SetBasePositions()
+{
+    basepositionOrigin = [ "Hilde", 47.6160995, 13.8121137, 748 ];  // this is subtracted from the data positions
+    latG = basepositionOrigin[1]; 
+    lngG = basepositionOrigin[2]; 
+    altG = basepositionOrigin[3]; 
+    latR = 0; lngR = 0; altR = 0; 
+    for (var i = 0; i < svxents.length; i++) {
+        if (svxents[i][0] == "p31") {
+            basepositionOrigin = svxents[i]; 
+        }
+    }
+    lat0 = basepositionOrigin[1]; 
+    lng0 = basepositionOrigin[2]; 
+    alt0 = basepositionOrigin[3]; 
+    
+    var earthrad = 6378137; 
+    nyfac = 2*Math.PI*earthrad/360; 
+    nxfac = 0; 
+    eyfac = 0; 
+    exfac = nyfac*Math.cos(lat0*Math.PI/180); 
+    
+    var pc = latlngtopt(latG - latR, lngG - lngR, altG - altR); 
+    console.log(pc); 
+    camera3JSAlt = pc.y; 
+    camera.position.set(pc.x, pc.y, pc.z); 
+}
+
+var peaks = [ 
+    ["Dachstein", 47.47527777777778, 13.606388888888889, 2995 ], 
+    ["Loser", 47.66083333333333, 13.771111111111113, 1837 ],
+    ["Trisselwand", 47.64611111111111, 13.813333333333334, 1754 ],
+    
+    ["Trissenstein", 47.626666666666665, 13.789166666666667, 1201 ],
+    ["Brauning Nase", 47.678381045318616, 13.805098487465617, 1769 ],
+    //["Hildestein", 47.610426, 13.814096, 900 ],
+    ["Rotelstein", 47.593488, 13.847536, 1614 ],
+    ["Sarstein", 47.602606, 13.699005, 1975 ]
+];
+
+function reset31() 
+{
+    latR = latG - lat0; 
+    lngR = lngG - lng0; 
+    altR = altG - alt0; 
+    var pc = latlngtopt(latG - latR, lngG - lngR, altG - altR); 
+    console.log("reset31", pc); 
+    camera3JSAlt = pc.y; 
+    camera.position.set(pc.x, pc.y, pc.z); 
+}
+
+
+var camera, scene, renderer, controls, bdevicecontrols, element, container;
+var clock = new THREE.Clock();
+var hoptime = null; 
+function Zhopdisplacement() 
+{
+    if (hoptime === null)
+        return 0.0; 
+    var hsecs = clock.elapsedTime - hoptime; 
+    if (hsecs > 4) {
+        hoptime = null; 
+        return 0.0; 
+    }
+    var x = Math.abs((hsecs-2)/2); 
+    var y = (x < 0.5 ? (1 - x*x*2) : (1 - x)*(1 - x)*2); 
+    return 300.0*y; 
+}
+
+function latlngtopt(lat, lng, alt)
+{
+    var rlat = lat - lat0; 
+    var rlng = lng - lng0; 
+    return new THREE.Vector3((rlat*eyfac + rlng*exfac)*gfac, alt*gfac, -(rlat*nyfac + rlng*nxfac)*gfac); 
+}
+
+function MakeLabel(card, text, fillstyle, pkp, scale)
+{
+    var canvas1 = document.createElement('canvas');
+    var context1 = canvas1.getContext('2d');
+    context1.font = "40px Helvetica";
+    context1.fillStyle = fillstyle;
+    context1.fillText(text, 40, 40);
+    var texture1 = new THREE.Texture(canvas1) 
+    texture1.needsUpdate = true;
+    var material1 = new THREE.MeshBasicMaterial( {map: texture1 } );
+    material1.transparent = true;
+    mesh1 = new THREE.Mesh(new THREE.PlaneGeometry(canvas1.width*0.1, canvas1.height*0.1), material1); 
+    mesh1.position.set(pkp.x+canvas1.width/50, pkp.y-canvas1.height/200, pkp.z);
+    mesh1.scale.set(scale, scale, scale); 
+    card.add(mesh1);
+    
+    var geometry2 = new THREE.PlaneGeometry(canvas1.width*0.1, canvas1.height*0.1);
+    var mesh2 = new THREE.Mesh(new THREE.PlaneGeometry(canvas1.width*0.1, canvas1.height*0.1), material1);
+    mesh2.rotation.y = Math.PI;
+    mesh2.position.set(pkp.x-canvas1.width/50, pkp.y-canvas1.height/200, pkp.z);
+    mesh2.scale.set(scale, scale, scale); 
+    card.add(mesh2);
+}
+
+function LoadMountains(scene)
+{
+    var g = new THREE.Geometry();
+    var g1 = new THREE.Geometry();
+    var card = new THREE.Object3D();
+    for(var i = 0; i < peaks.length; i++) {
+        var pkp = latlngtopt(peaks[i][1], peaks[i][2], peaks[i][3]); 
+        g.vertices.push(pkp); 
+        MakeLabel(card, peaks[i][0], "rgba(255,255,255,0.95)", pkp, 10); 
+    }
+    scene.add(card);
+    
+    var pointsmaterial = new THREE.PointCloudMaterial({ color: 0xFF3355, sizeAttenuation: true, size: 50.0 }); 
+    var points = new THREE.PointCloud(g, pointsmaterial);
+    scene.add(points);
+}
+
+function LoadFlight(scene)
+{
+    var g = new THREE.Geometry();
+    for(var i = 0; i < igcflight.length; i++) {
+        g.vertices.push(latlngtopt(igcflight[i][0], igcflight[i][1], igcflight[i][2])); 
+    }
+    var m = new THREE.LineBasicMaterial({ color:0x00AAFF, opacity:0.7, depthWrite:true }); 
+    var contour = new THREE.Line(g, m, THREE.LineStrip); // for disjoint line segments use THREE.LinePieces
+    scene.add(contour); 
+}
+
+var depthlayermap; 
+function LoadCave(scene)
+{
+    depthlayermap = { }; 
+    var depthlayers = [ ]; 
+    for (var i = 0; i < svxlegs.length; i++) {
+        var svxleg = svxlegs[i]; 
+        var rlayer = Math.round((svxleg[2]+svxleg[5])/50); 
+        if (depthlayermap[rlayer] == undefined) {
+            depthlayers.push(rlayer); 
+            depthlayermap[rlayer] = new THREE.Geometry(); 
+        }
+        depthlayermap[rlayer].vertices.push(latlngtopt(svxleg[0], svxleg[1], svxleg[2])); 
+        depthlayermap[rlayer].vertices.push(latlngtopt(svxleg[3], svxleg[4], svxleg[5])); 
+    }
+    depthlayers.sort(); 
+    for (var j = 0; j < depthlayers.length; j++) {
+        var c = new THREE.Color(); 
+        c.setHSL(1-j/depthlayers.length, 1.0, 0.5); 
+        var m = new THREE.LineBasicMaterial({ color:c, opacity:1.0, depthWrite:true, fog:true }); 
+        var contour = new THREE.Line(depthlayermap[depthlayers[j]], m, THREE.LinePieces);  // for disjoint line segments use THREE.LinePieces
+        scene.add(contour); 
+    }
+    
+    var gents = new THREE.Geometry();
+    var card = new THREE.Object3D();
+    for (var i = 0; i < svxents.length; i++) {
+        var pkp = latlngtopt(svxents[i][1], svxents[i][2], svxents[i][3]); 
+        if (svxents[i][0].match(/p\d+[a-z]?$/) !== null) {
+            MakeLabel(card, svxents[i][0], "rgba(0,200,200,0.95)", pkp, 0.5);  // rgba(0,200,200,0.95)
+        gents.vertices.push(pkp); 
+        }
+    }
+    var entpointsmaterial = new THREE.PointCloudMaterial({ color: 0x22FF11, sizeAttenuation: true, size: 2.0 }); 
+    var pents = new THREE.PointCloud(gents, entpointsmaterial); 
+    scene.add(pents);
+    scene.add(card);
+}
+
+function resize() 
+{
+    var width = container.offsetWidth;
+    var height = container.offsetHeight;
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+    renderer.setSize(width, height);
+}
+
+function update(dt) 
+{
+    resize();
+    camera.updateProjectionMatrix();
+    controls.update(dt);
+}
+
+function render(dt) 
+{
+    renderer.render(scene, camera);
+}
+
+function animate(t) 
+{
+    camera.position.y = camera3JSAlt + Zhopdisplacement(); 
+    $("#camerapos").text("cam:"+camera.position.x.toFixed(1)+" "+camera.position.y.toFixed(1)+" "+camera.position.z.toFixed(1))
+    requestAnimationFrame(animate);
+    update(clock.getDelta());
+    render(clock.getDelta());
+}
+
+
+function init() 
+{
+    renderer = new THREE.WebGLRenderer();
+    element = renderer.domElement;
+    container = document.getElementById('viz');
+    container.appendChild(element);
+    
+    scene = new THREE.Scene();
+    var fieldofview = 30; // degrees (smaller is more tunnel like)
+    var aspect = 1;       // reset in resize()
+    var neardistance = 2; 
+    var fardistance = 7000; 
+    camera = new THREE.PerspectiveCamera(fieldofview, aspect, neardistance, fardistance);
+    camera3JSAlt = alt0*gfac; 
+    camera.position.set(0, camera3JSAlt, 0); 
+    scene.add(camera); 
+
+    SetBasePositions(); 
+
+    // default mouse controls
+    controls = new THREE.OrbitControls(camera, element);
+    //controls.rotateUp(Math.PI/4);
+    controls.target.set(0, camera.position.y, -1);  // looking north
+    controls.noZoom = true;
+    controls.noPan = true;
+    bdevicecontrols = false; 
+    
+    var light = new THREE.PointLight(0xffffff);
+    light.position.set(0, 2500, 0);
+    scene.add(light);
+
+    LoadMountains(scene); 
+    LoadFlight(scene); 
+    LoadCave(scene); 
+
+    var corners = [ [0,-1,0xFFFFFF]/*North*/, [1,0,0x55FFAA]/*east*/, [0,1,0xFF3333], [-1,0,0xFFFF33] ];
+    var g = new THREE.Geometry();
+    var dd = 50; 
+    for (var j = 0; j < corners.length; j++) {
+        var g1 = new THREE.Geometry();
+        
+        g1.vertices.push(new THREE.Vector3(dd*corners[j][0], alt0*gfac, dd*corners[j][1])); 
+        g1.vertices.push(new THREE.Vector3(dd*corners[j][0], alt0*gfac+dd, dd*corners[j][1])); 
+        var m0 = new THREE.LineBasicMaterial({ color:corners[j][2], opacity:0.7, depthWrite:true }); 
+        var contour = new THREE.Line(g1, m0, THREE.LineStrip); // for disjoint line segments use THREE.LinePieces
+        scene.add(contour); 
+        g.vertices.push(new THREE.Vector3(dd*corners[j][0], alt0*gfac, dd*corners[j][1])); 
+    }
+    g.vertices.push(new THREE.Vector3(dd*corners[0][0], alt0*gfac, dd*corners[0][1])); 
+    var m = new THREE.LineBasicMaterial({ color:0xFF0000, opacity:1.0, depthWrite:true }); 
+    var contour = new THREE.Line(g, m, THREE.LineStrip); 
+    scene.add(contour); 
+    scene.fog = new THREE.Fog(0x202020, 10*gfac, 20000*gfac);  // near and far
+    
+    $("#fogplus").click(function() { scene.fog.far *= 0.5; }); 
+    $("#fogminus").click(function() { scene.fog.far *= 2; }); 
+    $("#fovplus").click(function() { camera.fov += 5; $("#fovdegrees").text(camera.fov); }); 
+    $("#fovminus").click(function() { camera.fov -= 5; $("#fovdegrees").text(camera.fov); }); 
+    $("#camerahop").click(function() { hoptime = clock.elapsedTime; }); 
+    $("#reset31").click(reset31); 
+     
+    window.addEventListener('resize', resize, false);
+    setTimeout(resize, 1);
+}
+
+init();
+animate();
+
+var count = 0, wcount = 0; 
+function setOrientationControls(event) 
+{
+    if (!bdevicecontrols && (event.alpha !== null)) {
+        controls = new THREE.DeviceOrientationControls(camera, true);
+        controls.connect();
+        controls.update();
+        bdevicecontrols = true; 
+    }   
+    document.getElementById('count').textContent = (++count); 
+    document.getElementById('alpha').textContent = (event.alpha === null ? "-" : event.alpha.toFixed(0)); 
+    document.getElementById('beta').textContent = (event.beta === null ? "-" : event.beta.toFixed(0)); 
+    document.getElementById('gamma').textContent = (event.gamma === null ? "-" : event.gamma.toFixed(0)); 
+}
+
+var compasscalibratecount = 0; 
+function setCompassNeedsCalibration(event)
+{
+    document.getElementById('compasscalibrate').textContent = (++compasscalibratecount); 
+}
+
+function geo_success(position) 
+{ 
+    document.getElementById('wcount').textContent = (++wcount); 
+    document.getElementById('latitude').textContent = position.coords.latitude.toFixed(7); 
+    document.getElementById('longitude').textContent = position.coords.longitude.toFixed(7); 
+    document.getElementById('altitude').textContent = position.coords.altitude.toFixed(1); 
+    document.getElementById('accuracy').textContent = position.coords.accuracy.toFixed(0); 
+    document.getElementById('altitudeaccuracy').textContent = position.coords.altitudeAccuracy.toFixed(0); 
+    document.getElementById('heading').textContent = position.coords.heading.toFixed(0); 
+    document.getElementById('speed').textContent = position.coords.speed.toFixed(2); 
+    
+    latG = position.coords.latitude; 
+    lngG = position.coords.longitude; 
+    altG = position.coords.altitude; 
+    var pc = latlngtopt(position.coords.latitude - latR, 
+                        position.coords.longitude - lngR, 
+                        position.coords.altitude - altR); 
+    console.log(pc); 
+    camera3JSAlt = pc.y; 
+    camera.position.set(pc.x, pc.y, pc.z); 
+};
+
+function geo_error() 
+{  
+    document.getElementById('wcount').textContent = "gps error"; 
+}
+window.addEventListener('deviceorientation', setOrientationControls, true);  // catch the first event to come though to upgrade to orientation control
+window.addEventListener('compassneedscalibration', setCompassNeedsCalibration, true); 
+var watchID = navigator.geolocation.watchPosition(geo_success, geo_error, {enableHighAccuracy:true, timeout:27000, maximumAge:30000}); 
+  
+console.log("dididi"); 
+console.log(watchID); 
+  </script>
+  </body>
+</html>
+
