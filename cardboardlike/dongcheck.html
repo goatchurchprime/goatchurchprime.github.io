@@ -35,6 +35,7 @@
             <input type="button" value="FOV-" id="fovminus"/>
             <input type="button" value="Hop" id="camerahop"/>
             <input type="button" value="31" id="reset31"/>
+            <input type="button" value="T1" id="test1"/>
             <span id="fovdegrees"></span>
             <span id="camerapos"></span>
         </div>
@@ -67,10 +68,7 @@ function SetBasePositions()
     eyfac = 0; 
     exfac = nyfac*Math.cos(lat0*Math.PI/180); 
     
-    var pc = latlngtopt(latG - latR, lngG - lngR, altG - altR); 
-    console.log(pc); 
-    camera3JSAlt = pc.y; 
-    camera.position.set(pc.x, pc.y, pc.z); 
+    SetCameraPositionG();
 }
 
 var peaks = [ 
@@ -89,11 +87,8 @@ function reset31()
 {
     latR = latG - lat0; 
     lngR = lngG - lng0; 
-    altR = altG - alt0; 
-    var pc = latlngtopt(latG - latR, lngG - lngR, altG - altR); 
-    console.log("reset31", pc); 
-    camera3JSAlt = pc.y; 
-    camera.position.set(pc.x, pc.y, pc.z); 
+    altR = altG - alt0 - 20; 
+    SetCameraPositionG(); 
 }
 
 
@@ -118,7 +113,7 @@ function latlngtopt(lat, lng, alt)
 {
     var rlat = lat - lat0; 
     var rlng = lng - lng0; 
-    return new THREE.Vector3((rlat*eyfac + rlng*exfac)*gfac, alt*gfac, -(rlat*nyfac + rlng*nxfac)*gfac); 
+    return new THREE.Vector3(-(rlat*eyfac + rlng*exfac)*gfac, alt*gfac, +(rlat*nyfac + rlng*nxfac)*gfac); 
 }
 
 function MakeLabel(card, text, fillstyle, pkp, scale)
@@ -203,7 +198,7 @@ function LoadCave(scene)
         var pkp = latlngtopt(svxents[i][1], svxents[i][2], svxents[i][3]); 
         if (svxents[i][0].match(/p\d+[a-z]?$/) !== null) {
             MakeLabel(card, svxents[i][0], "rgba(0,200,200,0.95)", pkp, 0.5);  // rgba(0,200,200,0.95)
-        gents.vertices.push(pkp); 
+            gents.vertices.push(pkp); 
         }
     }
     var entpointsmaterial = new THREE.PointCloudMaterial({ color: 0x22FF11, sizeAttenuation: true, size: 2.0 }); 
@@ -242,6 +237,9 @@ function animate(t)
     render(clock.getDelta());
 }
 
+// make some material for some planes to add some surfaces
+var material = new THREE.MeshPhongMaterial({ color: 0xaaaaaa, ambient: 0xaaaaaa, specular: 0xffffff, shininess: 25, side: THREE.DoubleSide, vertexColors: THREE.FaceColors, shading: THREE.FlatShading });  
+// rest of this
 
 function init() 
 {
@@ -279,7 +277,7 @@ function init()
     LoadCave(scene); 
 
     var corners = [ [0,-1,0xFFFFFF]/*North*/, [1,0,0x55FFAA]/*east*/, [0,1,0xFF3333], [-1,0,0xFFFF33] ];
-    var g = new THREE.Geometry();
+    var g = new THREE.Geometry(); 
     var dd = 50; 
     for (var j = 0; j < corners.length; j++) {
         var g1 = new THREE.Geometry();
@@ -303,6 +301,7 @@ function init()
     $("#fovminus").click(function() { camera.fov -= 5; $("#fovdegrees").text(camera.fov); }); 
     $("#camerahop").click(function() { hoptime = clock.elapsedTime; }); 
     $("#reset31").click(reset31); 
+    $("#test1").click(function() { latG -= 0.00001; SetCameraPositionG(); }); 
      
     window.addEventListener('resize', resize, false);
     setTimeout(resize, 1);
@@ -346,9 +345,12 @@ function geo_success(position)
     latG = position.coords.latitude; 
     lngG = position.coords.longitude; 
     altG = position.coords.altitude; 
-    var pc = latlngtopt(position.coords.latitude - latR, 
-                        position.coords.longitude - lngR, 
-                        position.coords.altitude - altR); 
+    SetCameraPositionG();
+} 
+    
+function SetCameraPositionG()
+{
+    var pc = latlngtopt(latG - latR, lngG - lngR, altG - altR); 
     console.log(pc); 
     camera3JSAlt = pc.y; 
     camera.position.set(pc.x, pc.y, pc.z); 
