@@ -13,7 +13,6 @@
     <script src="three.js"></script>
     <script src="DeviceOrientationControls.js?2"></script>
     <script src="OrbitControls.js"></script>
-    <!-- script src="dachflightgps.js"></script -->
     <script src="all3d.js"></script>
     <script src="jquery-2.1.4.min.js"></script>
   </head>
@@ -26,7 +25,6 @@
             <span id="latitude">Dlatitude</span>,<span id="longitude">Dlongitude</span> (~<span id="accuracy">Daccuracy</span>m)
             <span id="altitude">Daltitude</span>m (~<span id="altitudeaccuracy">Daltitudeaccuracy</span>m)
             dir:<span id="heading">Dheading</span> <span id="speed">Dspeed</span>m/s  #<span id="wcount">Dwcount</span>
-            compasscalibrate:<span id="compasscalibrate">Dcompasscalibrate</span>
         </div>
         <div>
             <input type="button" value="F+" id="fogplus"/>
@@ -176,17 +174,6 @@ function LoadMountains(scene)
     scene.add(points);
 }
 
-function LoadFlight(scene)
-{
-    var g = new THREE.Geometry();
-    for(var i = 0; i < igcflight.length; i++) {
-        g.vertices.push(latlngtopt(igcflight[i][0], igcflight[i][1], igcflight[i][2])); 
-    }
-    var m = new THREE.LineBasicMaterial({ color:0x00AAFF, opacity:0.7, linewidth:linewidth, depthWrite:true }); 
-    var contour = new THREE.Line(g, m, THREE.LineStrip); // for disjoint line segments use THREE.LinePieces
-    scene.add(contour); 
-}
-
 var depthlayermap; 
 function LoadCave(scene)
 {
@@ -298,7 +285,6 @@ function init()
     scene.add(light);
 
     LoadMountains(scene); 
-    //LoadFlight(scene); 
     LoadCave(scene); 
 
     var corners = [ [0,-1,0xFFFFFF]/*North*/, [1,0,0x55FFAA]/*east*/, [0,1,0xFF3333], [-1,0,0xFFFF33] ];
@@ -354,11 +340,6 @@ function setOrientationControls(event)
     document.getElementById('absolute').textContent = ""+event.absolute; 
 }
 
-var compasscalibratecount = 0; 
-function setCompassNeedsCalibration(event)
-{
-    document.getElementById('compasscalibrate').textContent = (++compasscalibratecount); 
-}
 
 function geo_success(position) 
 { 
@@ -391,7 +372,6 @@ function geo_error()
 }
 // could be absolutedeviceorientation
 window.addEventListener('deviceorientation', setOrientationControls, true);  // catch the first event to come though to upgrade to orientation control
-window.addEventListener('compassneedscalibration', setCompassNeedsCalibration, true); 
 var watchID = navigator.geolocation.watchPosition(geo_success, geo_error, {enableHighAccuracy:true, timeout:27000, maximumAge:30000}); 
   
 console.log("dididi"); 
