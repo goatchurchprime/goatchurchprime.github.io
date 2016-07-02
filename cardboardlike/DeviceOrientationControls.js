@@ -63,6 +63,7 @@ THREE.DeviceOrientationControls = function(object) {
   this.autoForward = false;
 
   this.alpha = 0;
+  this.alphaoffset = 0;
   this.beta = 0;
   this.gamma = 0;
   this.orient = 0;
@@ -100,7 +101,7 @@ THREE.DeviceOrientationControls = function(object) {
       //}
 
       this.alpha = deviceOrientation.gamma ?
-        THREE.Math.degToRad(deviceOrientation.alpha) : 0; // Z
+        THREE.Math.degToRad(deviceOrientation.alpha + this.alphaoffset) : 0; // Z
       this.beta = deviceOrientation.beta ?
         THREE.Math.degToRad(deviceOrientation.beta) : 0; // X'
       this.gamma = deviceOrientation.gamma ?

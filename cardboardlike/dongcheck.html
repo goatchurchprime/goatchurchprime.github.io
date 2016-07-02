@@ -11,9 +11,9 @@
     </style>
     <link rel="manifest" href="manifest.json">
     <script src="three.js"></script>
-    <script src="DeviceOrientationControls.js"></script>
+    <script src="DeviceOrientationControls.js?2"></script>
     <script src="OrbitControls.js"></script>
-    <script src="dachflightgps.js"></script>
+    <!-- script src="dachflightgps.js"></script -->
     <script src="all3d.js"></script>
     <script src="jquery-2.1.4.min.js"></script>
   </head>
@@ -21,22 +21,26 @@
     <div id="main">
       <div id="viz"></div>
       <div id="postext">
-        <div>A:<span id="alpha">Dalpha</span> B: <span id="beta">Dbeta</span> C:<span id="gamma">Dgamma</span> #<span id="count">Dcount</span></div>
-        <div>
+        <div class="numpanel">A:<span id="alpha">Dalpha</span> B: <span id="beta">Dbeta</span> C:<span id="gamma">Dgamma</span> T:<span id="absolute">Dabsolute</span> #<span id="count">Dcount</span></div>
+        <div class="numpanel">
             <span id="latitude">Dlatitude</span>,<span id="longitude">Dlongitude</span> (~<span id="accuracy">Daccuracy</span>m)
             <span id="altitude">Daltitude</span>m (~<span id="altitudeaccuracy">Daltitudeaccuracy</span>m)
             dir:<span id="heading">Dheading</span> <span id="speed">Dspeed</span>m/s  #<span id="wcount">Dwcount</span>
             compasscalibrate:<span id="compasscalibrate">Dcompasscalibrate</span>
         </div>
         <div>
-            <input type="button" value="Fog+" id="fogplus"/>
-            <input type="button" value="Fog-" id="fogminus"/>
+            <input type="button" value="F+" id="fogplus"/>
+            <input type="button" value="F-" id="fogminus"/>
             <input type="button" value="FOV+" id="fovplus"/>
             <input type="button" value="FOV-" id="fovminus"/>
             <input type="button" value="Hop" id="camerahop"/>
             <input type="button" value="31" id="reset31"/>
             <input type="button" value="T1" id="test1"/>
+            <input type="button" value="VV" id="vview"/>
             <span id="fovdegrees"></span>
+            <input type="button" value="A+" id="alphaoffsetplus"/>
+            <input type="button" value="A-" id="alphaoffsetminus"/>
+            <span id="alphaoffset"></span>
             <span id="camerapos"></span>
         </div>
       </div>
@@ -72,6 +76,7 @@ function SetBasePositions()
 }
 
 var peaks = [ 
+    ["Schoneberg", 47.712315, 13.790972, 2000 ], 
     ["Dachstein", 47.47527777777778, 13.606388888888889, 2995 ], 
     ["Loser", 47.66083333333333, 13.771111111111113, 1837 ],
     ["Trisselwand", 47.64611111111111, 13.813333333333334, 1754 ],
@@ -95,16 +100,30 @@ function reset31()
 var camera, scene, renderer, controls, bdevicecontrols, element, container;
 var clock = new THREE.Clock();
 var hoptime = null; 
+var hopmode = 0; // 0 on ground, 1 going up, -1 going down, 2 on the up
+var linewidth = 3; 
+function ZhopGo() 
+{
+    hopmode = (hopmode == 0 ? 1 : -1); 
+    hoptime = clock.elapsedTime; 
+}
 function Zhopdisplacement() 
 {
+    if (hopmode === 0)
+        return 0.0; 
+    if (hopmode === 2)
+        return 300; 
     if (hoptime === null)
         return 0.0; 
     var hsecs = clock.elapsedTime - hoptime; 
-    if (hsecs > 4) {
+    if (hsecs > 2) {
         hoptime = null; 
-        return 0.0; 
+        hopmode = (hopmode == 1 ? 2 : 0); 
+        return (hopmode === 2 ? 300 : 0); 
     }
     var x = Math.abs((hsecs-2)/2); 
+    if (hopmode == -1)
+        x = 1 - x; 
     var y = (x < 0.5 ? (1 - x*x*2) : (1 - x)*(1 - x)*2); 
     return 300.0*y; 
 }
@@ -163,7 +182,7 @@ function LoadFlight(scene)
     for(var i = 0; i < igcflight.length; i++) {
         g.vertices.push(latlngtopt(igcflight[i][0], igcflight[i][1], igcflight[i][2])); 
     }
-    var m = new THREE.LineBasicMaterial({ color:0x00AAFF, opacity:0.7, depthWrite:true }); 
+    var m = new THREE.LineBasicMaterial({ color:0x00AAFF, opacity:0.7, linewidth:linewidth, depthWrite:true }); 
     var contour = new THREE.Line(g, m, THREE.LineStrip); // for disjoint line segments use THREE.LinePieces
     scene.add(contour); 
 }
@@ -187,7 +206,7 @@ function LoadCave(scene)
     for (var j = 0; j < depthlayers.length; j++) {
         var c = new THREE.Color(); 
         c.setHSL(1-j/depthlayers.length, 1.0, 0.5); 
-        var m = new THREE.LineBasicMaterial({ color:c, opacity:1.0, depthWrite:true, fog:true }); 
+        var m = new THREE.LineBasicMaterial({ color:c, opacity:1.0, depthWrite:true, linewidth:linewidth }); 
         var contour = new THREE.Line(depthlayermap[depthlayers[j]], m, THREE.LinePieces);  // for disjoint line segments use THREE.LinePieces
         scene.add(contour); 
     }
@@ -230,17 +249,15 @@ function render(dt)
 
 function animate(t) 
 {
-    camera.position.y = camera3JSAlt + Zhopdisplacement(); 
-    $("#camerapos").text("cam:"+camera.position.x.toFixed(1)+" "+camera.position.y.toFixed(1)+" "+camera.position.z.toFixed(1))
+    if (hopmode !== 0)
+        camera.position.y = camera3JSAlt + Zhopdisplacement(); 
+    //$("#camerapos").text("cam:"+camera.position.x.toFixed(1)+" "+camera.position.y.toFixed(1)+" "+camera.position.z.toFixed(1))
     requestAnimationFrame(animate);
     update(clock.getDelta());
     render(clock.getDelta());
 }
 
-// make some material for some planes to add some surfaces
-var material = new THREE.MeshPhongMaterial({ color: 0xaaaaaa, ambient: 0xaaaaaa, specular: 0xffffff, shininess: 25, side: THREE.DoubleSide, vertexColors: THREE.FaceColors, shading: THREE.FlatShading });  
-// rest of this
-
+var geomeshtorus, flatmaterial; 
 function init() 
 {
     renderer = new THREE.WebGLRenderer();
@@ -260,6 +277,14 @@ function init()
 
     SetBasePositions(); 
 
+    var gsurf = new THREE.TorusGeometry(10*gfac, 4*gfac, 90, 30); 
+    flatmaterial = new THREE.MeshPhongMaterial({ color: "rgb(220,50,210)", opacity: 0.1, ambient: 0x333333, specular: 0x222222, shininess: 40, side: THREE.DoubleSide, vertexColors: THREE.FaceColors, shading: THREE.FlatShading });  
+    //gsurf.computeBoundingSphere();
+    geomeshtorus = new THREE.Mesh(gsurf, flatmaterial); 
+    geomeshtorus.rotateX(Math.PI/2); 
+    geomeshtorus.translateZ(-(alt0-50)*gfac); 
+    //scene.add(geomeshtorus);  
+
     // default mouse controls
     controls = new THREE.OrbitControls(camera, element);
     //controls.rotateUp(Math.PI/4);
@@ -273,7 +298,7 @@ function init()
     scene.add(light);
 
     LoadMountains(scene); 
-    LoadFlight(scene); 
+    //LoadFlight(scene); 
     LoadCave(scene); 
 
     var corners = [ [0,-1,0xFFFFFF]/*North*/, [1,0,0x55FFAA]/*east*/, [0,1,0xFF3333], [-1,0,0xFFFF33] ];
@@ -284,13 +309,13 @@ function init()
         
         g1.vertices.push(new THREE.Vector3(dd*corners[j][0], alt0*gfac, dd*corners[j][1])); 
         g1.vertices.push(new THREE.Vector3(dd*corners[j][0], alt0*gfac+dd, dd*corners[j][1])); 
-        var m0 = new THREE.LineBasicMaterial({ color:corners[j][2], opacity:0.7, depthWrite:true }); 
+        var m0 = new THREE.LineBasicMaterial({ color:corners[j][2], opacity:0.7, linewidth:linewidth, depthWrite:true }); 
         var contour = new THREE.Line(g1, m0, THREE.LineStrip); // for disjoint line segments use THREE.LinePieces
         scene.add(contour); 
         g.vertices.push(new THREE.Vector3(dd*corners[j][0], alt0*gfac, dd*corners[j][1])); 
     }
     g.vertices.push(new THREE.Vector3(dd*corners[0][0], alt0*gfac, dd*corners[0][1])); 
-    var m = new THREE.LineBasicMaterial({ color:0xFF0000, opacity:1.0, depthWrite:true }); 
+    var m = new THREE.LineBasicMaterial({ color:0xFF0000, opacity:1.0, linewidth:linewidth, depthWrite:true }); 
     var contour = new THREE.Line(g, m, THREE.LineStrip); 
     scene.add(contour); 
     scene.fog = new THREE.Fog(0x202020, 10*gfac, 20000*gfac);  // near and far
@@ -299,10 +324,13 @@ function init()
     $("#fogminus").click(function() { scene.fog.far *= 2; }); 
     $("#fovplus").click(function() { camera.fov += 5; $("#fovdegrees").text(camera.fov); }); 
     $("#fovminus").click(function() { camera.fov -= 5; $("#fovdegrees").text(camera.fov); }); 
-    $("#camerahop").click(function() { hoptime = clock.elapsedTime; }); 
+    $("#camerahop").click(ZhopGo); 
     $("#reset31").click(reset31); 
     $("#test1").click(function() { latG -= 0.00001; SetCameraPositionG(); }); 
-     
+    $("#vview").click(function() { ($(".numpanel").css("display") == "none" ? $(".numpanel").show() : $(".numpanel").hide()); }); 
+    $("#alphaoffsetplus").click(function() { controls.alphaoffset += 5;  $("#alphaoffset").text(controls.alphaoffset); }); 
+    $("#alphaoffsetminus").click(function() { controls.alphaoffset -= 5;  $("#alphaoffset").text(controls.alphaoffset); }); 
+
     window.addEventListener('resize', resize, false);
     setTimeout(resize, 1);
 }
@@ -323,6 +351,7 @@ function setOrientationControls(event)
     document.getElementById('alpha').textContent = (event.alpha === null ? "-" : event.alpha.toFixed(0)); 
     document.getElementById('beta').textContent = (event.beta === null ? "-" : event.beta.toFixed(0)); 
     document.getElementById('gamma').textContent = (event.gamma === null ? "-" : event.gamma.toFixed(0)); 
+    document.getElementById('absolute').textContent = ""+event.absolute; 
 }
 
 var compasscalibratecount = 0; 
@@ -360,6 +389,7 @@ function geo_error()
 {  
     document.getElementById('wcount').textContent = "gps error"; 
 }
+// could be absolutedeviceorientation
 window.addEventListener('deviceorientation', setOrientationControls, true);  // catch the first event to come though to upgrade to orientation control
 window.addEventListener('compassneedscalibration', setCompassNeedsCalibration, true); 
 var watchID = navigator.geolocation.watchPosition(geo_success, geo_error, {enableHighAccuracy:true, timeout:27000, maximumAge:30000}); 
