@@ -43,6 +43,33 @@
         </div>
       </div>
     </div>
+
+  <script id="fragment_shader_centreline" type="x-shader/x-fragment">
+uniform vec4 closecolour; 
+uniform float closedist; 
+varying float altitude; 
+float midlump(float v, float offset) {
+    float lv = (mod(v + offset, 100.0) - 50.0)/50.0; 
+    return clamp(1.0 - lv*lv*1.3, 0.0, 1.0); 
+}
+void main( void ) {
+    float redalt = (mod(altitude * 10.0, 10.0) <= 1.0 ? 20.0 : 70.0); 
+    float fdepth = gl_FragCoord.z / gl_FragCoord.w; 
+    vec4 ptcolour = vec4(midlump(altitude, redalt), midlump(altitude, redalt-67.0), midlump(altitude, redalt-33.0), 1.0); 
+    float cfac = clamp((closedist - fdepth)*0.1, 0.0, 0.7); 
+    gl_FragColor = mix(ptcolour, closecolour, cfac); 
+}
+  </script>
+  <script id="vertexShader_centreline" type="x-shader/x-vertex">
+varying float altitude; 
+void main()
+{
+    altitude = position.y; 
+    vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+    gl_Position = projectionMatrix * mvPosition;
+}
+  </script>
+  
   <script>
 
 var basepositionOrigin, latR, lngR, altR, latG, lngG, altG; 
@@ -174,29 +201,28 @@ function LoadMountains(scene)
     scene.add(points);
 }
 
-var depthlayermap; 
+var centrelinematerial; 
 function LoadCave(scene)
 {
-    depthlayermap = { }; 
-    var depthlayers = [ ]; 
+    centrelinematerial = new THREE.ShaderMaterial({
+        uniforms: { closecolour: { type: 'v4', value: new THREE.Vector4(1.0, 1.0, 0.5, 1.0) }, 
+                    closedist: { type: 'f', value: 5 }
+                  }, 
+        vertexShader: document.getElementById('vertexShader_centreline').textContent,
+        fragmentShader: document.getElementById('fragment_shader_centreline').textContent, 
+        depthWrite:true, depthTest:true,  // not sure these work
+        linewidth:2 
+    });
+
+    var centrelines = new THREE.Geometry(); 
     for (var i = 0; i < svxlegs.length; i++) {
         var svxleg = svxlegs[i]; 
-        var rlayer = Math.round((svxleg[2]+svxleg[5])/50); 
-        if (depthlayermap[rlayer] == undefined) {
-            depthlayers.push(rlayer); 
-            depthlayermap[rlayer] = new THREE.Geometry(); 
-        }
-        depthlayermap[rlayer].vertices.push(latlngtopt(svxleg[0], svxleg[1], svxleg[2])); 
-        depthlayermap[rlayer].vertices.push(latlngtopt(svxleg[3], svxleg[4], svxleg[5])); 
+        centrelines.vertices.push(latlngtopt(svxleg[0], svxleg[1], svxleg[2])); 
+        centrelines.vertices.push(latlngtopt(svxleg[3], svxleg[4], svxleg[5])); 
     }
-    depthlayers.sort(); 
-    for (var j = 0; j < depthlayers.length; j++) {
-        var c = new THREE.Color(); 
-        c.setHSL(1-j/depthlayers.length, 1.0, 0.5); 
-        var m = new THREE.LineBasicMaterial({ color:c, opacity:1.0, depthWrite:true, linewidth:linewidth }); 
-        var contour = new THREE.Line(depthlayermap[depthlayers[j]], m, THREE.LinePieces);  // for disjoint line segments use THREE.LinePieces
-        scene.add(contour); 
-    }
+    var contour = new THREE.Line(centrelines, centrelinematerial, THREE.LinePieces);  
+    scene.add(contour); 
+
     
     var gents = new THREE.Geometry();
     var card = new THREE.Object3D();
@@ -207,6 +233,8 @@ function LoadCave(scene)
             gents.vertices.push(pkp); 
         }
     }
+    
+    
     var entpointsmaterial = new THREE.PointCloudMaterial({ color: 0x22FF11, sizeAttenuation: true, size: 2.0 }); 
     var pents = new THREE.PointCloud(gents, entpointsmaterial); 
     scene.add(pents);

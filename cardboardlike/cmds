@@ -1,3 +1,15 @@
+// things to do
+// * bigger buttons that pop up and go down
+// * disable screen drag in phone orientation
+// * closest point fog case
+// * depth colour spectrum implemented in shader
+// * get line width handled in fragment shader
+
+
+float depth = gl_FragCoord.z / gl_FragCoord.w
+
+
+
 // copy the file to the phone
 
 adb push dongcheck.html /storage/emulated/legacy/Cardboard/
