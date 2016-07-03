@@ -42,6 +42,7 @@
             <input type="button" value="A-" id="alphaoffsetminus"/>
             <span id="alphaoffset"></span>
             <span id="camerapos"></span>
+            <span id="aspect"></span>
         </div>
       </div>
     </div>
@@ -83,7 +84,7 @@ void main()
 {
     vec2 uv = vec2(vUv.x, vUv.y);
     vec3 color = texture2D(texture, uv).rgb;
-    if (color.x == 0.0)
+    if (color.y == 0.0)
         discard; 
     gl_FragColor = vec4(color, 1.0);
 }
@@ -93,6 +94,7 @@ void main()
   <script id="vertex_shader_textlabel" type="x-shader/x-fragment">
 uniform float aspect; 
 uniform float pixelsize; 
+uniform float textureaspect; 
 varying vec2 vUv;
 void main()
 {
@@ -100,11 +102,10 @@ void main()
     vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
     gl_Position = projectionMatrix * mvPosition; 
     float spixelsize = pixelsize*gl_Position.z; 
-    gl_Position.x += uv.x*spixelsize*aspect*0.5 - 32.0; 
-    gl_Position.y += uv.y*spixelsize; 
+    gl_Position.x += uv.x*spixelsize*textureaspect; 
+    gl_Position.y += uv.y*spixelsize*aspect; 
 }
   </script>
-
 
 
   <script id="vertexShader_peaktriangle" type="x-shader/x-vertex">
@@ -213,22 +214,24 @@ function latlngtopt(lat, lng, alt)
     return new THREE.Vector3(-(rlat*eyfac + rlng*exfac)*gfac, alt*gfac, +(rlat*nyfac + rlng*nxfac)*gfac); 
 }
 
+
 var textlabelmaterials = [ ]; 
-function MakeLabel(card, text, fillstyle, pkp, scale)
+function MakeLabel(card, text, fillstyle, p, scale)
 {
     var canvas1 = document.createElement('canvas');
     canvas1.width = 256;  canvas1.height = 32; 
     var context1 = canvas1.getContext('2d');
     context1.font = "28px Helvetica";
     context1.fillStyle = fillstyle;
-    context1.fillText(text, 32, 20);
+    context1.fillText(text, 0, 20); 
     //document.getElementById('camerapos').appendChild(canvas1); // to preview the bitmaps we are using
     
     var texture1 = new THREE.Texture(canvas1);  
     texture1.needsUpdate = true; 
     var textlabelmaterial = new THREE.ShaderMaterial({
-        uniforms: { pixelsize: {type: 'f', value: 0.2}, 
+        uniforms: { pixelsize: {type: 'f', value: 1.2}, 
                     aspect: { type: 'f', value: 1.0 },
+                    textureaspect: { type: 'f', value: canvas1.width/canvas1.height }, 
                     texture: { value: texture1 }
                   }, 
         vertexShader: document.getElementById('vertex_shader_textlabel').textContent,
@@ -237,10 +240,21 @@ function MakeLabel(card, text, fillstyle, pkp, scale)
         side: THREE.DoubleSide
     }); 
     textlabelmaterials.push(textlabelmaterial); 
-    
-    // trick of making a very small base mesh in 3D which is overwhelmed by the texture coordinate offsetting
-    mesh1 = new THREE.Mesh(new THREE.PlaneGeometry(canvas1.width/scale*0.1, canvas1.height/scale*0.1), textlabelmaterial); 
-    mesh1.position.set(pkp.x, pkp.y, pkp.z);
+
+    var textlabelpositionsbuff = new THREE.BufferAttribute(new Float32Array(4*3), 3);
+    var textlabeluvsbuff = new THREE.BufferAttribute(new Float32Array(4*2), 2);
+    for (var i = 0; i < 4; i++) {
+        textlabelpositionsbuff.setXYZ(i, p.x, p.y, p.z); 
+        textlabeluvsbuff.setXY(i, ((i == 0) || (i == 2) ? 0.0 : 1.0), (i <= 1 ? 0.0 : 1.0)); 
+    }
+    var indices = new Uint16Array(6);
+    indices[0] = 0; indices[1] = 1; indices[2] = 2; 
+    indices[3] = 1; indices[4] = 3; indices[5] = 2; 
+    var buffergeometry = new THREE.BufferGeometry(); 
+    buffergeometry.setIndex(new THREE.BufferAttribute(indices, 1));
+    buffergeometry.addAttribute('position', textlabelpositionsbuff);
+    buffergeometry.addAttribute('uv', textlabeluvsbuff);
+    mesh1 = new THREE.Mesh(buffergeometry, textlabelmaterial); 
     card.add(mesh1);
 }
 
@@ -328,10 +342,13 @@ function resize()
     camera.aspect = width / height;
     peaktrianglematerial.uniforms.aspect.value = camera.aspect; 
     peaktrianglematerial.uniforms.trianglesize.value = 30/width; 
-    for (var i = 0; i < textlabelmaterials.length; i++)
+    for (var i = 0; i < textlabelmaterials.length; i++) {
         textlabelmaterials[i].uniforms.aspect.value = camera.aspect; 
+        textlabelmaterials[i].uniforms.pixelsize.value = 60/width; 
+    }
     camera.updateProjectionMatrix();
     renderer.setSize(width, height);
+    document.getElementById('aspect').textContent = camera.aspect.toFixed(1); 
 }
 
 function update(dt) 
