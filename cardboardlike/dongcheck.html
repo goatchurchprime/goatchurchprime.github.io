@@ -53,7 +53,7 @@ float midlump(float v, float offset) {
     return clamp(1.0 - lv*lv*1.3, 0.0, 1.0); 
 }
 void main( void ) {
-    float redalt = (mod(altitude * 10.0, 10.0) <= 1.0 ? 20.0 : 70.0); 
+    float redalt = 70.0; 
     float fdepth = gl_FragCoord.z / gl_FragCoord.w; 
     vec4 ptcolour = vec4(midlump(altitude, redalt), midlump(altitude, redalt-67.0), midlump(altitude, redalt-33.0), 1.0); 
     float cfac = clamp((closedist - fdepth)*0.1, 0.0, 0.7); 
@@ -69,6 +69,32 @@ void main()
     gl_Position = projectionMatrix * mvPosition; 
 }
   </script>
+
+
+
+  <script id="fragment_shader_textlabel" type="x-shader/x-fragment">
+uniform vec4 closecolour; 
+uniform float pixelsize; 
+uniform sampler2D texture;
+varying vec2 vUv;
+void main( void ) {
+    vec2 uv = vec2(vUv.x, vUv.y);
+    vec3 color = texture2D(texture, uv).rgb;
+    if (color.x == 0.0)
+        discard; 
+    gl_FragColor = vec4(color, 1.0);
+}
+  </script>
+  <script id="vertex_shader_textlabel" type="x-shader/x-fragment">
+varying vec2 vUv;
+void main()
+{
+    vUv = uv;
+    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+    gl_Position = projectionMatrix * mvPosition;
+}
+  </script>
+
 
 
   <script id="vertexShader_peaktriangle" type="x-shader/x-vertex">
@@ -185,22 +211,29 @@ function MakeLabel(card, text, fillstyle, pkp, scale)
     context1.font = "32px Helvetica";
     context1.fillStyle = fillstyle;
     context1.fillText(text, 32, 32);
-    var texture1 = new THREE.Texture(canvas1) 
-    texture1.needsUpdate = true;
-    var material1 = new THREE.MeshBasicMaterial( {map: texture1 } );
+    //document.getElementById('camerapos').appendChild(canvas1); // to preview the bitmaps we are using
+    
+    var texture1 = new THREE.Texture(canvas1);  
+    texture1.needsUpdate = true; 
+    var material1 = new THREE.MeshBasicMaterial( {map: texture1 } ); 
+    var textlabelmaterial = new THREE.ShaderMaterial({
+        uniforms: { pixelsize: {type: 'f', value: 15.0}, 
+                    aspect: { type: 'f', value: 1.0 },
+                    texture: { value: texture1 }
+                  }, 
+        vertexShader: document.getElementById('vertex_shader_textlabel').textContent,
+        fragmentShader: document.getElementById('fragment_shader_textlabel').textContent, 
+        depthWrite:true, depthTest:true, 
+        side: THREE.DoubleSide
+    });
+material1 = textlabelmaterial; 
+    
+    
     material1.transparent = true;
     mesh1 = new THREE.Mesh(new THREE.PlaneGeometry(canvas1.width*0.1, canvas1.height*0.1), material1); 
     mesh1.position.set(pkp.x+96, pkp.y+20, pkp.z);
     mesh1.scale.set(scale, scale, scale); 
     card.add(mesh1);
-//    document.getElementById('camerapos').appendChild(canvas1); 
-    
-    var geometry2 = new THREE.PlaneGeometry(canvas1.width*0.1, canvas1.height*0.1);
-    var mesh2 = new THREE.Mesh(new THREE.PlaneGeometry(canvas1.width*0.1, canvas1.height*0.1), material1);
-    mesh2.rotation.y = Math.PI;
-    mesh2.position.set(pkp.x-96, pkp.y+20, pkp.z);
-    mesh2.scale.set(scale, scale, scale); 
-    card.add(mesh2);
 }
 
 var peaktrianglematerial; 
