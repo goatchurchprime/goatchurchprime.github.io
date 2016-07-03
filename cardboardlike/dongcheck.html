@@ -29,8 +29,10 @@
         <div>
             <input type="button" value="F+" id="fogplus"/>
             <input type="button" value="F-" id="fogminus"/>
+            <span id="closedist"></span>
             <input type="button" value="FOV+" id="fovplus"/>
             <input type="button" value="FOV-" id="fovminus"/>
+            <span id="fovdegrees"></span>
             <input type="button" value="Hop" id="camerahop"/>
             <input type="button" value="31" id="reset31"/>
             <input type="button" value="T1" id="test1"/>
@@ -48,15 +50,17 @@
 uniform vec4 closecolour; 
 uniform float closedist; 
 varying float altitude; 
-float midlump(float v, float offset) {
+float midlump(float v, float offset) 
+{
     float lv = (mod(v + offset, 100.0) - 50.0)/50.0; 
     return clamp(1.0 - lv*lv*1.3, 0.0, 1.0); 
 }
-void main( void ) {
+void main(void) 
+{
     float redalt = 70.0; 
     float fdepth = gl_FragCoord.z / gl_FragCoord.w; 
     vec4 ptcolour = vec4(midlump(altitude, redalt), midlump(altitude, redalt-67.0), midlump(altitude, redalt-33.0), 1.0); 
-    float cfac = clamp((closedist - fdepth)*0.1, 0.0, 0.7); 
+    float cfac = clamp((closedist - fdepth)*0.1, 0.0, 0.81); 
     gl_FragColor = mix(ptcolour, closecolour, cfac); 
 }
   </script>
@@ -73,11 +77,10 @@ void main()
 
 
   <script id="fragment_shader_textlabel" type="x-shader/x-fragment">
-uniform vec4 closecolour; 
-uniform float pixelsize; 
 uniform sampler2D texture;
 varying vec2 vUv;
-void main( void ) {
+void main() 
+{
     vec2 uv = vec2(vUv.x, vUv.y);
     vec3 color = texture2D(texture, uv).rgb;
     if (color.x == 0.0)
@@ -85,13 +88,20 @@ void main( void ) {
     gl_FragColor = vec4(color, 1.0);
 }
   </script>
+  
+  
   <script id="vertex_shader_textlabel" type="x-shader/x-fragment">
+uniform float aspect; 
+uniform float pixelsize; 
 varying vec2 vUv;
 void main()
 {
     vUv = uv;
     vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-    gl_Position = projectionMatrix * mvPosition;
+    gl_Position = projectionMatrix * mvPosition; 
+    float spixelsize = pixelsize*gl_Position.z; 
+    gl_Position.x += uv.x*spixelsize*aspect*0.5 - 32.0; 
+    gl_Position.y += uv.y*spixelsize; 
 }
   </script>
 
@@ -203,21 +213,21 @@ function latlngtopt(lat, lng, alt)
     return new THREE.Vector3(-(rlat*eyfac + rlng*exfac)*gfac, alt*gfac, +(rlat*nyfac + rlng*nxfac)*gfac); 
 }
 
+var textlabelmaterials = [ ]; 
 function MakeLabel(card, text, fillstyle, pkp, scale)
 {
     var canvas1 = document.createElement('canvas');
     canvas1.width = 256;  canvas1.height = 32; 
     var context1 = canvas1.getContext('2d');
-    context1.font = "32px Helvetica";
+    context1.font = "28px Helvetica";
     context1.fillStyle = fillstyle;
-    context1.fillText(text, 32, 32);
+    context1.fillText(text, 32, 20);
     //document.getElementById('camerapos').appendChild(canvas1); // to preview the bitmaps we are using
     
     var texture1 = new THREE.Texture(canvas1);  
     texture1.needsUpdate = true; 
-    var material1 = new THREE.MeshBasicMaterial( {map: texture1 } ); 
     var textlabelmaterial = new THREE.ShaderMaterial({
-        uniforms: { pixelsize: {type: 'f', value: 15.0}, 
+        uniforms: { pixelsize: {type: 'f', value: 0.2}, 
                     aspect: { type: 'f', value: 1.0 },
                     texture: { value: texture1 }
                   }, 
@@ -225,14 +235,12 @@ function MakeLabel(card, text, fillstyle, pkp, scale)
         fragmentShader: document.getElementById('fragment_shader_textlabel').textContent, 
         depthWrite:true, depthTest:true, 
         side: THREE.DoubleSide
-    });
-material1 = textlabelmaterial; 
+    }); 
+    textlabelmaterials.push(textlabelmaterial); 
     
-    
-    material1.transparent = true;
-    mesh1 = new THREE.Mesh(new THREE.PlaneGeometry(canvas1.width*0.1, canvas1.height*0.1), material1); 
-    mesh1.position.set(pkp.x+96, pkp.y+20, pkp.z);
-    mesh1.scale.set(scale, scale, scale); 
+    // trick of making a very small base mesh in 3D which is overwhelmed by the texture coordinate offsetting
+    mesh1 = new THREE.Mesh(new THREE.PlaneGeometry(canvas1.width/scale*0.1, canvas1.height/scale*0.1), textlabelmaterial); 
+    mesh1.position.set(pkp.x, pkp.y, pkp.z);
     card.add(mesh1);
 }
 
@@ -263,7 +271,7 @@ function LoadMountains(scene)
         vertexShader: document.getElementById('vertexShader_peaktriangle').textContent,
         depthWrite:true, depthTest:true, 
         side: THREE.DoubleSide
-    });
+    }); 
     
     var peaktriangles = new THREE.Mesh(buffergeometry, peaktrianglematerial);  
     scene.add(peaktriangles); 
@@ -273,7 +281,7 @@ var centrelinematerial;
 function LoadCentrelines(scene)
 {
     centrelinematerial = new THREE.ShaderMaterial({
-        uniforms: { closecolour: { type: 'v4', value: new THREE.Vector4(1.0, 1.0, 0.5, 1.0) }, 
+        uniforms: { closecolour: { type: 'v4', value: new THREE.Vector4(1.0, 1.0, 1.0, 1.0) }, 
                     closedist: { type: 'f', value: 5.0 } 
                   }, 
         vertexShader: document.getElementById('vertexShader_centreline').textContent,
@@ -320,6 +328,8 @@ function resize()
     camera.aspect = width / height;
     peaktrianglematerial.uniforms.aspect.value = camera.aspect; 
     peaktrianglematerial.uniforms.trianglesize.value = 30/width; 
+    for (var i = 0; i < textlabelmaterials.length; i++)
+        textlabelmaterials[i].uniforms.aspect.value = camera.aspect; 
     camera.updateProjectionMatrix();
     renderer.setSize(width, height);
 }
@@ -409,8 +419,8 @@ function init()
     scene.add(contour); 
     scene.fog = new THREE.Fog(0x202020, 10*gfac, 20000*gfac);  // near and far
     
-    $("#fogplus").click(function() { scene.fog.far *= 0.5; }); 
-    $("#fogminus").click(function() { scene.fog.far *= 2; }); 
+    $("#fogplus").click(function() { centrelinematerial.uniforms.closedist.value *= 2.0;  $("#closedist").text(centrelinematerial.uniforms.closedist.value/gfac); }); 
+    $("#fogminus").click(function() { centrelinematerial.uniforms.closedist.value *= 0.5;  $("#closedist").text(centrelinematerial.uniforms.closedist.value/gfac); }); 
     $("#fovplus").click(function() { camera.fov += 5; $("#fovdegrees").text(camera.fov); }); 
     $("#fovminus").click(function() { camera.fov -= 5; $("#fovdegrees").text(camera.fov); }); 
     $("#camerahop").click(ZhopGo); 
