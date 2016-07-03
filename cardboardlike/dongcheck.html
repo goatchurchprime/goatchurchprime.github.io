@@ -180,23 +180,25 @@ function latlngtopt(lat, lng, alt)
 function MakeLabel(card, text, fillstyle, pkp, scale)
 {
     var canvas1 = document.createElement('canvas');
+    canvas1.width = 256;  canvas1.height = 32; 
     var context1 = canvas1.getContext('2d');
-    context1.font = "40px Helvetica";
+    context1.font = "32px Helvetica";
     context1.fillStyle = fillstyle;
-    context1.fillText(text, 40, 40);
+    context1.fillText(text, 32, 32);
     var texture1 = new THREE.Texture(canvas1) 
     texture1.needsUpdate = true;
     var material1 = new THREE.MeshBasicMaterial( {map: texture1 } );
     material1.transparent = true;
     mesh1 = new THREE.Mesh(new THREE.PlaneGeometry(canvas1.width*0.1, canvas1.height*0.1), material1); 
-    mesh1.position.set(pkp.x+canvas1.width/50, pkp.y-canvas1.height/200, pkp.z);
+    mesh1.position.set(pkp.x+96, pkp.y+20, pkp.z);
     mesh1.scale.set(scale, scale, scale); 
     card.add(mesh1);
+//    document.getElementById('camerapos').appendChild(canvas1); 
     
     var geometry2 = new THREE.PlaneGeometry(canvas1.width*0.1, canvas1.height*0.1);
     var mesh2 = new THREE.Mesh(new THREE.PlaneGeometry(canvas1.width*0.1, canvas1.height*0.1), material1);
     mesh2.rotation.y = Math.PI;
-    mesh2.position.set(pkp.x-canvas1.width/50, pkp.y-canvas1.height/200, pkp.z);
+    mesh2.position.set(pkp.x-96, pkp.y+20, pkp.z);
     mesh2.scale.set(scale, scale, scale); 
     card.add(mesh2);
 }
@@ -253,7 +255,7 @@ function LoadCentrelines(scene)
         centrelines.vertices.push(latlngtopt(svxleg[0], svxleg[1], svxleg[2])); 
         centrelines.vertices.push(latlngtopt(svxleg[3], svxleg[4], svxleg[5])); 
     }
-    var contour = new THREE.Line(centrelines, centrelinematerial, THREE.LinePieces);  
+    var contour = new THREE.LineSegments(centrelines, centrelinematerial);  
     scene.add(contour); 
 }
 
@@ -284,7 +286,7 @@ function resize()
     var height = container.offsetHeight;
     camera.aspect = width / height;
     peaktrianglematerial.uniforms.aspect.value = camera.aspect; 
-    peaktrianglematerial.uniforms.trianglesize.value = 80*Math.tan(camera.fov*Math.PI/180)/width; 
+    peaktrianglematerial.uniforms.trianglesize.value = 30/width; 
     camera.updateProjectionMatrix();
     renderer.setSize(width, height);
 }
