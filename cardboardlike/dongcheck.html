@@ -15,6 +15,7 @@
     <script src="OrbitControls.js"></script>
     <script src="all3d.js"></script>
     <script src="jquery-2.1.4.min.js"></script>
+    
   </head>
   <body>
     <div id="main">
@@ -51,25 +52,30 @@
 uniform vec4 closecolour; 
 uniform float closedist; 
 varying float altitude; 
+varying float vcosslope; 
 float midlump(float v, float offset) 
 {
     float lv = (mod(v + offset, 100.0) - 50.0)/50.0; 
-    return clamp(1.0 - lv*lv*1.3, 0.0, 1.0); 
+    return clamp(1.0 - lv*lv*1.0, 0.0, 1.0); 
 }
 void main(void) 
 {
     float redalt = 70.0; 
     float fdepth = gl_FragCoord.z / gl_FragCoord.w; 
-    vec4 ptcolour = vec4(midlump(altitude, redalt), midlump(altitude, redalt-67.0), midlump(altitude, redalt-33.0), 1.0); 
+    vec4 ptcolour = vec4(midlump(altitude, redalt), midlump(altitude, redalt-67.0)*0.98, midlump(altitude, redalt-33.0), 1.0); 
     float cfac = clamp((closedist - fdepth)*0.1, 0.0, 0.81); 
-    gl_FragColor = mix(ptcolour, closecolour, cfac); 
+    vec4 sptcolour = mix(ptcolour, vec4(0.0, 0.0, 0.0, 1.0), 0.6*(1.0-vcosslope)); 
+    gl_FragColor = mix(sptcolour, closecolour, cfac); 
 }
   </script>
   <script id="vertexShader_centreline" type="x-shader/x-vertex">
+attribute float cosslope; 
 varying float altitude; 
+varying float vcosslope; 
 void main()
 {
     altitude = position.y; 
+    vcosslope = cosslope; 
     vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
     gl_Position = projectionMatrix * mvPosition; 
 }
@@ -102,6 +108,7 @@ void main()
     vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
     gl_Position = projectionMatrix * mvPosition; 
     float spixelsize = pixelsize*gl_Position.z; 
+    // wepeaktriangle
     gl_Position.x += uv.x*spixelsize*textureaspect; 
     gl_Position.y += uv.y*spixelsize*aspect; 
 }
@@ -118,12 +125,35 @@ void main()
     gl_Position = projectionMatrix * mvPosition; 
     float strianglesize = trianglesize*gl_Position.z; 
     if (pcorner != 0.0) {
-        gl_Position.y -= strianglesize*aspect; 
-        gl_Position.x += (pcorner == 1.0 ? 1.0 : -1.0) * 0.57735*strianglesize; 
+        // this is now attempting to draw the triangle fixed even with rotation of the screen
+        gl_Position += projectionMatrix*viewMatrix[1]*(-strianglesize) + projectionMatrix*viewMatrix[0]*((pcorner == 1.0 ? 1.0 : -1.0) * 0.57735*strianglesize); 
+        //gl_Position.y += strianglesize*aspect; 
+        //gl_Position.x += (pcorner == 1.0 ? 1.0 : -1.0) * 0.57735*strianglesize; 
     }
 }
   </script>
   
+
+
+  <script id="vertex_shader_enttriangle" type="x-shader/x-vertex">
+uniform float trianglesize; 
+uniform float aspect; 
+attribute float pcorner; 
+varying float altitude; 
+varying float vcosslope; 
+void main()
+{
+    altitude = position.y; 
+    vcosslope = 1.0; 
+    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+    gl_Position = projectionMatrix * mvPosition; 
+    float strianglesize = trianglesize*gl_Position.z*10.0; 
+    if (pcorner != 0.0) {
+        gl_Position.y += strianglesize*aspect; 
+        gl_Position.x += (pcorner == 1.0 ? 1.0 : -1.0) * 0.57735*strianglesize*0.5; 
+    }
+}
+  </script>
   
   <script>
 var basepositionOrigin, latR, lngR, altR, latG, lngG, altG; 
@@ -137,7 +167,7 @@ function SetBasePositions()
     altG = basepositionOrigin[3]; 
     latR = 0; lngR = 0; altR = 0; 
     for (var i = 0; i < svxents.length; i++) {
-        if (svxents[i][0] == "p31") {
+        if (svxents[i][0] == "p258b") {
             basepositionOrigin = svxents[i]; 
         }
     }
@@ -301,30 +331,61 @@ function LoadCentrelines(scene)
         vertexShader: document.getElementById('vertexShader_centreline').textContent,
         fragmentShader: document.getElementById('fragment_shader_centreline').textContent, 
         depthWrite:true, depthTest:true,  // not sure these work
-        linewidth:2 
+        linewidth:3 
     });
 
-    var centrelines = new THREE.Geometry(); 
+    var centrelinepositionsbuff = new THREE.BufferAttribute(new Float32Array(svxlegs.length*2*3), 3);
+    var cosslope = new Float32Array(svxlegs.length*2); 
     for (var i = 0; i < svxlegs.length; i++) {
         var svxleg = svxlegs[i]; 
-        centrelines.vertices.push(latlngtopt(svxleg[0], svxleg[1], svxleg[2])); 
-        centrelines.vertices.push(latlngtopt(svxleg[3], svxleg[4], svxleg[5])); 
+        var p0 = latlngtopt(svxleg[0], svxleg[1], svxleg[2]); 
+        var p1 = latlngtopt(svxleg[3], svxleg[4], svxleg[5]); 
+        centrelinepositionsbuff.setXYZ(i*2, p0.x, p0.y, p0.z); 
+        centrelinepositionsbuff.setXYZ(i*2+1, p1.x, p1.y, p1.z); 
+        var dx = p1.x - p0.x, dy = p1.y - p0.y, dz = p1.z - p0.z; 
+        var lcosslope = Math.cos(Math.atan2(dy, Math.sqrt(dx*dx + dz*dz))); 
+        cosslope[i*2] = lcosslope; 
+        cosslope[i*2+1] = lcosslope; 
     }
-    var contour = new THREE.LineSegments(centrelines, centrelinematerial);  
+    var centrelinebuffergeometry = new THREE.BufferGeometry(); 
+    centrelinebuffergeometry.addAttribute('position', centrelinepositionsbuff);
+    centrelinebuffergeometry.addAttribute('cosslope', new THREE.BufferAttribute(cosslope, 1)); 
+
+    var contour = new THREE.LineSegments(centrelinebuffergeometry, centrelinematerial);  
     scene.add(contour); 
 }
 
-
-    
+var enttrianglematerial; 
 function LoadEntrances(scene)
 {
+    var entpositionbuff = new THREE.BufferAttribute(new Float32Array(svxents.length*9), 3); 
+    var entcorner = new Float32Array(svxents.length*3); 
+    var g1 = new THREE.Geometry();
+    
+    var buffergeometry = new THREE.BufferGeometry(); 
+    buffergeometry.addAttribute('position', entpositionbuff); 
+    buffergeometry.addAttribute('pcorner', new THREE.BufferAttribute(entcorner, 1)); 
+    enttrianglematerial = new THREE.ShaderMaterial({
+        uniforms: { trianglesize: {type: 'f', value: 10.0}, 
+                    aspect: { type: 'f', value: 1.0 }, 
+                    closecolour: { type: 'v4', value: new THREE.Vector4(1.0, 1.0, 1.0, 1.0) }, 
+                    closedist: { type: 'f', value: 5.0 } 
+                  }, 
+        vertexShader: document.getElementById('vertex_shader_enttriangle').textContent,
+        fragmentShader: document.getElementById('fragment_shader_centreline').textContent, 
+        depthWrite:true, depthTest:true, 
+        side: THREE.DoubleSide
+    }); 
+
     var gents = new THREE.Geometry();
     var card = new THREE.Object3D();
     for (var i = 0; i < svxents.length; i++) {
-        var pkp = latlngtopt(svxents[i][1], svxents[i][2], svxents[i][3]); 
+        var p = latlngtopt(svxents[i][1], svxents[i][2], svxents[i][3]); 
+        entpositionbuff.setXYZ(i*3, p.x, p.y, p.z);  entpositionbuff.setXYZ(i*3+1, p.x, p.y, p.z);  entpositionbuff.setXYZ(i*3+2, p.x, p.y, p.z); 
+        entcorner[i*3] = 0.0;  entcorner[i*3+1] = 1.0;  entcorner[i*3+2] = 2.0; 
         if (svxents[i][0].match(/p\d+[a-z]?$/) !== null) {
-            MakeLabel(card, svxents[i][0], "rgba(0,200,200,0.95)", pkp, 0.5);  // rgba(0,200,200,0.95)
-            gents.vertices.push(pkp); 
+            MakeLabel(card, svxents[i][0], "rgba(0,200,200,0.95)", p, 0.5);  // rgba(0,200,200,0.95)
+            gents.vertices.push(p); 
         }
     }
     scene.add(card);
@@ -332,7 +393,8 @@ function LoadEntrances(scene)
     
     var entpointsmaterial = new THREE.PointsMaterial({ color: 0x22FF11, sizeAttenuation: true, size: 20.0 }); 
     var pents = new THREE.Points(gents, entpointsmaterial); 
-    scene.add(pents);
+    var enttriangles = new THREE.Mesh(buffergeometry, enttrianglematerial);  
+    scene.add(enttriangles);
 }
 
 function resize() 
@@ -341,7 +403,9 @@ function resize()
     var height = container.offsetHeight;
     camera.aspect = width / height;
     peaktrianglematerial.uniforms.aspect.value = camera.aspect; 
-    peaktrianglematerial.uniforms.trianglesize.value = 30/width; 
+    peaktrianglematerial.uniforms.trianglesize.value = 10/height; 
+    enttrianglematerial.uniforms.aspect.value = camera.aspect; 
+    enttrianglematerial.uniforms.trianglesize.value = 5/width; 
     for (var i = 0; i < textlabelmaterials.length; i++) {
         textlabelmaterials[i].uniforms.aspect.value = camera.aspect; 
         textlabelmaterials[i].uniforms.pixelsize.value = 60/width; 
