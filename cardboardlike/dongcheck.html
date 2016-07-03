@@ -73,59 +73,22 @@ void main()
 
   <script id="vertexShader_peaktriangle" type="x-shader/x-vertex">
 uniform float trianglesize; 
+uniform float aspect; 
 attribute float pcorner; 
 void main()
 {
     vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
     gl_Position = projectionMatrix * mvPosition; 
+    float strianglesize = trianglesize*gl_Position.z; 
     if (pcorner != 0.0) {
-        gl_Position.y -= trianglesize/0.57735; 
-        gl_Position.x += (pcorner == 1.0 ? 0.5 : -0.5)*trianglesize; 
+        gl_Position.y -= strianglesize*aspect; 
+        gl_Position.x += (pcorner == 1.0 ? 1.0 : -1.0) * 0.57735*strianglesize; 
     }
 }
   </script>
   
-<script type="x-shader/x-vertex" id="vertexshader">
-    uniform float amplitude;
-    attribute float displacement;
-    varying vec3 vNormal;
-    varying vec2 vUv;
-    void main() {
-        vNormal = normal;
-        vUv = ( 0.5 + amplitude ) * uv + vec2( amplitude );
-
-        vec3 newPosition = position + amplitude * normal * vec3( displacement );
-        gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition, 1.0 );
-    }
-</script>
-<script type="x-shader/x-fragment" id="fragmentshader">
-
-    varying vec3 vNormal;
-    varying vec2 vUv;
-
-    uniform vec3 color;
-
-    void main() {
-
-        vec3 light = vec3( 0.5, 0.2, 1.0 );
-        light = normalize( light );
-
-        float dProd = dot( vNormal, light ) * 0.5 + 0.5;
-
-        vec4 tcolor = vec4(1.0, 0.0, 1.0, 1.0); 
-        vec4 gray = vec4( vec3( tcolor.r * 0.3 + tcolor.g * 0.59 + tcolor.b * 0.11 ), 1.0 );
-
-        gl_FragColor = gray * vec4( vec3( dProd ) * vec3( color ), 1.0 );
-
-    }
-
-</script>
-  
   
   <script>
-
-
-
 var basepositionOrigin, latR, lngR, altR, latG, lngG, altG; 
 var nyfac, nxfac, eyfac, exfac, lat0, lng0, alt0, camera3JSAlt; 
 var gfac = 0.1; // scale applied to all elements in the scene 
@@ -238,21 +201,37 @@ function MakeLabel(card, text, fillstyle, pkp, scale)
     card.add(mesh2);
 }
 
+var peaktrianglematerial; 
 function LoadMountains(scene)
 {
-    var g = new THREE.Geometry();
+    var peakpositionbuff = new THREE.BufferAttribute(new Float32Array(peaks.length*9), 3); 
+    var peakcorner = new Float32Array(peaks.length*3); 
+    
     var g1 = new THREE.Geometry();
     var card = new THREE.Object3D();
     for (var i = 0; i < peaks.length; i++) {
-        var pkp = latlngtopt(peaks[i][1], peaks[i][2], peaks[i][3]); 
-        g.vertices.push(pkp); 
-        MakeLabel(card, peaks[i][0], "rgba(255,255,255,0.95)", pkp, 10); 
+        var p = latlngtopt(peaks[i][1], peaks[i][2], peaks[i][3]); 
+        peakpositionbuff.setXYZ(i*3, p.x, p.y, p.z);  peakpositionbuff.setXYZ(i*3+1, p.x, p.y, p.z);  peakpositionbuff.setXYZ(i*3+2, p.x, p.y, p.z); 
+        peakcorner[i*3] = 0.0;  peakcorner[i*3+1] = 1.0;  peakcorner[i*3+2] = 2.0; 
+
+        MakeLabel(card, peaks[i][0], "rgba(255,255,255,0.95)", p, 10); 
     }
     scene.add(card);
     
-    var pointsmaterial = new THREE.PointCloudMaterial({ color: 0xFF3355, sizeAttenuation: true, size: 50.0 }); 
-    var points = new THREE.PointCloud(g, pointsmaterial);
-    scene.add(points);
+    var buffergeometry = new THREE.BufferGeometry(); 
+    buffergeometry.addAttribute('position', peakpositionbuff); 
+    buffergeometry.addAttribute('pcorner', new THREE.BufferAttribute(peakcorner, 1)); 
+    peaktrianglematerial = new THREE.ShaderMaterial({
+        uniforms: { trianglesize: {type: 'f', value: 15.0}, 
+                    aspect: { type: 'f', value: 1.0 }
+                  }, 
+        vertexShader: document.getElementById('vertexShader_peaktriangle').textContent,
+        depthWrite:true, depthTest:true, 
+        side: THREE.DoubleSide
+    });
+    
+    var peaktriangles = new THREE.Mesh(buffergeometry, peaktrianglematerial);  
+    scene.add(peaktriangles); 
 }
 
 var centrelinematerial; 
@@ -260,7 +239,7 @@ function LoadCentrelines(scene)
 {
     centrelinematerial = new THREE.ShaderMaterial({
         uniforms: { closecolour: { type: 'v4', value: new THREE.Vector4(1.0, 1.0, 0.5, 1.0) }, 
-                    closedist: { type: 'f', value: 5 }
+                    closedist: { type: 'f', value: 5.0 } 
                   }, 
         vertexShader: document.getElementById('vertexShader_centreline').textContent,
         fragmentShader: document.getElementById('fragment_shader_centreline').textContent, 
@@ -278,39 +257,6 @@ function LoadCentrelines(scene)
     scene.add(contour); 
 }
 
-var geometryPP; 
-function LoadTrianglePeaks(scene, svxents) 
-{
-    var position = new THREE.BufferAttribute(new Float32Array(svxents.length*9), 3); 
-    var pbcorner = new Float32Array(svxents.length*3); 
-    for (var i = 0; i < svxents.length; i++) {
-        var p = latlngtopt(svxents[i][1], svxents[i][2], svxents[i][3]); 
-        position.setXYZ(i*3, p.x, p.y, p.z); 
-        position.setXYZ(i*3+1, p.x, p.y, p.z); 
-        position.setXYZ(i*3+2, p.x, p.y, p.z); 
-        pbcorner[i*3] = 0.0; 
-        pbcorner[i*3+1] = 1.0; 
-        pbcorner[i*3+2] = 2.0; 
-    }
-
-    var buffergeometry = new THREE.BufferGeometry(); 
-    buffergeometry.addAttribute('position', position); 
-    var pcorner = new THREE.BufferAttribute(pbcorner, 1); 
-    buffergeometry.addAttribute('pcorner', pcorner); 
-    var flatmaterial = new THREE.MeshBasicMaterial({ color: "rgb(220,50,210)", side: THREE.DoubleSide });  
-    
-    var Gflatmaterial = new THREE.ShaderMaterial({
-        uniforms: { trianglesize: {type: 'f', value: 15.0} }, 
-        vertexShader: document.getElementById('vertexShader_peaktriangle').textContent,
-        //fragmentShader: document.getElementById('vertexShader_peaktriangle').textContent, 
-        depthWrite:true, depthTest:true,  // not sure these work
-        side: THREE.DoubleSide
-    });
-    
-    var peaktriangles = new THREE.Mesh(buffergeometry, Gflatmaterial);  
-    scene.add(peaktriangles); 
-    geometryPP = buffergeometry; 
-}
 
     
 function LoadEntrances(scene)
@@ -326,11 +272,10 @@ function LoadEntrances(scene)
     }
     scene.add(card);
 
-    LoadTrianglePeaks(scene, svxents); 
     
-    var entpointsmaterial = new THREE.PointCloudMaterial({ color: 0x22FF11, sizeAttenuation: true, size: 20.0 }); 
-    var pents = new THREE.PointCloud(gents, entpointsmaterial); 
-//    scene.add(pents);
+    var entpointsmaterial = new THREE.PointsMaterial({ color: 0x22FF11, sizeAttenuation: true, size: 20.0 }); 
+    var pents = new THREE.Points(gents, entpointsmaterial); 
+    scene.add(pents);
 }
 
 function resize() 
@@ -338,6 +283,8 @@ function resize()
     var width = container.offsetWidth;
     var height = container.offsetHeight;
     camera.aspect = width / height;
+    peaktrianglematerial.uniforms.aspect.value = camera.aspect; 
+    peaktrianglematerial.uniforms.trianglesize.value = 80*Math.tan(camera.fov*Math.PI/180)/width; 
     camera.updateProjectionMatrix();
     renderer.setSize(width, height);
 }
@@ -385,7 +332,7 @@ function init()
     SetBasePositions(); 
 
     var gsurf = new THREE.TorusGeometry(10*gfac, 4*gfac, 90, 30); 
-    flatmaterial = new THREE.MeshPhongMaterial({ color: "rgb(220,50,210)", opacity: 0.1, ambient: 0x333333, specular: 0x222222, shininess: 40, side: THREE.DoubleSide, vertexColors: THREE.FaceColors, shading: THREE.FlatShading });  
+    flatmaterial = new THREE.MeshPhongMaterial({ color: "rgb(220,50,210)", opacity: 0.1, specular: 0x222222, shininess: 40, side: THREE.DoubleSide, vertexColors: THREE.FaceColors, shading: THREE.FlatShading });  
     //gsurf.computeBoundingSphere();
     geomeshtorus = new THREE.Mesh(gsurf, flatmaterial); 
     geomeshtorus.rotateX(Math.PI/2); 
