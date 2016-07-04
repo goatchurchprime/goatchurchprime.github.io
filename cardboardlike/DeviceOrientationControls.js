@@ -15,17 +15,23 @@
  * (http://w3c.github.io/deviceorientation/spec-source-orientation.html)
  */
 
+var GdeviceOrientation; 
 (function() {
 
-  var deviceOrientation = {};
+  var deviceOrientation = { alpha:0.0, beta:0.0, gamma:0.0, absolute:false }; 
+  GdeviceOrientation = deviceOrientation; 
   var screenOrientation = window.orientation || 0;
 
   function onDeviceOrientationChangeEvent(evt) {
-    deviceOrientation = evt;
+    if ((evt.alpha !== undefined) && (evt.alpha !== null)) {
+        deviceOrientation = evt;
+        GdeviceOrientation = deviceOrientation; 
+    }
   }
   window.addEventListener('deviceorientation', onDeviceOrientationChangeEvent, false);
 
   function getOrientation() {
+    if (GdeviceOrientation.alpha === undefined)   return 0;   // force portrait view on computer version (that doesn't have orientation controls)
     switch (window.screen.orientation || window.screen.mozOrientation) {
       case 'landscape-primary':
         return 90;

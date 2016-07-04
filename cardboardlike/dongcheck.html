@@ -466,12 +466,30 @@ function init()
     //scene.add(geomeshtorus);  
 
     // default mouse controls
-    controls = new THREE.OrbitControls(camera, element);
+/*    controls = new THREE.OrbitControls(camera, element);
     //controls.rotateUp(Math.PI/4);
     controls.target.set(0, camera.position.y, -1);  // looking north
     controls.noZoom = true;
     controls.noPan = true;
     bdevicecontrols = false; 
+*/
+
+controls = new THREE.DeviceOrientationControls(camera, true);
+controls.connect();
+controls.update();
+bdevicecontrols = true; 
+
+    window.addEventListener('keydown', function(event) {
+        if (event.keyCode == 37) 
+            GdeviceOrientation.gamma += 5; 
+        else if (event.keyCode == 39) 
+            GdeviceOrientation.gamma -= 5; 
+        else if (event.keyCode == 38)
+            GdeviceOrientation.beta += 5; 
+        else if (event.keyCode == 40)
+            GdeviceOrientation.beta -= 5; 
+    }, false);
+
     
     var light = new THREE.PointLight(0xffffff);
     light.position.set(0, 2500, 0);
