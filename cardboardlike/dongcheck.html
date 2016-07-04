@@ -13,15 +13,13 @@
     <script src="three.js"></script>
     <script src="DeviceOrientationControls.js?2"></script>
     <script src="all3d.js"></script>
-    <script src="jquery-2.1.4.min.js"></script>
     
   </head>
   <body>
     <div id="main">
       <div id="viz"></div>
       <div id="postext">
-        <div class="numpanel">A:<span id="alpha">Dalpha</span> B: <span id="beta">Dbeta</span> C:<span id="gamma">Dgamma</span> T:<span id="absolute">Dabsolute</span> #<span id="count">Dcount</span></div>
-        <div class="numpanel">
+        <div id="numpanel">A:<span id="alpha">Dalpha</span> B: <span id="beta">Dbeta</span> C:<span id="gamma">Dgamma</span> T:<span id="absolute">Dabsolute</span> #<span id="count">Dcount</span>
             <span id="latitude">Dlatitude</span>,<span id="longitude">Dlongitude</span> (~<span id="accuracy">Daccuracy</span>m)
             <span id="altitude">Daltitude</span>m (~<span id="altitudeaccuracy">Daltitudeaccuracy</span>m)
             dir:<span id="heading">Dheading</span> <span id="speed">Dspeed</span>m/s  #<span id="wcount">Dwcount</span>
@@ -441,10 +439,10 @@ function tryabsoluteorient(event)
 {
     window.removeEventListener('absolutedeviceorientation', tryabsoluteorient, true);  
     console.log("absoluteorient", event); 
-    $("#alphaoffset").text("gting "+event.alpha+" "+event.absolute+" T"+(event.alpha !== null)); 
+    document.getElementById('alphaoffset').textContent = "gting "+event.alpha+" "+event.absolute+" T"+(event.alpha !== null); 
     if ((event.alpha !== null) && event.absolute) {
         controls.alphaoffset = event.alpha - GdeviceOrientation.alpha; 
-        $("#alphaoffset").text("A "+controls.alphaoffset.toFixed(1) + " BB "+event.alpha.toFixed(1)); 
+        document.getElementById('alphaoffset').textContent = "A "+controls.alphaoffset.toFixed(1) + " BB "+event.alpha.toFixed(1); 
     }
 }
 
@@ -518,17 +516,17 @@ function init()
     scene.add(contour); 
     scene.fog = new THREE.Fog(0x202020, 10*gfac, 20000*gfac);  // near and far
     
-    $("#fogplus").click(function() { centrelinematerial.uniforms.closedist.value *= 2.0;  $("#closedist").text(centrelinematerial.uniforms.closedist.value/gfac); }); 
-    $("#fogminus").click(function() { centrelinematerial.uniforms.closedist.value *= 0.5;  $("#closedist").text(centrelinematerial.uniforms.closedist.value/gfac); }); 
-    $("#fovplus").click(function() { camera.fov += 5; $("#fovdegrees").text(camera.fov); }); 
-    $("#fovminus").click(function() { camera.fov -= 5; $("#fovdegrees").text(camera.fov); }); 
-    $("#camerahop").click(ZhopGo); 
-    $("#reset31").click(reset31); 
-    //$("#test1").click(reset31); 
-    $("#magorientset").click(function() { window.addEventListener('absolutedeviceorientation', tryabsoluteorient, true); }); 
-    $("#vview").click(function() { ($(".numpanel").css("display") == "none" ? $(".numpanel").show() : $(".numpanel").hide()); }); 
-    $("#alphaoffsetplus").click(function() { controls.alphaoffset += 5;  $("#alphaoffset").text(controls.alphaoffset); }); 
-    $("#alphaoffsetminus").click(function() { controls.alphaoffset -= 5;  $("#alphaoffset").text(controls.alphaoffset); }); 
+    document.getElementById("fogplus").addEventListener("click", function() { centrelinematerial.uniforms.closedist.value *= 2.0;  document.getElementById('closedist').textContent = centrelinematerial.uniforms.closedist.value/gfac; }, true); 
+    document.getElementById("fogminus").addEventListener("click", function() { centrelinematerial.uniforms.closedist.value *= 0.5;  document.getElementById('closedist').textContent = centrelinematerial.uniforms.closedist.value/gfac; }, true); 
+    document.getElementById("fovplus").addEventListener("click", function() { camera.fov += 5; document.getElementById('fovdegrees').textContent = camera.fov; }, true); 
+    document.getElementById("fovminus").addEventListener("click", function() { camera.fov -= 5; document.getElementById('fovdegrees').textContent = camera.fov; }, true); 
+    document.getElementById("camerahop").addEventListener("click", ZhopGo, true); 
+    document.getElementById("reset31").addEventListener("click", reset31, true); 
+    document.getElementById("test1").addEventListener("click", function() { console.log("hihi"); }, true); 
+    document.getElementById("magorientset").addEventListener("click", function() { window.addEventListener('absolutedeviceorientation', tryabsoluteorient, true); }, true); 
+    document.getElementById("vview").addEventListener("click", function() { var s = document.getElementById('numpanel'); s.style.display = (s.style.display == "none" ? "" : "none"); }, true); 
+    document.getElementById("alphaoffsetplus").addEventListener("click", function() { controls.alphaoffset += 5;  document.getElementById('alphaoffset').textContent = controls.alphaoffset; }, true); 
+    document.getElementById("alphaoffsetminus").addEventListener("click", function() { controls.alphaoffset -= 5;  document.getElementById('alphaoffset').textContent = controls.alphaoffset; }, true); 
 
     window.addEventListener('resize', resize, false);
     setTimeout(resize, 1);

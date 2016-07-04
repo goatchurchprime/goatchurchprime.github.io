@@ -1,21 +1,23 @@
 
 // things to do
-// * cave entrance daggers of same colour as passage
 // * bigger buttons that pop up and go down
-// * disable screen drag in phone orientation
-// * get line width handled in fragment shader
 // * spot underneath you
 // * picking (possibly light up a cave)
-// * use magnetometer to set start point
 // * other peaks in view into database
 // * break file into different javascript files
-// * clean version of data without junk
+// * clean version of data without fake cave junk
 // * drop straight into data if miles away
 // * gps directional navigation by 20m buttons
-
-
+// * small slight hopping as we go along
+// * pinch zoom for FOV
+// * click to find cave
+// * swipe up to handle close and far bits
 
 // done
+// * get line width handled in fragment shader
+// * use magnetometer to set start point
+// * disable screen drag in phone orientation
+// * cave entrance daggers of same colour as passage
 // * depth colour spectrum implemented in shader
 // * closest point fog case
 // * vertical lines darker as if overhead light
