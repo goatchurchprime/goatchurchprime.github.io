@@ -15,10 +15,10 @@
  * (http://w3c.github.io/deviceorientation/spec-source-orientation.html)
  */
 
-var GdeviceOrientation; 
+var GdeviceOrientation; // global version for access in other code
 (function() {
 
-  var deviceOrientation = { alpha:0.0, beta:0.0, gamma:0.0, absolute:false }; 
+  var deviceOrientation = { alpha:0.0, beta:90.0, gamma:90.0, absolute:false }; 
   GdeviceOrientation = deviceOrientation; 
   var screenOrientation = window.orientation || 0;
 
@@ -31,7 +31,6 @@ var GdeviceOrientation;
   window.addEventListener('deviceorientation', onDeviceOrientationChangeEvent, false);
 
   function getOrientation() {
-    if (GdeviceOrientation.alpha === undefined)   return 0;   // force portrait view on computer version (that doesn't have orientation controls)
     switch (window.screen.orientation || window.screen.mozOrientation) {
       case 'landscape-primary':
         return 90;
@@ -106,14 +105,10 @@ THREE.DeviceOrientationControls = function(object) {
         //this.autoAlign = true;
       //}
 
-      this.alpha = deviceOrientation.gamma ?
-        THREE.Math.degToRad(deviceOrientation.alpha + this.alphaoffset) : 0; // Z
-      this.beta = deviceOrientation.beta ?
-        THREE.Math.degToRad(deviceOrientation.beta) : 0; // X'
-      this.gamma = deviceOrientation.gamma ?
-        THREE.Math.degToRad(deviceOrientation.gamma) : 0; // Y''
-      this.orient = screenOrientation ?
-        THREE.Math.degToRad(screenOrientation) : 0; // O
+      this.alpha = deviceOrientation.gamma ? THREE.Math.degToRad(deviceOrientation.alpha + this.alphaoffset) : 0; // Z
+      this.beta = deviceOrientation.beta ? THREE.Math.degToRad(deviceOrientation.beta) : 0; // X'
+      this.gamma = deviceOrientation.gamma ? THREE.Math.degToRad(deviceOrientation.gamma) : 0; // Y''
+      this.orient = screenOrientation ? THREE.Math.degToRad(screenOrientation) : 0; // O
 
       // The angles alpha, beta and gamma
       // form a set of intrinsic Tait-Bryan angles of type Z-X'-Y''
@@ -133,7 +128,6 @@ THREE.DeviceOrientationControls = function(object) {
 
       // adjust for screen orientation
       this.orientationQuaternion.multiply(q0.setFromAxisAngle(zee, - this.orient));
-
       this.object.quaternion.copy(this.alignQuaternion);
       this.object.quaternion.multiply(this.orientationQuaternion);
 

@@ -12,7 +12,6 @@
     <link rel="manifest" href="manifest.json">
     <script src="three.js"></script>
     <script src="DeviceOrientationControls.js?2"></script>
-    <script src="OrbitControls.js"></script>
     <script src="all3d.js"></script>
     <script src="jquery-2.1.4.min.js"></script>
     
@@ -36,6 +35,7 @@
             <span id="fovdegrees"></span>
             <input type="button" value="Hop" id="camerahop"/>
             <input type="button" value="31" id="reset31"/>
+            <input type="button" value="Mag" id="magorientset"/>
             <input type="button" value="T1" id="test1"/>
             <input type="button" value="VV" id="vview"/>
             <span id="fovdegrees"></span>
@@ -206,7 +206,7 @@ function reset31()
 }
 
 
-var camera, scene, renderer, controls, bdevicecontrols, element, container;
+var camera, scene, renderer, controls, element, container;
 var clock = new THREE.Clock();
 var hoptime = null; 
 var hopmode = 0; // 0 on ground, 1 going up, -1 going down, 2 on the up
@@ -437,6 +437,17 @@ function animate(t)
     render(clock.getDelta());
 }
 
+function tryabsoluteorient(event)
+{
+    window.removeEventListener('absolutedeviceorientation', tryabsoluteorient, true);  
+    console.log("absoluteorient", event); 
+    $("#alphaoffset").text("gting "+event.alpha+" "+event.absolute+" T"+(event.alpha !== null)); 
+    if ((event.alpha !== null) && event.absolute) {
+        controls.alphaoffset = event.alpha - GdeviceOrientation.alpha; 
+        $("#alphaoffset").text("A "+controls.alphaoffset.toFixed(1) + " BB "+event.alpha.toFixed(1)); 
+    }
+}
+
 var geomeshtorus, flatmaterial; 
 function init() 
 {
@@ -465,20 +476,9 @@ function init()
     geomeshtorus.translateZ(-(alt0-50)*gfac); 
     //scene.add(geomeshtorus);  
 
-    // default mouse controls
-/*    controls = new THREE.OrbitControls(camera, element);
-    //controls.rotateUp(Math.PI/4);
-    controls.target.set(0, camera.position.y, -1);  // looking north
-    controls.noZoom = true;
-    controls.noPan = true;
-    bdevicecontrols = false; 
-*/
-
-controls = new THREE.DeviceOrientationControls(camera, true);
-controls.connect();
-controls.update();
-bdevicecontrols = true; 
-
+    controls = new THREE.DeviceOrientationControls(camera, true);
+    controls.connect();
+    controls.update();
     window.addEventListener('keydown', function(event) {
         if (event.keyCode == 37) 
             GdeviceOrientation.gamma += 5; 
@@ -524,7 +524,8 @@ bdevicecontrols = true;
     $("#fovminus").click(function() { camera.fov -= 5; $("#fovdegrees").text(camera.fov); }); 
     $("#camerahop").click(ZhopGo); 
     $("#reset31").click(reset31); 
-    $("#test1").click(function() { latG -= 0.00001; SetCameraPositionG(); }); 
+    //$("#test1").click(reset31); 
+    $("#magorientset").click(function() { window.addEventListener('absolutedeviceorientation', tryabsoluteorient, true); }); 
     $("#vview").click(function() { ($(".numpanel").css("display") == "none" ? $(".numpanel").show() : $(".numpanel").hide()); }); 
     $("#alphaoffsetplus").click(function() { controls.alphaoffset += 5;  $("#alphaoffset").text(controls.alphaoffset); }); 
     $("#alphaoffsetminus").click(function() { controls.alphaoffset -= 5;  $("#alphaoffset").text(controls.alphaoffset); }); 
@@ -539,12 +540,6 @@ animate();
 var count = 0, wcount = 0; 
 function setOrientationControls(event) 
 {
-    if (!bdevicecontrols && (event.alpha !== null)) {
-        controls = new THREE.DeviceOrientationControls(camera, true);
-        controls.connect();
-        controls.update();
-        bdevicecontrols = true; 
-    }   
     document.getElementById('count').textContent = (++count); 
     document.getElementById('alpha').textContent = (event.alpha === null ? "-" : event.alpha.toFixed(0)); 
     document.getElementById('beta').textContent = (event.beta === null ? "-" : event.beta.toFixed(0)); 
