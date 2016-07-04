@@ -437,7 +437,7 @@ function animate(t)
 
 function tryabsoluteorient(event)
 {
-    window.removeEventListener('absolutedeviceorientation', tryabsoluteorient, true);  
+    window.removeEventListener('absolutedeviceorientation', tryabsoluteorient);  
     console.log("absoluteorient", event); 
     document.getElementById('alphaoffset').textContent = "gting "+event.alpha+" "+event.absolute+" T"+(event.alpha !== null); 
     if ((event.alpha !== null) && event.absolute) {
@@ -486,7 +486,7 @@ function init()
             GdeviceOrientation.beta += 5; 
         else if (event.keyCode == 40)
             GdeviceOrientation.beta -= 5; 
-    }, false);
+    });
 
     
     var light = new THREE.PointLight(0xffffff);
@@ -516,19 +516,19 @@ function init()
     scene.add(contour); 
     scene.fog = new THREE.Fog(0x202020, 10*gfac, 20000*gfac);  // near and far
     
-    document.getElementById("fogplus").addEventListener("click", function() { centrelinematerial.uniforms.closedist.value *= 2.0;  document.getElementById('closedist').textContent = centrelinematerial.uniforms.closedist.value/gfac; }, true); 
-    document.getElementById("fogminus").addEventListener("click", function() { centrelinematerial.uniforms.closedist.value *= 0.5;  document.getElementById('closedist').textContent = centrelinematerial.uniforms.closedist.value/gfac; }, true); 
-    document.getElementById("fovplus").addEventListener("click", function() { camera.fov += 5; document.getElementById('fovdegrees').textContent = camera.fov; }, true); 
-    document.getElementById("fovminus").addEventListener("click", function() { camera.fov -= 5; document.getElementById('fovdegrees').textContent = camera.fov; }, true); 
-    document.getElementById("camerahop").addEventListener("click", ZhopGo, true); 
-    document.getElementById("reset31").addEventListener("click", reset31, true); 
-    document.getElementById("test1").addEventListener("click", function() { console.log("hihi"); }, true); 
-    document.getElementById("magorientset").addEventListener("click", function() { window.addEventListener('absolutedeviceorientation', tryabsoluteorient, true); }, true); 
-    document.getElementById("vview").addEventListener("click", function() { var s = document.getElementById('numpanel'); s.style.display = (s.style.display == "none" ? "" : "none"); }, true); 
-    document.getElementById("alphaoffsetplus").addEventListener("click", function() { controls.alphaoffset += 5;  document.getElementById('alphaoffset').textContent = controls.alphaoffset; }, true); 
-    document.getElementById("alphaoffsetminus").addEventListener("click", function() { controls.alphaoffset -= 5;  document.getElementById('alphaoffset').textContent = controls.alphaoffset; }, true); 
+    document.getElementById("fogplus").addEventListener("click", function() { centrelinematerial.uniforms.closedist.value *= 2.0;  document.getElementById('closedist').textContent = centrelinematerial.uniforms.closedist.value/gfac; }); 
+    document.getElementById("fogminus").addEventListener("click", function() { centrelinematerial.uniforms.closedist.value *= 0.5;  document.getElementById('closedist').textContent = centrelinematerial.uniforms.closedist.value/gfac; }); 
+    document.getElementById("fovplus").addEventListener("click", function() { camera.fov += 5; document.getElementById('fovdegrees').textContent = camera.fov; }); 
+    document.getElementById("fovminus").addEventListener("click", function() { camera.fov -= 5; document.getElementById('fovdegrees').textContent = camera.fov; }); 
+    document.getElementById("camerahop").addEventListener("click", ZhopGo); 
+    document.getElementById("reset31").addEventListener("click", reset31); 
+    document.getElementById("test1").addEventListener("click", function() { console.log("hihi"); }); 
+    document.getElementById("magorientset").addEventListener("click", function() { window.addEventListener('absolutedeviceorientation', tryabsoluteorient); }); 
+    document.getElementById("vview").addEventListener("click", function() { var s = document.getElementById('numpanel'); s.style.display = (s.style.display == "none" ? "" : "none"); }); 
+    document.getElementById("alphaoffsetplus").addEventListener("click", function() { controls.alphaoffset += 5;  document.getElementById('alphaoffset').textContent = controls.alphaoffset; }); 
+    document.getElementById("alphaoffsetminus").addEventListener("click", function() { controls.alphaoffset -= 5;  document.getElementById('alphaoffset').textContent = controls.alphaoffset; }); 
 
-    window.addEventListener('resize', resize, false);
+    window.addEventListener('resize', resize);
     setTimeout(resize, 1);
 }
 
@@ -576,7 +576,7 @@ function geo_error()
     document.getElementById('wcount').textContent = "gps error"; 
 }
 // could be absolutedeviceorientation
-window.addEventListener('deviceorientation', setOrientationControls, true);  // catch the first event to come though to upgrade to orientation control
+window.addEventListener('deviceorientation', setOrientationControls);  // catch the first event to come though to upgrade to orientation control
 var watchID = navigator.geolocation.watchPosition(geo_success, geo_error, {enableHighAccuracy:true, timeout:27000, maximumAge:30000}); 
   
 console.log("dididi"); 

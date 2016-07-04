@@ -14,6 +14,7 @@
 // * swipe up to handle close and far bits
 
 // done
+// * remove query load
 // * get line width handled in fragment shader
 // * use magnetometer to set start point
 // * disable screen drag in phone orientation
