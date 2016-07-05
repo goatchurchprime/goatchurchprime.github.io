@@ -10,6 +10,7 @@
       #quantshow { position: absolute; right:0; top: 0; width: 75%; border: thin red solid; background:#ddf; display: block }
       #quantshowtext { font-size: 200%; position: relative; left: 0; top: 0; display: none }
       #postext { position: relative; left: 0; top: 0; display: block }
+      #postext input { font-size: 150%}
     </style>
     <link rel="manifest" href="manifest.json">
     <script src="three.min.js"></script>
@@ -23,20 +24,15 @@
       <div id="quantshow">
         <div id="quantshowtext">TEE</div>
         <div id="postext">
-          <div id="numpanel">A:<span id="alpha">Dalpha</span> B: <span id="beta">Dbeta</span> C:<span id="gamma">Dgamma</span> T:<span id="absolute">Dabsolute</span> #<span id="count">Dcount</span>
-              <span id="latitude">Dlatitude</span>,<span id="longitude">Dlongitude</span> (~<span id="accuracy">Daccuracy</span>m)
-              <span id="altitude">Daltitude</span>m (~<span id="altitudeaccuracy">Daltitudeaccuracy</span>m)
-              dir:<span id="heading">Dheading</span> <span id="speed">Dspeed</span>m/s  #<span id="wcount">Dwcount</span>
-          </div>
+          <div id="numpanel">
+              <span id="gpsrec">Dgps</span>
+              <span id="testout">:</span>
+         </div>
           <div>
               <input type="button" value="Hop" id="camerahop"/>
               <input type="button" value="31" id="reset31"/>
               <input type="button" value="Mag" id="magorientset"/>
               <input type="button" value="T1" id="test1"/>
-              <span id="fovdegrees"></span>
-              <span id="alphaoffset"></span>
-              <span id="camerapos"></span>
-              <span id="aspect"></span>
            </div>
         </div>
       </div>
@@ -256,7 +252,6 @@ function MakeLabel(card, text, fillstyle, p, scale)
     context1.font = "28px Helvetica";
     context1.fillStyle = fillstyle;
     context1.fillText(text, 0, 20); 
-    //document.getElementById('camerapos').appendChild(canvas1); // to preview the bitmaps we are using
     
     var texture1 = new THREE.Texture(canvas1);  
     texture1.needsUpdate = true; 
@@ -393,12 +388,20 @@ function LoadEntrances(scene)
         }
     }
     scene.add(card);
+}
 
-    
-    var entpointsmaterial = new THREE.PointsMaterial({ color: 0x22FF11, sizeAttenuation: true, size: 20.0 }); 
-    var pents = new THREE.Points(gents, entpointsmaterial); 
-    var enttriangles = new THREE.Mesh(buffergeometry, enttrianglematerial);  
-    scene.add(enttriangles);
+var trailgeometry; 
+var trialgeometryindex = 0; 
+function LoadTrail(scene) 
+{
+    trailgeometry = new THREE.Geometry();
+    //var p = latlngtopt(svxents[i][1], svxents[i][2], svxents[i][3]); 
+    var p = new THREE.Vector3(camera.position.x, camera.position.y - 4, camera.position.z); 
+    for (var i = 0; i < 50; i++)
+        trailgeometry.vertices.push(p); 
+    var trailpointsmaterial = new THREE.PointsMaterial({ color: 0x22FF11, sizeAttenuation: false, size: 5.0 }); 
+    var trailpoints = new THREE.Points(trailgeometry, trailpointsmaterial); 
+    scene.add(trailpoints); 
 }
 
 function resize() 
@@ -416,7 +419,6 @@ function resize()
     }
     camera.updateProjectionMatrix();
     renderer.setSize(width, height);
-    document.getElementById('aspect').textContent = camera.aspect.toFixed(1); 
 }
 
 
@@ -569,13 +571,13 @@ function init()
 
     SetBasePositions(); 
 
-    var gsurf = new THREE.TorusGeometry(10*gfac, 4*gfac, 90, 30); 
+    /*var gsurf = new THREE.TorusGeometry(10*gfac, 4*gfac, 90, 30); 
     flatmaterial = new THREE.MeshPhongMaterial({ color: "rgb(220,50,210)", opacity: 0.1, specular: 0x222222, shininess: 40, side: THREE.DoubleSide, vertexColors: THREE.FaceColors, shading: THREE.FlatShading });  
-    //gsurf.computeBoundingSphere();
+    gsurf.computeBoundingSphere();
     geomeshtorus = new THREE.Mesh(gsurf, flatmaterial); 
     geomeshtorus.rotateX(Math.PI/2); 
     geomeshtorus.translateZ(-(alt0-50)*gfac); 
-    //scene.add(geomeshtorus);  
+    scene.add(geomeshtorus);  */
 
     controls = new THREE.DeviceOrientationControls(camera, true);
     controls.connect();
@@ -599,7 +601,8 @@ function init()
     LoadMountains(scene); 
     LoadCentrelines(scene); 
     LoadEntrances(scene); 
-
+    LoadTrail(scene); 
+    
     var corners = [ [0,-1,0xFFFFFF]/*North*/, [1,0,0x55FFAA]/*east*/, [0,1,0xFF3333], [-1,0,0xFFFF33] ];
     var g = new THREE.Geometry(); 
     var dd = 50; 
@@ -637,30 +640,19 @@ function init()
 init();
 animate();
 
-var count = 0, wcount = 0; 
-function setOrientationControls(event) 
-{
-    document.getElementById('count').textContent = (++count); 
-    document.getElementById('alpha').textContent = (event.alpha === null ? "-" : event.alpha.toFixed(0)); 
-    document.getElementById('beta').textContent = (event.beta === null ? "-" : event.beta.toFixed(0)); 
-    document.getElementById('gamma').textContent = (event.gamma === null ? "-" : event.gamma.toFixed(0)); 
-    document.getElementById('absolute').textContent = ""+event.absolute; 
-}
 
 
 function geo_success(position) 
 { 
-    document.getElementById('wcount').textContent = (++wcount); 
-    document.getElementById('latitude').textContent = position.coords.latitude.toFixed(7); 
-    document.getElementById('longitude').textContent = position.coords.longitude.toFixed(7); 
-    document.getElementById('altitude').textContent = position.coords.altitude.toFixed(1); 
-    document.getElementById('accuracy').textContent = position.coords.accuracy.toFixed(0); 
-    document.getElementById('altitudeaccuracy').textContent = position.coords.altitudeAccuracy.toFixed(0); 
-    document.getElementById('heading').textContent = position.coords.heading.toFixed(0); 
-    document.getElementById('speed').textContent = position.coords.speed.toFixed(2); 
-    
     latG = position.coords.latitude; 
     lngG = position.coords.longitude; 
+    document.getElementById('gpsrec').textContent = "Lat:"+latG.toFixed(7)+" Lng:"+lngG.toFixed(7)+
+                                                    " (~"+position.coords.accuracy.toFixed(0)+"m)"+
+                                                    " Alt:"+position.coords.altitude.toFixed(1)+
+                                                    " (~"+position.coords.altitudeAccuracy.toFixed(0)+"m)"; 
+    //document.getElementById('heading').textContent = position.coords.heading.toFixed(0); 
+    //document.getElementById('speed').textContent = position.coords.speed.toFixed(2); 
+    
     if (position.coords.altitude == 0.0)
         altG = position.coords.altitude; 
     SetCameraPositionG();
@@ -672,14 +664,25 @@ function SetCameraPositionG()
     console.log(pc); 
     camera3JSAlt = pc.y; 
     camera.position.set(pc.x, pc.y, pc.z); 
+
+    // make the trail
+    if (trailgeometry) {
+        var pp = trailgeometry.vertices[trialgeometryindex % trailgeometry.vertices.length]; 
+        if (Math.max(Math.abs(pp.x - pc.x), Math.abs(pp.z - pc.z)) >= 2) {
+            trialgeometryindex++; 
+            trailgeometry.vertices[trialgeometryindex % trailgeometry.vertices.length].set(pc.x, pc.y - 4, pc.z); 
+            document.getElementById('testout').textContent = ":"+trialgeometryindex+" "+pc.x.toFixed(0)+","+pc.y.toFixed(0)+","+pc.z.toFixed(0); 
+            trailgeometry.verticesNeedUpdate = true; 
+            trailgeometry.computeBoundingSphere(); 
+            trailgeometry.computeBoundingBox(); 
+        }
+    }
 };
 
 function geo_error() 
 {  
-    document.getElementById('wcount').textContent = "gps error"; 
+    document.getElementById('gpsrec').textContent = "gps error"; 
 }
-// could be absolutedeviceorientation
-window.addEventListener('deviceorientation', setOrientationControls);  // catch the first event to come though to upgrade to orientation control
 var watchID = navigator.geolocation.watchPosition(geo_success, geo_error, {enableHighAccuracy:true, timeout:27000, maximumAge:30000}); 
   
 console.log("dididi"); 
