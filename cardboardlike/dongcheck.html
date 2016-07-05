@@ -8,9 +8,10 @@
       body { margin: 0px; overflow: hidden; }
       #viz { position: absolute; top: 0; left: 0; right: 0; bottom: 0; }
       #postext { position: absolute; right:0; top: 0; width: 75%; border: thin black solid; background:#ddf }
+      #quantshow { position: absolute; right:0; bottom: 0; width: 50%; border: thin red solid; background:#ddf; font-size: 200%; display: none }
     </style>
     <link rel="manifest" href="manifest.json">
-    <script src="three.js"></script>
+    <script src="three.min.js"></script>
     <script src="DeviceOrientationControls.js?2"></script>
     <script src="all3d.js"></script>
     
@@ -37,12 +38,12 @@
             <input type="button" value="T1" id="test1"/>
             <input type="button" value="VV" id="vview"/>
             <span id="fovdegrees"></span>
-            <input type="button" value="A+" id="alphaoffsetplus"/>
-            <input type="button" value="A-" id="alphaoffsetminus"/>
             <span id="alphaoffset"></span>
             <span id="camerapos"></span>
             <span id="aspect"></span>
         </div>
+      </div>
+      <div id="quantshow">TEE
       </div>
     </div>
 
@@ -199,12 +200,13 @@ function reset31()
 {
     latR = latG - lat0; 
     lngR = lngG - lng0; 
-    altR = altG - alt0 - 20; 
+    altR = altG - alt0; 
     SetCameraPositionG(); 
 }
 
 
-var camera, scene, renderer, controls, element, container;
+var camera, scene, renderer, controls, threejselement, vizcontainer;
+var quantshowelement; 
 var clock = new THREE.Clock();
 var hoptime = null; 
 var hopmode = 0; // 0 on ground, 1 going up, -1 going down, 2 on the up
@@ -397,8 +399,8 @@ function LoadEntrances(scene)
 
 function resize() 
 {
-    var width = container.offsetWidth;
-    var height = container.offsetHeight;
+    var width = vizcontainer.offsetWidth;
+    var height = vizcontainer.offsetHeight;
     camera.aspect = width / height;
     peaktrianglematerial.uniforms.aspect.value = camera.aspect; 
     peaktrianglematerial.uniforms.trianglesize.value = 10/height; 
@@ -438,21 +440,74 @@ function animate(t)
 function tryabsoluteorient(event)
 {
     window.removeEventListener('absolutedeviceorientation', tryabsoluteorient);  
+    quantshowshow(); 
     console.log("absoluteorient", event); 
-    document.getElementById('alphaoffset').textContent = "gting "+event.alpha+" "+event.absolute+" T"+(event.alpha !== null); 
+    quantshowelement.textContent = "gting "+event.alpha.toFixed(1)+" "+event.absolute; 
     if ((event.alpha !== null) && event.absolute) {
         controls.alphaoffset = event.alpha - GdeviceOrientation.alpha; 
-        document.getElementById('alphaoffset').textContent = "A "+controls.alphaoffset.toFixed(1) + " BB "+event.alpha.toFixed(1); 
+        quantshowelement.textContent = "AA-offs: "+controls.alphaoffset.toFixed(1); 
+    }
+    quantshowhidedelay(); 
+}
+
+var quantshowhidetimeout = null; 
+function quantshowhide()  {  quantshowelement.style.display = "none";  quantshowhidetimeout = null; }
+function quantshowhidedelay()  { if (quantshowhidetimeout === null)  quantshowhidetimeout = setTimeout(quantshowhide, 500);  }
+function quantshowshow()  
+{ 
+    if (quantshowhidetimeout !== null) {
+        clearTimeout(quantshowhidetimeout);  
+        quantshowhidetimeout = null; 
+    }
+    quantshowelement.style.display = "block"; 
+}
+
+var touchStart = new THREE.Vector2(), touchEnd = new THREE.Vector2(), touchDelta = new THREE.Vector2();
+var alphaoffsetStart; 
+var touchmovestate = 0; // 1 is touchdrag, 2 is dragging left-right for 
+function touchstartfunc(event)
+{
+    event.preventDefault(); 
+    if (event.touches.length == 1) {
+        touchmovestate = 1; 
+        touchStart.set(event.touches[0].pageX, event.touches[0].pageY); 
     }
 }
+
+function touchmovefunc(event)
+{
+    event.preventDefault(); 
+    if (event.touches.length == 1) {
+        touchEnd.set(event.touches[0].pageX, event.touches[0].pageY);
+        touchDelta.subVectors(touchEnd, touchStart); 
+        if ((touchmovestate == 1) && (Math.max(Math.abs(touchDelta.x), Math.abs(touchDelta.y)) > 10)) {
+            touchmovestate = (Math.abs(touchDelta.x) >= Math.abs(touchDelta.y) ? 2 : 3); 
+            touchmovevalueStart = (touchmovestate == 2 ? controls.alphaoffset : 1); 
+            quantshowshow(); 
+        }
+        if (touchmovestate == 2) {
+            controls.alphaoffset = touchmovevalueStart + touchDelta.x*0.1;  
+            quantshowelement.textContent = "A-offs: "+controls.alphaoffset.toFixed(1); 
+        }
+    }
+}
+function touchendfunc(event)
+{
+    event.preventDefault(); 
+    if (touchmovestate != 0)
+        quantshowhidedelay(); 
+    touchmovestate = 0; 
+}
+
 
 var geomeshtorus, flatmaterial; 
 function init() 
 {
     renderer = new THREE.WebGLRenderer();
-    element = renderer.domElement;
-    container = document.getElementById('viz');
-    container.appendChild(element);
+    threejselement = renderer.domElement;
+    vizcontainer = document.getElementById('viz');
+    vizcontainer.appendChild(threejselement);
+    quantshowelement = document.getElementById('quantshow'); 
     
     scene = new THREE.Scene();
     var fieldofview = 30; // degrees (smaller is more tunnel like)
@@ -525,8 +580,10 @@ function init()
     document.getElementById("test1").addEventListener("click", function() { console.log("hihi"); }); 
     document.getElementById("magorientset").addEventListener("click", function() { window.addEventListener('absolutedeviceorientation', tryabsoluteorient); }); 
     document.getElementById("vview").addEventListener("click", function() { var s = document.getElementById('numpanel'); s.style.display = (s.style.display == "none" ? "" : "none"); }); 
-    document.getElementById("alphaoffsetplus").addEventListener("click", function() { controls.alphaoffset += 5;  document.getElementById('alphaoffset').textContent = controls.alphaoffset; }); 
-    document.getElementById("alphaoffsetminus").addEventListener("click", function() { controls.alphaoffset -= 5;  document.getElementById('alphaoffset').textContent = controls.alphaoffset; }); 
+
+    vizcontainer.addEventListener('touchstart', touchstartfunc, false);
+    vizcontainer.addEventListener('touchend', touchendfunc, false);
+    vizcontainer.addEventListener('touchmove', touchmovefunc, false);
 
     window.addEventListener('resize', resize);
     setTimeout(resize, 1);
@@ -559,7 +616,8 @@ function geo_success(position)
     
     latG = position.coords.latitude; 
     lngG = position.coords.longitude; 
-    altG = position.coords.altitude; 
+    if (position.coords.altitude == 0.0)
+        altG = position.coords.altitude; 
     SetCameraPositionG();
 } 
     

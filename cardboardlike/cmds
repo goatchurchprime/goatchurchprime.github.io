@@ -12,8 +12,10 @@
 // * pinch zoom for FOV
 // * click to find cave
 // * swipe up to handle close and far bits
+// * do the mag check early on on startup
 
 // done
+// * minimized three.js
 // * remove query load
 // * get line width handled in fragment shader
 // * use magnetometer to set start point
