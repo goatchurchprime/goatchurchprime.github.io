@@ -1,7 +1,11 @@
 
 // things to do
+// * make the info panel pop up and disappear 
 // * bigger buttons that pop up and go down
-// * spot underneath you
+// * pinch zoom for FOV
+// * do the mag check early on on startup
+
+// * landing spot underneath you and poss compass rose
 // * picking (possibly light up a cave)
 // * other peaks in view into database
 // * break file into different javascript files
@@ -9,12 +13,11 @@
 // * drop straight into data if miles away
 // * gps directional navigation by 20m buttons
 // * small slight hopping as we go along
-// * pinch zoom for FOV
 // * click to find cave
-// * swipe up to handle close and far bits
-// * do the mag check early on on startup
 
 // done
+// * make the light up of words nice 
+// * swipe up to handle close and far bits
 // * minimized three.js
 // * remove query load
 // * get line width handled in fragment shader

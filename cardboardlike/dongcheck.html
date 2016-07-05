@@ -7,8 +7,9 @@
     <style>
       body { margin: 0px; overflow: hidden; }
       #viz { position: absolute; top: 0; left: 0; right: 0; bottom: 0; }
-      #postext { position: absolute; right:0; top: 0; width: 75%; border: thin black solid; background:#ddf }
-      #quantshow { position: absolute; right:0; bottom: 0; width: 50%; border: thin red solid; background:#ddf; font-size: 200%; display: none }
+      #quantshow { position: absolute; right:0; top: 0; width: 75%; border: thin red solid; background:#ddf; display: none }
+      #quantshowtext { font-size: 200%; position: relative; left: 0; top: 0; display: block }
+      #postext { position: relative; left: 0; top: 0; display: block }
     </style>
     <link rel="manifest" href="manifest.json">
     <script src="three.min.js"></script>
@@ -19,31 +20,28 @@
   <body>
     <div id="main">
       <div id="viz"></div>
-      <div id="postext">
-        <div id="numpanel">A:<span id="alpha">Dalpha</span> B: <span id="beta">Dbeta</span> C:<span id="gamma">Dgamma</span> T:<span id="absolute">Dabsolute</span> #<span id="count">Dcount</span>
-            <span id="latitude">Dlatitude</span>,<span id="longitude">Dlongitude</span> (~<span id="accuracy">Daccuracy</span>m)
-            <span id="altitude">Daltitude</span>m (~<span id="altitudeaccuracy">Daltitudeaccuracy</span>m)
-            dir:<span id="heading">Dheading</span> <span id="speed">Dspeed</span>m/s  #<span id="wcount">Dwcount</span>
+      <div id="quantshow">
+        <div id="quantshowtext">TEE</div>
+        <div id="postext">
+          <div id="numpanel">A:<span id="alpha">Dalpha</span> B: <span id="beta">Dbeta</span> C:<span id="gamma">Dgamma</span> T:<span id="absolute">Dabsolute</span> #<span id="count">Dcount</span>
+              <span id="latitude">Dlatitude</span>,<span id="longitude">Dlongitude</span> (~<span id="accuracy">Daccuracy</span>m)
+              <span id="altitude">Daltitude</span>m (~<span id="altitudeaccuracy">Daltitudeaccuracy</span>m)
+              dir:<span id="heading">Dheading</span> <span id="speed">Dspeed</span>m/s  #<span id="wcount">Dwcount</span>
+          </div>
+          <div>
+              <input type="button" value="FOV+" id="fovplus"/>
+              <input type="button" value="FOV-" id="fovminus"/>
+              <span id="fovdegrees"></span>
+              <input type="button" value="Hop" id="camerahop"/>
+              <input type="button" value="31" id="reset31"/>
+              <input type="button" value="Mag" id="magorientset"/>
+              <input type="button" value="T1" id="test1"/>
+              <span id="fovdegrees"></span>
+              <span id="alphaoffset"></span>
+              <span id="camerapos"></span>
+              <span id="aspect"></span>
+           </div>
         </div>
-        <div>
-            <input type="button" value="F+" id="fogplus"/>
-            <input type="button" value="F-" id="fogminus"/>
-            <span id="closedist"></span>
-            <input type="button" value="FOV+" id="fovplus"/>
-            <input type="button" value="FOV-" id="fovminus"/>
-            <span id="fovdegrees"></span>
-            <input type="button" value="Hop" id="camerahop"/>
-            <input type="button" value="31" id="reset31"/>
-            <input type="button" value="Mag" id="magorientset"/>
-            <input type="button" value="T1" id="test1"/>
-            <input type="button" value="VV" id="vview"/>
-            <span id="fovdegrees"></span>
-            <span id="alphaoffset"></span>
-            <span id="camerapos"></span>
-            <span id="aspect"></span>
-        </div>
-      </div>
-      <div id="quantshow">TEE
       </div>
     </div>
 
@@ -60,10 +58,11 @@ float midlump(float v, float offset)
 void main(void) 
 {
     float redalt = 70.0; 
-    float fdepth = gl_FragCoord.z / gl_FragCoord.w; 
     vec4 ptcolour = vec4(midlump(altitude, redalt), midlump(altitude, redalt-67.0)*0.98, midlump(altitude, redalt-33.0), 1.0); 
-    float cfac = clamp((closedist - fdepth)*0.1, 0.0, 0.81); 
     vec4 sptcolour = mix(ptcolour, vec4(0.0, 0.0, 0.0, 1.0), 0.6*(1.0-vcosslope)); 
+
+    float fdepth = gl_FragCoord.z / gl_FragCoord.w; 
+    float cfac = clamp((closedist - fdepth)*0.1, 0.0, 0.81); 
     gl_FragColor = mix(sptcolour, closecolour, cfac); 
 }
   </script>
@@ -83,6 +82,8 @@ void main()
 
 
   <script id="fragment_shader_textlabel" type="x-shader/x-fragment">
+uniform vec4 closecolour; 
+uniform float closedist; 
 uniform sampler2D texture;
 varying vec2 vUv;
 void main() 
@@ -91,7 +92,12 @@ void main()
     vec3 color = texture2D(texture, uv).rgb;
     if (color.y == 0.0)
         discard; 
-    gl_FragColor = vec4(color, 1.0);
+    vec4 sptcolour = vec4(color, 1.0);
+
+    // color.y >= 0.5 separates out the aliased dark part of the text texture from the internal pixels of the letters
+    float fdepth = gl_FragCoord.z / gl_FragCoord.w; 
+    float cfac = clamp((closedist - fdepth)*0.1, 0.0, 0.81); 
+    gl_FragColor = mix(sptcolour, closecolour, (color.y >= 0.5 ? cfac : 0.0)); 
 }
   </script>
   
@@ -107,7 +113,6 @@ void main()
     vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
     gl_Position = projectionMatrix * mvPosition; 
     float spixelsize = pixelsize*gl_Position.z; 
-    // wepeaktriangle
     gl_Position.x += uv.x*spixelsize*textureaspect; 
     gl_Position.y += uv.y*spixelsize*aspect; 
 }
@@ -206,7 +211,7 @@ function reset31()
 
 
 var camera, scene, renderer, controls, threejselement, vizcontainer;
-var quantshowelement; 
+var quantshowelement, quantshowtextelement, postextelement; 
 var clock = new THREE.Clock();
 var hoptime = null; 
 var hopmode = 0; // 0 on ground, 1 going up, -1 going down, 2 on the up
@@ -262,7 +267,9 @@ function MakeLabel(card, text, fillstyle, p, scale)
         uniforms: { pixelsize: {type: 'f', value: 1.2}, 
                     aspect: { type: 'f', value: 1.0 },
                     textureaspect: { type: 'f', value: canvas1.width/canvas1.height }, 
-                    texture: { value: texture1 }
+                    texture: { value: texture1 },
+                    closecolour: { type: 'v4', value: new THREE.Vector4(1.0, 1.0, 1.0, 1.0) }, 
+                    closedist: { type: 'f', value: 5.0 } 
                   }, 
         vertexShader: document.getElementById('vertex_shader_textlabel').textContent,
         fragmentShader: document.getElementById('fragment_shader_textlabel').textContent, 
@@ -415,6 +422,7 @@ function resize()
     document.getElementById('aspect').textContent = camera.aspect.toFixed(1); 
 }
 
+
 function update(dt) 
 {
     resize();
@@ -440,37 +448,64 @@ function animate(t)
 function tryabsoluteorient(event)
 {
     window.removeEventListener('absolutedeviceorientation', tryabsoluteorient);  
-    quantshowshow(); 
+    quantshowshow("**"); 
     console.log("absoluteorient", event); 
-    quantshowelement.textContent = "gting "+event.alpha.toFixed(1)+" "+event.absolute; 
+    quantshowtextelement.textContent = "gting "+event.alpha.toFixed(1)+" "+event.absolute; 
     if ((event.alpha !== null) && event.absolute) {
         controls.alphaoffset = event.alpha - GdeviceOrientation.alpha; 
-        quantshowelement.textContent = "AA-offs: "+controls.alphaoffset.toFixed(1); 
+        quantshowtextelement.textContent = "AA-offs: "+controls.alphaoffset.toFixed(1); 
     }
-    quantshowhidedelay(); 
+    quantshowhidedelay(1500); 
 }
 
 var quantshowhidetimeout = null; 
-function quantshowhide()  {  quantshowelement.style.display = "none";  quantshowhidetimeout = null; }
-function quantshowhidedelay()  { if (quantshowhidetimeout === null)  quantshowhidetimeout = setTimeout(quantshowhide, 500);  }
-function quantshowshow()  
+function quantshowhide()  
+{
+    quantshowelement.style.display = "none";  
+    if (quantshowhidetimeout !== null) {
+        clearTimeout(quantshowhidetimeout);  
+        quantshowhidetimeout = null; 
+    }
+}
+function quantshowhidedelay(dt)  { if (quantshowhidetimeout === null)  quantshowhidetimeout = setTimeout(quantshowhide, dt);  }
+function quantshowshow(qtext)  
 { 
     if (quantshowhidetimeout !== null) {
         clearTimeout(quantshowhidetimeout);  
         quantshowhidetimeout = null; 
     }
     quantshowelement.style.display = "block"; 
+    if (qtext) {
+        quantshowtextelement.textContent = qtext; 
+        quantshowtextelement.style.display = "block"; 
+        postextelement.style.display = "none"; 
+    } else {
+        quantshowtextelement.style.display = "none"; 
+        postextelement.style.display = "block"; 
+    }
+}
+
+function setclosedistvalue(closedistvalue)
+{
+    centrelinematerial.uniforms.closedist.value = closedistvalue; 
+    enttrianglematerial.uniforms.closedist.value = closedistvalue
+    for (var i = 0; i < textlabelmaterials.length; i++) 
+        textlabelmaterials[i].uniforms.closedist.value = closedistvalue; 
 }
 
 var touchStart = new THREE.Vector2(), touchEnd = new THREE.Vector2(), touchDelta = new THREE.Vector2();
 var alphaoffsetStart; 
-var touchmovestate = 0; // 1 is touchdrag, 2 is dragging left-right for 
-function touchstartfunc(event)
+var touchmovestate = 0; // 1 is touchdrag, 2 is dragging left-right for alpha compass rotate, 3 for depth of fogbrightness
+function touchstartfunc(event) 
 {
     event.preventDefault(); 
     if (event.touches.length == 1) {
-        touchmovestate = 1; 
         touchStart.set(event.touches[0].pageX, event.touches[0].pageY); 
+        if ((touchStart.y < 30) && (touchStart.x >= vizcontainer.offsetWidth*0.25)) {
+            quantshowshow(false); 
+        } else {
+            touchmovestate = 1; 
+        }
     }
 }
 
@@ -482,12 +517,15 @@ function touchmovefunc(event)
         touchDelta.subVectors(touchEnd, touchStart); 
         if ((touchmovestate == 1) && (Math.max(Math.abs(touchDelta.x), Math.abs(touchDelta.y)) > 10)) {
             touchmovestate = (Math.abs(touchDelta.x) >= Math.abs(touchDelta.y) ? 2 : 3); 
-            touchmovevalueStart = (touchmovestate == 2 ? controls.alphaoffset : 1); 
-            quantshowshow(); 
+            touchmovevalueStart = (touchmovestate == 2 ? controls.alphaoffset : centrelinematerial.uniforms.closedist.value); 
+            quantshowshow("**"); 
         }
         if (touchmovestate == 2) {
             controls.alphaoffset = touchmovevalueStart + touchDelta.x*0.1;  
-            quantshowelement.textContent = "A-offs: "+controls.alphaoffset.toFixed(1); 
+            quantshowtextelement.textContent = "A-offs: "+controls.alphaoffset.toFixed(0); 
+        } else if (touchmovestate == 3) {
+            setclosedistvalue(Math.max(0.0, touchmovevalueStart - Math.max(1.0, touchmovevalueStart)*touchDelta.y*0.02)); 
+            quantshowtextelement.textContent = "Light: "+(centrelinematerial.uniforms.closedist.value/gfac).toFixed(0)+"m"; 
         }
     }
 }
@@ -495,7 +533,7 @@ function touchendfunc(event)
 {
     event.preventDefault(); 
     if (touchmovestate != 0)
-        quantshowhidedelay(); 
+        quantshowhidedelay(1500); 
     touchmovestate = 0; 
 }
 
@@ -508,6 +546,8 @@ function init()
     vizcontainer = document.getElementById('viz');
     vizcontainer.appendChild(threejselement);
     quantshowelement = document.getElementById('quantshow'); 
+    quantshowtextelement = document.getElementById('quantshowtext'); 
+    postextelement = document.getElementById('postext'); 
     
     scene = new THREE.Scene();
     var fieldofview = 30; // degrees (smaller is more tunnel like)
@@ -571,15 +611,14 @@ function init()
     scene.add(contour); 
     scene.fog = new THREE.Fog(0x202020, 10*gfac, 20000*gfac);  // near and far
     
-    document.getElementById("fogplus").addEventListener("click", function() { centrelinematerial.uniforms.closedist.value *= 2.0;  document.getElementById('closedist').textContent = centrelinematerial.uniforms.closedist.value/gfac; }); 
-    document.getElementById("fogminus").addEventListener("click", function() { centrelinematerial.uniforms.closedist.value *= 0.5;  document.getElementById('closedist').textContent = centrelinematerial.uniforms.closedist.value/gfac; }); 
     document.getElementById("fovplus").addEventListener("click", function() { camera.fov += 5; document.getElementById('fovdegrees').textContent = camera.fov; }); 
     document.getElementById("fovminus").addEventListener("click", function() { camera.fov -= 5; document.getElementById('fovdegrees').textContent = camera.fov; }); 
     document.getElementById("camerahop").addEventListener("click", ZhopGo); 
     document.getElementById("reset31").addEventListener("click", reset31); 
-    document.getElementById("test1").addEventListener("click", function() { console.log("hihi"); }); 
-    document.getElementById("magorientset").addEventListener("click", function() { window.addEventListener('absolutedeviceorientation', tryabsoluteorient); }); 
-    document.getElementById("vview").addEventListener("click", function() { var s = document.getElementById('numpanel'); s.style.display = (s.style.display == "none" ? "" : "none"); }); 
+    document.getElementById("test1").addEventListener("click", function(event) {  event.stopPropagation(); console.log("hihi"); return true; }, true); 
+    document.getElementById("magorientset").addEventListener("click", function(event) { event.preventDefault(); window.addEventListener('absolutedeviceorientation', tryabsoluteorient); }); 
+
+    quantshowelement.addEventListener("click", quantshowhide); 
 
     vizcontainer.addEventListener('touchstart', touchstartfunc, false);
     vizcontainer.addEventListener('touchend', touchendfunc, false);
