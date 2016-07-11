@@ -16,7 +16,7 @@
     <script src="three.min.js"></script>
     <script src="DeviceOrientationControls.js?2"></script>
     <script src="all3d.js"></script>
-    
+    <script src="positionfuncs.js"></script>
   </head>
   <body>
     <div id="main">
@@ -390,19 +390,6 @@ function LoadEntrances(scene)
     scene.add(card);
 }
 
-var trailgeometry; 
-var trialgeometryindex = 0; 
-function LoadTrail(scene) 
-{
-    trailgeometry = new THREE.Geometry();
-    //var p = latlngtopt(svxents[i][1], svxents[i][2], svxents[i][3]); 
-    var p = new THREE.Vector3(camera.position.x, camera.position.y - 4, camera.position.z); 
-    for (var i = 0; i < 50; i++)
-        trailgeometry.vertices.push(p); 
-    var trailpointsmaterial = new THREE.PointsMaterial({ color: 0x22FF11, sizeAttenuation: false, size: 5.0 }); 
-    var trailpoints = new THREE.Points(trailgeometry, trailpointsmaterial); 
-    scene.add(trailpoints); 
-}
 
 function resize() 
 {
@@ -562,8 +549,8 @@ function init()
     scene = new THREE.Scene();
     var fieldofview = 30; // degrees (smaller is more tunnel like)
     var aspect = 1;       // reset in resize()
-    var neardistance = 2; 
-    var fardistance = 7000; 
+    var neardistance = 5*gfac; 
+    var fardistance = 70000*gfac; 
     camera = new THREE.PerspectiveCamera(fieldofview, aspect, neardistance, fardistance);
     camera3JSAlt = alt0*gfac; 
     camera.position.set(0, camera3JSAlt, 0); 
@@ -602,6 +589,7 @@ function init()
     LoadCentrelines(scene); 
     LoadEntrances(scene); 
     LoadTrail(scene); 
+    LoadFootpos(scene); 
     
     var corners = [ [0,-1,0xFFFFFF]/*North*/, [1,0,0x55FFAA]/*east*/, [0,1,0xFF3333], [-1,0,0xFFFF33] ];
     var g = new THREE.Geometry(); 
@@ -653,7 +641,7 @@ function geo_success(position)
     //document.getElementById('heading').textContent = position.coords.heading.toFixed(0); 
     //document.getElementById('speed').textContent = position.coords.speed.toFixed(2); 
     
-    if (position.coords.altitude == 0.0)
+    if (position.coords.altitude != 0.0)
         altG = position.coords.altitude; 
     SetCameraPositionG();
 } 
@@ -664,29 +652,17 @@ function SetCameraPositionG()
     console.log(pc); 
     camera3JSAlt = pc.y; 
     camera.position.set(pc.x, pc.y, pc.z); 
-
-    // make the trail
-    if (trailgeometry) {
-        var pp = trailgeometry.vertices[trialgeometryindex % trailgeometry.vertices.length]; 
-        if (Math.max(Math.abs(pp.x - pc.x), Math.abs(pp.z - pc.z)) >= 2) {
-            trialgeometryindex++; 
-            trailgeometry.vertices[trialgeometryindex % trailgeometry.vertices.length].set(pc.x, pc.y - 4, pc.z); 
-            document.getElementById('testout').textContent = ":"+trialgeometryindex+" "+pc.x.toFixed(0)+","+pc.y.toFixed(0)+","+pc.z.toFixed(0); 
-            trailgeometry.verticesNeedUpdate = true; 
-            trailgeometry.computeBoundingSphere(); 
-            trailgeometry.computeBoundingBox(); 
-        }
-    }
+    TrailUpdate(); 
 };
 
 function geo_error() 
 {  
     document.getElementById('gpsrec').textContent = "gps error"; 
 }
-var watchID = navigator.geolocation.watchPosition(geo_success, geo_error, {enableHighAccuracy:true, timeout:27000, maximumAge:30000}); 
-  
+
+//var watchID = navigator.geolocation.watchPosition(geo_success, geo_error, {enableHighAccuracy:true, timeout:27000, maximumAge:30000}); 
+fakegpsgenerator(); 
 console.log("dididi"); 
-console.log(watchID); 
   </script>
   </body>
 </html>
