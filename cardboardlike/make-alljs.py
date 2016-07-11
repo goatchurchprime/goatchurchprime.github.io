@@ -2,7 +2,7 @@ import os, time, re, sys
 import pyproj
 import json
 
-fjs = "/home/goatchurch/geom3d/goatchurchprime.github.io/cardboardlike/all3d.js"
+fjs = "/home/goatchurch/geom3d/goatchurchprime.github.io/cardboardlike/all3dn.js"
 fsvx = "/home/goatchurch/caving/expoloser/all.svx"
 f3d = "/home/goatchurch/caving/allding.3d"
 
@@ -28,8 +28,10 @@ for l in g:
 
 prevp = None
 conts = [ ]
-segs = [ ]  # same as conts but in segments
-ents = [ ]
+segsnamemap = { }
+stationsnamemap = { }
+entsmap = { }
+sallnames = set()
 for l in g:
     ls = l.split()
     if ls[0] in ["MOVE", "NODE", "LINE"]:
@@ -40,32 +42,66 @@ for l in g:
             if conts and len(conts[-1]) == 1:
                 conts.pop()
             conts.append([])
-            prevp = None
+            prevp = p
         elif ls[0] == "LINE":
             toplevelname = re.match("\[([^\]\.]*)", ls[4]).group(1)
             styles = ls[5].split("=")[1:]+ls[6:]
+            if prevp:
+                stationsnamemap[prevp] = toplevelname
+            stationsnamemap[p] = toplevelname
             if "SURFACE" not in styles and "SPLAY" not in styles and "DUPLICATE" not in styles:
+                sallnames.add(toplevelname)
                 conts[-1].append(p)
                 if prevp is not None:
-                    segs.append(prevp + p)
+                    if toplevelname not in segsnamemap:
+                        segsnamemap[toplevelname] = []
+                    segsnamemap[toplevelname].append((prevp, p))
                 prevp = p
         elif ls[0] == "NODE":
             name = ls[4].strip("[]")
             tags = ls[5].split() if len(ls) >= 6 else []
             if ("ENTRANCE" in tags and "." not in name) or name in ["t2006-09", "gps2010-01", "gps2010-07"]:
-                ents.append((name, lat, lng, alt))
-        
-os.system("rm %s" % f3d)
+                entsmap[name] = p
+                
+assocnamesents = { }
+for e, p in entsmap.items():
+    toplevelsurvname = stationsnamemap.get(p)
+    if toplevelsurvname and toplevelsurvname in segsnamemap:
+        if toplevelsurvname not in assocnamesents:
+            assocnamesents[toplevelsurvname] = [ ]
+        assocnamesents[toplevelsurvname].append(e)
+    else:
+        sallnames.add(e)
+
+allnames = list(sallnames)
+allnames.sort()
+
+# associate an index to each entrance
+svxents = [ ]
+for e, p in entsmap.items():
+    toplevelsurvname = stationsnamemap.get(p)
+    le = toplevelsurvname if toplevelsurvname and toplevelsurvname in segsnamemap else e
+    svxents.append((e, p[0], p[1], p[2], allnames.index(le)))
+svxents.sort(key=lambda X: -X[3])
+    
+svxsegs = [ ]
+for sname, segs in segsnamemap.items():
+    i = allnames.index(sname)
+    for p, p1 in segs:
+        svxsegs.append((p[0], p[1], p[2], p1[0], p1[1], p1[2], i))
+svxsegs.sort(key=lambda X: -max(X[2], X[5]))
 
 fout = open(fjs, "w")
 fout.write("// generated %s from running %s\n\n" % (time.asctime(), sys.argv[0]))
-fout.write("var svxlegs = ") 
-fout.write(json.dumps(segs))
+fout.write("var svxnames = ") 
+fout.write(json.dumps(allnames))
 fout.write(";\n\n")
 fout.write("var svxents = ") 
-fout.write(json.dumps(ents))
+fout.write(json.dumps(svxents))
+fout.write(";\n\n")
+fout.write("var svxlegs = ") 
+fout.write(json.dumps(svxsegs))
 fout.write(";\n")
-
 fout.close()
 
 
