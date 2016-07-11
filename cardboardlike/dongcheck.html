@@ -381,7 +381,6 @@ function LoadEntrances(scene)
     var enttriangles = new THREE.Mesh(buffergeometry, enttrianglematerial);  
     scene.add(enttriangles); 
 
-    var gents = new THREE.Geometry();
     var card = new THREE.Object3D();
     for (var i = 0; i < svxents.length; i++) {
         var p = latlngtopt(svxents[i][1], svxents[i][2], svxents[i][3]); 
@@ -389,7 +388,6 @@ function LoadEntrances(scene)
         entcorner[i*3] = 0.0;  entcorner[i*3+1] = 1.0;  entcorner[i*3+2] = 2.0; 
         if (svxents[i][0].match(/p\d+[a-z]?$/) !== null) {
             MakeLabel(card, svxents[i][0], "rgba(0,200,200,0.95)", p, 0.5);  // rgba(0,200,200,0.95)
-            gents.vertices.push(p); 
         }
     }
     scene.add(card);
@@ -507,10 +505,19 @@ function touchstartfunc(event)
 }
 
 var selectposx, selectposy; 
+var pickray = new THREE.Raycaster()
 function selecteffort(px, py, sesource)
 {
     quantshowshow("SELECT"+px+" "+py+" "+sesource); 
-    console.log("bbbb "+px+" "+py); 
+    var sx = (px/window.innerWidth)*2 - 1; 
+    var sy = -(py/window.innerHeight)*2 + 1; 
+    console.log("bbbb "+sx+" "+sy); 
+    pickray.setFromCamera({x:sx, y:sy}, camera); 
+//    rayorigin.setFromMatrixPosition(camera.matrixWorld);
+//    raydirection.set(sx, sy, 0.5).unproject(camera).sub(rayorigin).normalize();
+    var rfac = 150.0; 
+    pickposmesh.position.set(pickray.ray.origin.x + pickray.ray.direction.x*rfac, pickray.ray.origin.y + pickray.ray.direction.y*rfac, pickray.ray.origin.z + pickray.ray.direction.z*rfac); 
+    console.log(pickposmesh.position, "f", footposmesh.position); 
 }; 
 
 function touchholdfunc(event) 
@@ -521,7 +528,6 @@ function touchholdfunc(event)
         touchmovestate = 5; 
         selecteffort(event.pageX, event.pageY, "contextevent"); 
     }
-    console.log(event); 
     return false 
 }; 
 
@@ -630,6 +636,7 @@ function init()
     LoadEntrances(scene); 
     LoadTrail(scene); 
     LoadFootpos(scene); 
+    LoadPickPos(scene); 
     
     var corners = [ [0,-1,0xFFFFFF]/*North*/, [1,0,0x55FFAA]/*east*/, [0,1,0xFF3333], [-1,0,0xFFFF33] ];
     var g = new THREE.Geometry(); 

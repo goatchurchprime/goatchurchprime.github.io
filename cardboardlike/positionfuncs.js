@@ -1,4 +1,5 @@
-var fakegpsstart = [47.69278936428201, 13.820952855143327, 1877.69]; 
+
+var fakegpsstart = [47.69278936428201, 13.820952855143327, 1877.69];  // this is at 204a entrance
 var ifakegpsstart = 0; 
 function fakegpsgenerator()
 {
@@ -82,6 +83,27 @@ function LoadFootpos(scene)
     scene.add(footposmesh); 
 }
 
+var pickposmesh = null; 
+function LoadPickPos(scene) 
+{
+    var alt = 0, tfac = 3; 
+    var vertbuff = new THREE.Float32Attribute(new Float32Array(6*3), 3); 
+    var indices = new Uint16Array(6);
+    for (var i = 0; i <= 1; i++) {
+        var xfac = (i == 0 ? -1 : 1); 
+        vertbuff.setXYZ(i*3, 0.02*xfac*tfac, alt, 0); 
+        vertbuff.setXYZ(i*3+1, 0.02*xfac*tfac, alt, -2*tfac); 
+        vertbuff.setXYZ(i*3+2, 1*xfac*tfac, alt + i, -2*tfac); 
+        indices[i*3] = i*3; 
+        indices[i*3+1] = i*3+1+i; 
+        indices[i*3+2] = i*3+2-i; 
+    }
+    var buffergeometry = new THREE.BufferGeometry(); 
+    buffergeometry.setIndex(new THREE.BufferAttribute(indices, 1)); 
+    buffergeometry.addAttribute('position', vertbuff);
+    pickposmesh = new THREE.Mesh(buffergeometry, new THREE.MeshBasicMaterial({ color: "red" }));  
+    scene.add(pickposmesh); 
+}
 
 
 
