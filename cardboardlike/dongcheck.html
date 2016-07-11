@@ -428,6 +428,10 @@ function animate(t)
         camera.position.y = camera3JSAlt + Zhopdisplacement(); 
     //$("#camerapos").text("cam:"+camera.position.x.toFixed(1)+" "+camera.position.y.toFixed(1)+" "+camera.position.z.toFixed(1))
     requestAnimationFrame(animate);
+    if  ((touchmovestate == 1) && (clock.elapsedTime - touchtime > 1)) {
+        touchmovestate = 5; 
+        selecteffort(touchStart.x, touchStart.y, "fromanimate")
+    }
     update(clock.getDelta());
     render(clock.getDelta());
 }
@@ -481,11 +485,12 @@ function setclosedistvalue(closedistvalue)
 }
 
 var touchStart = new THREE.Vector2(), touchEnd = new THREE.Vector2(), touchDelta = new THREE.Vector2();
-var alphaoffsetStart; 
-var touchmovestate = 0; // 1 is touchdrag, 2 is dragging left-right for alpha compass rotate, 3 for depth of fogbrightness, 4 pinch for FOV change
+var alphaoffsetStart, touchtime; 
+var touchmovestate = 0; // 1 is touchdrag, 2 is dragging left-right for alpha compass rotate, 3 for depth of fogbrightness, 4 pinch for FOV change, 5 for point selection
 function touchstartfunc(event) 
 {
     event.stopPropagation(); 
+    touchtime = clock.elapsedTime; 
     if (event.touches.length == 1) {
         touchStart.set(event.touches[0].pageX, event.touches[0].pageY); 
         if ((touchStart.y < 30) && (touchStart.x >= vizcontainer.offsetWidth*0.25)) {
@@ -501,17 +506,43 @@ function touchstartfunc(event)
     }
 }
 
+var selectposx, selectposy; 
+function selecteffort(px, py, sesource)
+{
+    quantshowshow("SELECT"+px+" "+py+" "+sesource); 
+    console.log("bbbb "+px+" "+py); 
+}; 
+
+function touchholdfunc(event) 
+{ 
+    event.preventDefault(); 
+    event.stopPropagation(); 
+    if (touchmovestate == 1) {
+        touchmovestate = 5; 
+        selecteffort(event.pageX, event.pageY, "contextevent"); 
+    }
+    console.log(event); 
+    return false 
+}; 
+
 function touchmovefunc(event)
 {
     event.preventDefault(); 
+    event.stopPropagation(); 
+    var touchmovepixelsrequired = 20; 
     if (event.touches.length == 1) {
         touchEnd.set(event.touches[0].pageX, event.touches[0].pageY);
         touchDelta.subVectors(touchEnd, touchStart); 
-        if ((touchmovestate == 1) && (Math.max(Math.abs(touchDelta.x), Math.abs(touchDelta.y)*2) > 20)) {
+        if ((touchmovestate == 1) && (Math.max(Math.abs(touchDelta.x), Math.abs(touchDelta.y)*2) > touchmovepixelsrequired)) {
             touchmovestate = (Math.abs(touchDelta.x) >= Math.abs(touchDelta.y) ? 2 : 3); 
             touchmovevalueStart = (touchmovestate == 2 ? controls.alphaoffset : centrelinematerial.uniforms.closedist.value); 
-            quantshowshow("**"); 
+            quantshowshow("**");   // drops through
         }
+        if  ((touchmovestate == 1) && (clock.elapsedTime - touchtime > 1)) {
+            touchmovestate = 5; 
+            selecteffort(touchStart.x, touchStart.y, "touchholdmove")
+        }
+
         if (touchmovestate == 2) {
             controls.alphaoffset = touchmovevalueStart + touchDelta.x*0.1;  
             quantshowtextelement.textContent = "A-offs: "+controls.alphaoffset.toFixed(0); 
@@ -526,7 +557,9 @@ function touchmovefunc(event)
             quantshowtextelement.textContent = "FOV: "+camera.fov.toFixed(0)+"deg"; 
         }
     }
+    return false; 
 }
+
 function touchendfunc(event)
 {
     event.preventDefault(); 
@@ -621,6 +654,7 @@ function init()
     vizcontainer.addEventListener('touchstart', touchstartfunc, false);
     vizcontainer.addEventListener('touchend', touchendfunc, false);
     vizcontainer.addEventListener('touchmove', touchmovefunc, false);
+    vizcontainer.addEventListener('contextmenu', touchholdfunc, false); 
 
     window.addEventListener('resize', resize);
     setTimeout(resize, 1);
@@ -629,41 +663,12 @@ function init()
 init();
 animate();
 
-
-
-function geo_success(position) 
-{ 
-    latG = position.coords.latitude; 
-    lngG = position.coords.longitude; 
-    document.getElementById('gpsrec').textContent = "Lat:"+latG.toFixed(7)+" Lng:"+lngG.toFixed(7)+
-                                                    " (~"+position.coords.accuracy.toFixed(0)+"m)"+
-                                                    " Alt:"+position.coords.altitude.toFixed(1)+
-                                                    " (~"+position.coords.altitudeAccuracy.toFixed(0)+"m)"; 
-    //document.getElementById('heading').textContent = position.coords.heading.toFixed(0); 
-    //document.getElementById('speed').textContent = position.coords.speed.toFixed(2); 
-    
-    if (position.coords.altitude != 0.0)
-        altG = position.coords.altitude; 
-    SetCameraPositionG();
-} 
-    
-function SetCameraPositionG()
-{
-    var pc = latlngtopt(latG - latR, lngG - lngR, altG - altR); 
-    camera3JSAlt = pc.y; 
-    camera.position.set(pc.x, pc.y, pc.z); 
-    TrailUpdate(); 
-};
-
-function geo_error() 
-{  
-    document.getElementById('gpsrec').textContent = "gps error"; 
-}
-
+// add GPS reader to this or do fake positions
 //var watchID = navigator.geolocation.watchPosition(geo_success, geo_error, {enableHighAccuracy:true, timeout:27000, maximumAge:30000}); 
 fakegpsgenerator(); 
-
 console.log("dididi"); 
+
+
   </script>
   </body>
 </html>

@@ -83,3 +83,33 @@ function LoadFootpos(scene)
 }
 
 
+
+
+function geo_success(position) 
+{ 
+    latG = position.coords.latitude; 
+    lngG = position.coords.longitude; 
+    document.getElementById('gpsrec').textContent = "Lat:"+latG.toFixed(7)+" Lng:"+lngG.toFixed(7)+
+                                                    " (~"+position.coords.accuracy.toFixed(0)+"m)"+
+                                                    " Alt:"+position.coords.altitude.toFixed(1)+
+                                                    " (~"+position.coords.altitudeAccuracy.toFixed(0)+"m)"; 
+    //document.getElementById('heading').textContent = position.coords.heading.toFixed(0); 
+    //document.getElementById('speed').textContent = position.coords.speed.toFixed(2); 
+    
+    if (position.coords.altitude != 0.0)
+        altG = position.coords.altitude; 
+    SetCameraPositionG();
+} 
+    
+function SetCameraPositionG()
+{
+    var pc = latlngtopt(latG - latR, lngG - lngR, altG - altR); 
+    camera3JSAlt = pc.y; 
+    camera.position.set(pc.x, pc.y, pc.z); 
+    TrailUpdate(); 
+};
+
+function geo_error() 
+{  
+    document.getElementById('gpsrec').textContent = "gps error"; 
+}
