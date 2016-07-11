@@ -45,7 +45,7 @@ varying float altitude;
 varying float vcosslope; 
 float midlump(float v, float offset) 
 {
-    float lv = (mod(v + offset, 100.0) - 50.0)/50.0; 
+    float lv = (mod(v*0.1 + offset, 100.0) - 50.0)/50.0; 
     return clamp(1.0 - lv*lv*1.0, 0.0, 1.0); 
 }
 void main(void) 
@@ -155,7 +155,6 @@ void main()
   <script>
 var basepositionOrigin, latR, lngR, altR, latG, lngG, altG; 
 var nyfac, nxfac, eyfac, exfac, lat0, lng0, alt0, camera3JSAlt; 
-var gfac = 0.1; // scale applied to all elements in the scene 
 function SetBasePositions()
 {
     basepositionOrigin = [ "Hilde", 47.6160995, 13.8121137, 748 ];  // this is subtracted from the data positions
@@ -216,30 +215,31 @@ function ZhopGo()
 }
 function Zhopdisplacement() 
 {
+    var hopheight = 1500.0; 
     if (hopmode === 0)
         return 0.0; 
     if (hopmode === 2)
-        return 300; 
+        return hopheight; 
     if (hoptime === null)
         return 0.0; 
     var hsecs = clock.elapsedTime - hoptime; 
     if (hsecs > 2) {
         hoptime = null; 
         hopmode = (hopmode == 1 ? 2 : 0); 
-        return (hopmode === 2 ? 300 : 0); 
+        return (hopmode === 2 ? hopheight : 0); 
     }
     var x = Math.abs((hsecs-2)/2); 
     if (hopmode == -1)
         x = 1 - x; 
     var y = (x < 0.5 ? (1 - x*x*2) : (1 - x)*(1 - x)*2); 
-    return 300.0*y; 
+    return hopheight*y; 
 }
 
 function latlngtopt(lat, lng, alt)
 {
     var rlat = lat - lat0; 
     var rlng = lng - lng0; 
-    return new THREE.Vector3(-(rlat*eyfac + rlng*exfac)*gfac, alt*gfac, +(rlat*nyfac + rlng*nxfac)*gfac); 
+    return new THREE.Vector3(-(rlat*eyfac + rlng*exfac), alt, +(rlat*nyfac + rlng*nxfac)); 
 }
 
 
@@ -516,7 +516,7 @@ function touchmovefunc(event)
             quantshowtextelement.textContent = "A-offs: "+controls.alphaoffset.toFixed(0); 
         } else if (touchmovestate == 3) {
             setclosedistvalue(Math.max(0.0, touchmovevalueStart - Math.max(1.0, touchmovevalueStart)*touchDelta.y*0.02)); 
-            quantshowtextelement.textContent = "Light: "+(centrelinematerial.uniforms.closedist.value/gfac).toFixed(0)+"m"; 
+            quantshowtextelement.textContent = "Light: "+(centrelinematerial.uniforms.closedist.value).toFixed(0)+"m"; 
         }
     } else if (event.touches.length == 2) {
         if (touchmovestate == 4) {
@@ -549,21 +549,21 @@ function init()
     scene = new THREE.Scene();
     var fieldofview = 30; // degrees (smaller is more tunnel like)
     var aspect = 1;       // reset in resize()
-    var neardistance = 5*gfac; 
-    var fardistance = 70000*gfac; 
+    var neardistance = 5; 
+    var fardistance = 70000; 
     camera = new THREE.PerspectiveCamera(fieldofview, aspect, neardistance, fardistance);
-    camera3JSAlt = alt0*gfac; 
+    camera3JSAlt = alt0; 
     camera.position.set(0, camera3JSAlt, 0); 
     scene.add(camera); 
 
     SetBasePositions(); 
 
-    /*var gsurf = new THREE.TorusGeometry(10*gfac, 4*gfac, 90, 30); 
+    /*var gsurf = new THREE.TorusGeometry(10hopmode, 4, 90, 30); 
     flatmaterial = new THREE.MeshPhongMaterial({ color: "rgb(220,50,210)", opacity: 0.1, specular: 0x222222, shininess: 40, side: THREE.DoubleSide, vertexColors: THREE.FaceColors, shading: THREE.FlatShading });  
     gsurf.computeBoundingSphere();
     geomeshtorus = new THREE.Mesh(gsurf, flatmaterial); 
     geomeshtorus.rotateX(Math.PI/2); 
-    geomeshtorus.translateZ(-(alt0-50)*gfac); 
+    geomeshtorus.translateZ(-(alt0-50)); 
     scene.add(geomeshtorus);  */
 
     controls = new THREE.DeviceOrientationControls(camera, true);
@@ -593,22 +593,22 @@ function init()
     
     var corners = [ [0,-1,0xFFFFFF]/*North*/, [1,0,0x55FFAA]/*east*/, [0,1,0xFF3333], [-1,0,0xFFFF33] ];
     var g = new THREE.Geometry(); 
-    var dd = 50; 
+    var dd = 500; 
     for (var j = 0; j < corners.length; j++) {
         var g1 = new THREE.Geometry();
         
-        g1.vertices.push(new THREE.Vector3(dd*corners[j][0], alt0*gfac, dd*corners[j][1])); 
-        g1.vertices.push(new THREE.Vector3(dd*corners[j][0], alt0*gfac+dd, dd*corners[j][1])); 
+        g1.vertices.push(new THREE.Vector3(dd*corners[j][0], alt0, dd*corners[j][1])); 
+        g1.vertices.push(new THREE.Vector3(dd*corners[j][0], alt0+dd, dd*corners[j][1])); 
         var m0 = new THREE.LineBasicMaterial({ color:corners[j][2], opacity:0.7, linewidth:linewidth, depthWrite:true }); 
         var contour = new THREE.Line(g1, m0, THREE.LineStrip); // for disjoint line segments use THREE.LinePieces
         scene.add(contour); 
-        g.vertices.push(new THREE.Vector3(dd*corners[j][0], alt0*gfac, dd*corners[j][1])); 
+        g.vertices.push(new THREE.Vector3(dd*corners[j][0], alt0, dd*corners[j][1])); 
     }
-    g.vertices.push(new THREE.Vector3(dd*corners[0][0], alt0*gfac, dd*corners[0][1])); 
+    g.vertices.push(new THREE.Vector3(dd*corners[0][0], alt0, dd*corners[0][1])); 
     var m = new THREE.LineBasicMaterial({ color:0xFF0000, opacity:1.0, linewidth:linewidth, depthWrite:true }); 
     var contour = new THREE.Line(g, m, THREE.LineStrip); 
     scene.add(contour); 
-    scene.fog = new THREE.Fog(0x202020, 10*gfac, 20000*gfac);  // near and far
+    scene.fog = new THREE.Fog(0x202020, 10, 20000);  // near and far
         
     document.getElementById("camerahop").addEventListener("click", ZhopGo); 
     document.getElementById("reset31").addEventListener("click", reset31); 
@@ -649,7 +649,6 @@ function geo_success(position)
 function SetCameraPositionG()
 {
     var pc = latlngtopt(latG - latR, lngG - lngR, altG - altR); 
-    console.log(pc); 
     camera3JSAlt = pc.y; 
     camera.position.set(pc.x, pc.y, pc.z); 
     TrailUpdate(); 
@@ -662,6 +661,7 @@ function geo_error()
 
 //var watchID = navigator.geolocation.watchPosition(geo_success, geo_error, {enableHighAccuracy:true, timeout:27000, maximumAge:30000}); 
 fakegpsgenerator(); 
+
 console.log("dididi"); 
   </script>
   </body>

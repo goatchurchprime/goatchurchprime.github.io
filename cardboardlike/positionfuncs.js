@@ -4,12 +4,12 @@ function fakegpsgenerator()
 {
     var ioffs = 100, ifac = 1.0/600; 
     var i = ioffs; 
-    var x0 = Math.cos(i*ifac)*i*0.0001*gfac; 
-    var y0 = -Math.sin(i*ifac)*i*0.0001*gfac; 
+    var x0 = Math.cos(i*ifac)*i*0.00001; 
+    var y0 = -Math.sin(i*ifac)*i*0.00001; 
 
     i = ioffs + ifakegpsstart; 
-    var x = Math.cos(i*ifac)*i*0.0001*gfac; 
-    var y = -Math.sin(i*ifac)*i*0.0001*gfac; 
+    var x = Math.cos(i*ifac)*i*0.00001; 
+    var y = -Math.sin(i*ifac)*i*0.00001; 
     
     geo_success({ coords: { latitude: fakegpsstart[0] + x - x0, longitude: fakegpsstart[1] + y - y0, accuracy: i*0.01, altitudeAccuracy: i*0.01+1, altitude: ((i % 31) != 6 ? fakegpsstart[2] : 0.0) }}); 
     ifakegpsstart++; 
@@ -19,11 +19,12 @@ function fakegpsgenerator()
 
 var trailgeometry = null; 
 var trialgeometryindex = 0; 
+var footminusalt = 20; 
 function LoadTrail(scene) 
 {
     trailgeometry = new THREE.Geometry();
     //var p = latlngtopt(svxents[i][1], svxents[i][2], svxents[i][3]); 
-    var p = new THREE.Vector3(camera.position.x, camera.position.y - 4, camera.position.z); 
+    var p = new THREE.Vector3(camera.position.x, camera.position.y - footminusalt, camera.position.z); 
     for (var i = 0; i < 50; i++)
         trailgeometry.vertices.push(new THREE.Vector3(p.x, p.y, p.z)); 
     var trailpointsmaterial = new THREE.PointsMaterial({ color: 0x22FF11, sizeAttenuation: false, size: 5.0 }); 
@@ -34,12 +35,13 @@ function LoadTrail(scene)
 function TrailUpdate()
 {
     // make the trail
+    var trailstep = 15.0; 
     if (trailgeometry) {
         var pp = trailgeometry.vertices[trialgeometryindex % trailgeometry.vertices.length]; 
         var pc = camera.position; 
-        if (Math.max(Math.abs(pp.x - pc.x), Math.abs(pp.z - pc.z)) >= 2) {
+        if (Math.max(Math.abs(pp.x - pc.x), Math.abs(pp.z - pc.z)) >= trailstep) {
             trialgeometryindex++; 
-            trailgeometry.vertices[trialgeometryindex % trailgeometry.vertices.length].set(pc.x, pc.y - 4, pc.z); 
+            trailgeometry.vertices[trialgeometryindex % trailgeometry.vertices.length].set(pc.x, pc.y - footminusalt, pc.z); 
             document.getElementById('testout').textContent = " :::"+trialgeometryindex+" "+pc.x.toFixed(0)+","+pc.y.toFixed(0)+","+pc.z.toFixed(0); 
             trailgeometry.verticesNeedUpdate = true; 
             trailgeometry.computeBoundingSphere(); 
@@ -48,7 +50,7 @@ function TrailUpdate()
     }
     
     if (footposmesh) {
-        footposmesh.position.set(camera.position.x, camera.position.y - 20*gfac, camera.position.z); 
+        footposmesh.position.set(camera.position.x, camera.position.y - footminusalt, camera.position.z); 
     }
 }
 
@@ -56,7 +58,7 @@ function TrailUpdate()
 var footposmesh = null; 
 function LoadFootpos(scene) 
 {
-    var alt = 0, tfac = 0.05, pixsize = 0.06; 
+    var alt = 0, tfac = 0.5, pixsize = 0.06; 
     var vertbuff = new THREE.Float32Attribute(new Float32Array((6+4)*3), 3); 
     var indices = new Uint16Array(6+6);
     for (var i = 0; i <= 1; i++) {

@@ -1,7 +1,5 @@
 
 // things to do
-// * landing feet underneath you and poss compass rose
-// * set gfac to 1.0
 // * do the mag check early on on startup
 // * picking (possibly light up a cave)
 // * other peaks in view into database
@@ -15,6 +13,8 @@
 // * hard-coded fake position offset mode
 
 // done
+// * set gfac to 1.0
+// * landing feet underneath you and poss compass rose
 // * make the info panel pop up and disappear 
 // * bigger buttons that pop up and go down
 // * pinch zoom for FOV
