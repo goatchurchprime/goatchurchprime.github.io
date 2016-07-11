@@ -31,32 +31,29 @@ conts = [ ]
 segs = [ ]  # same as conts but in segments
 ents = [ ]
 for l in g:
-    # legs sections
-    m = re.match('(MOVE|LINE) ([0-9\.\-]*) ([0-9\.\-]*) ([0-9\.\-]*)(?:.*?STYLE=.*?(SURFACE))?', l)
-    if m:
-        if m.group(1) == 'MOVE':
+    ls = l.split()
+    if ls[0] in ["MOVE", "NODE", "LINE"]:
+        lng, lat = proj(float(ls[1]), float(ls[2]), inverse=True)
+        alt = float(ls[3])
+        p = (lat, lng, alt)
+        if ls[0] == "MOVE":
             if conts and len(conts[-1]) == 1:
                 conts.pop()
             conts.append([])
             prevp = None
-        lng, lat = proj(float(m.group(2)), float(m.group(3)), inverse=True)
-        alt = float(m.group(4))
-        p = (lat, lng, alt)
-        if not m.group(5):
-            conts[-1].append(p)
-            if prevp is not None:
-                segs.append(prevp + p)
-            prevp = p
-    
-    # entrances
-    m = re.match('(NODE) ([0-9\.\-]*) ([0-9\.\-]*) ([0-9\.\-]*) \[([^\]]*)\]\s+(.*)', l)
-    if m:
-        tags = m.group(6).split()
-        name = m.group(5)
-        if ("ENTRANCE" in tags and "." not in name) or name in ["t2006-09", "gps2010-01", "gps2010-07"]:
-            lng, lat = proj(float(m.group(2)), float(m.group(3)), inverse=True)
-            alt = float(m.group(4))
-            ents.append((name, lat, lng, alt))
+        elif ls[0] == "LINE":
+            toplevelname = re.match("\[([^\]\.]*)", ls[4]).group(1)
+            styles = ls[5].split("=")[1:]+ls[6:]
+            if "SURFACE" not in styles and "SPLAY" not in styles and "DUPLICATE" not in styles:
+                conts[-1].append(p)
+                if prevp is not None:
+                    segs.append(prevp + p)
+                prevp = p
+        elif ls[0] == "NODE":
+            name = ls[4].strip("[]")
+            tags = ls[5].split() if len(ls) >= 6 else []
+            if ("ENTRANCE" in tags and "." not in name) or name in ["t2006-09", "gps2010-01", "gps2010-07"]:
+                ents.append((name, lat, lng, alt))
         
 os.system("rm %s" % f3d)
 

@@ -1,12 +1,13 @@
 
 // things to do
+// * put the cave index as attribute to entrances and legs
 // * Rauchercan data
 // * picking (possibly light up a cave)
+// * picking to be its own class in another javascript file
 // * drop straight into data if miles away
 // * put some passage widths into the picture using attributes
 // * other peaks in view into database
 // * break file into different javascript files
-// * clean version of data without fake cave junk
 // * do the mag check early on on startup
 // * small slight hopping as we go along
 // * click to find cave
@@ -14,7 +15,9 @@
 // * hard-coded fake position offset mode
 // * background image from camera
 
+
 // done
+// * clean version of data without fake cave junk
 // * make the open out bit a button on the top right
 // * when dragging the alpha, fix the position even when device is moving (given up)
 // * set gfac to 1.0
