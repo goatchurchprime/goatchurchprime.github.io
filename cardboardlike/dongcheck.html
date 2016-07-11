@@ -7,10 +7,11 @@
     <style>
       body { margin: 0px; overflow: hidden; }
       #viz { position: absolute; top: 0; left: 0; right: 0; bottom: 0; }
+      #quantbutton { position: absolute; right:0; top: 0; border: thin red solid; background:#ddf; display: block }
       #quantshow { position: absolute; right:0; top: 0; width: 75%; border: thin red solid; background:#ddf; display: block }
       #quantshowtext { font-size: 200%; position: relative; left: 0; top: 0; display: none }
       #postext { position: relative; left: 0; top: 0; display: block }
-      #postext input { font-size: 150%}
+      #postext input, #quantbutton input { font-size: 150%}
     </style>
     <link rel="manifest" href="manifest.json">
     <script src="three.min.js"></script>
@@ -21,19 +22,22 @@
   <body>
     <div id="main">
       <div id="viz"></div>
+      <div id="quantbutton">
+        <input type="button" value="Q" id="qshow"/>
+      </div>
       <div id="quantshow">
         <div id="quantshowtext">TEE</div>
         <div id="postext">
           <div id="numpanel">
               <span id="gpsrec">Dgps</span>
               <span id="testout">:</span>
-         </div>
+          </div>
           <div>
               <input type="button" value="Hop" id="camerahop"/>
               <input type="button" value="31" id="reset31"/>
               <input type="button" value="Mag" id="magorientset"/>
               <input type="button" value="T1" id="test1"/>
-           </div>
+          </div>
         </div>
       </div>
     </div>
@@ -443,7 +447,7 @@ function tryabsoluteorient(event)
     console.log("absoluteorient", event); 
     quantshowtextelement.textContent = "gting "+event.alpha.toFixed(1)+" "+event.absolute; 
     if ((event.alpha !== null) && event.absolute) {
-        controls.alphaoffset = event.alpha - GdeviceOrientation.alpha; 
+        controls.alphaoffset = event.alpha - GdeviceOrientation.alpha; // GdeviceOrientation is global var accessing deviceOrientation within the controls library
         quantshowtextelement.textContent = "AA-offs: "+controls.alphaoffset.toFixed(1); 
     }
     quantshowhidedelay(1500); 
@@ -493,11 +497,7 @@ function touchstartfunc(event)
     touchtime = clock.elapsedTime; 
     if (event.touches.length == 1) {
         touchStart.set(event.touches[0].pageX, event.touches[0].pageY); 
-        if ((touchStart.y < 30) && (touchStart.x >= vizcontainer.offsetWidth*0.25)) {
-            quantshowshow(false); 
-        } else {
-            touchmovestate = 1; // pre-single move, but don't know direction of drag
-        }
+        touchmovestate = 1; // pre-single move, but don't know direction of drag
     } else if ((event.touches.length == 2) && (touchmovestate <= 1)) {
         touchStart.set(event.touches[1].pageX - event.touches[0].pageX, event.touches[1].pageX - event.touches[0].pageY); 
         touchmovevalueStart = camera.fov; 
@@ -537,6 +537,8 @@ function touchmovefunc(event)
             touchmovestate = (Math.abs(touchDelta.x) >= Math.abs(touchDelta.y) ? 2 : 3); 
             touchmovevalueStart = (touchmovestate == 2 ? controls.alphaoffset : centrelinematerial.uniforms.closedist.value); 
             quantshowshow("**");   // drops through
+            //if (touchmovestate == 2)
+            //    controls.alphalock = true; 
         }
         if  ((touchmovestate == 1) && (clock.elapsedTime - touchtime > 1)) {
             touchmovestate = 5; 
@@ -544,7 +546,9 @@ function touchmovefunc(event)
         }
 
         if (touchmovestate == 2) {
-            controls.alphaoffset = touchmovevalueStart + touchDelta.x*0.1;  
+            //controls.alpha += THREE.Math.degToRad(touchDelta.x*0.1);  // didnt work
+            //touchStart.set(touchEnd.x, touchEnd.y); // make incremental so the holding flag within the controls can also work
+            controls.alphaoffset = touchmovevalueStart + touchDelta.x*0.3;  
             quantshowtextelement.textContent = "A-offs: "+controls.alphaoffset.toFixed(0); 
         } else if (touchmovestate == 3) {
             setclosedistvalue(Math.max(0.0, touchmovevalueStart - Math.max(1.0, touchmovevalueStart)*touchDelta.y*0.02)); 
@@ -563,6 +567,8 @@ function touchmovefunc(event)
 function touchendfunc(event)
 {
     event.preventDefault(); 
+    //if (touchmovestate == 2)
+    //    controls.alphalock = false; 
     if (touchmovestate > 0)
         quantshowhidedelay(1500); 
     touchmovestate = 0; 
@@ -650,9 +656,11 @@ function init()
     document.getElementById("magorientset").addEventListener("click", function(event) { event.preventDefault(); window.addEventListener('absolutedeviceorientation', tryabsoluteorient); }); 
 
     quantshowelement.addEventListener("click", quantshowhide); 
+    document.getElementById("qshow").addEventListener("click", function(event) { quantshowshow(false); }); 
 
     vizcontainer.addEventListener('touchstart', touchstartfunc, false);
     vizcontainer.addEventListener('touchend', touchendfunc, false);
+    vizcontainer.addEventListener('touchcancel', touchendfunc, false);
     vizcontainer.addEventListener('touchmove', touchmovefunc, false);
     vizcontainer.addEventListener('contextmenu', touchholdfunc, false); 
 

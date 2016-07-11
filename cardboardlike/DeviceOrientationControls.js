@@ -68,7 +68,8 @@ THREE.DeviceOrientationControls = function(object) {
   this.autoForward = false;
 
   this.alpha = 0;
-  this.alphaoffset = 0;
+  this.alphaoffset = 0.0;  // added
+  //this.alphalock = false;  // added  // didn't work.  couldn't see why it was unstable
   this.beta = 0;
   this.gamma = 0;
   this.orient = 0;
@@ -105,6 +106,8 @@ THREE.DeviceOrientationControls = function(object) {
         //this.autoAlign = true;
       //}
 
+      //if (this.alphalock && deviceOrientation.gamma)
+      //    this.alphaoffset = THREE.Math.radToDeg(this.alpha) - deviceOrientation.alpha; 
       this.alpha = deviceOrientation.gamma ? THREE.Math.degToRad(deviceOrientation.alpha + this.alphaoffset) : 0; // Z
       this.beta = deviceOrientation.beta ? THREE.Math.degToRad(deviceOrientation.beta) : 0; // X'
       this.gamma = deviceOrientation.gamma ? THREE.Math.degToRad(deviceOrientation.gamma) : 0; // Y''
@@ -181,7 +184,7 @@ THREE.DeviceOrientationControls = function(object) {
   };
 
   this.disconnect = function() {
-    this.freze = true;
+    this.freeze = true;
   };
 
 };
