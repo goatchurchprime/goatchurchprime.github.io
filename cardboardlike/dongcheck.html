@@ -296,7 +296,6 @@ function LoadMountains(scene)
     var peakpositionbuff = new THREE.BufferAttribute(new Float32Array(peaks.length*9), 3); 
     var peakcorner = new Float32Array(peaks.length*3); 
     
-    var g1 = new THREE.Geometry();
     var card = new THREE.Object3D();
     for (var i = 0; i < peaks.length; i++) {
         var p = latlngtopt(peaks[i][1], peaks[i][2], peaks[i][3]); 
@@ -307,7 +306,7 @@ function LoadMountains(scene)
     }
     scene.add(card);
     
-    var buffergeometry = new THREE.BufferGeometry(); 
+    buffergeometry = new THREE.BufferGeometry(); 
     buffergeometry.addAttribute('position', peakpositionbuff); 
     buffergeometry.addAttribute('pcorner', new THREE.BufferAttribute(peakcorner, 1)); 
     peaktrianglematerial = new THREE.ShaderMaterial({
@@ -358,15 +357,15 @@ function LoadCentrelines(scene)
 }
 
 var enttrianglematerial; 
+var entgeometry; 
 function LoadEntrances(scene)
 {
     var entpositionbuff = new THREE.BufferAttribute(new Float32Array(svxents.length*9), 3); 
     var entcorner = new Float32Array(svxents.length*3); 
-    var g1 = new THREE.Geometry();
     
-    var buffergeometry = new THREE.BufferGeometry(); 
-    buffergeometry.addAttribute('position', entpositionbuff); 
-    buffergeometry.addAttribute('pcorner', new THREE.BufferAttribute(entcorner, 1)); 
+    entgeometry = new THREE.BufferGeometry(); 
+    entgeometry.addAttribute('position', entpositionbuff); 
+    entgeometry.addAttribute('pcorner', new THREE.BufferAttribute(entcorner, 1)); 
     enttrianglematerial = new THREE.ShaderMaterial({
         uniforms: { trianglesize: {type: 'f', value: 10.0}, 
                     aspect: { type: 'f', value: 1.0 }, 
@@ -378,7 +377,7 @@ function LoadEntrances(scene)
         depthWrite:true, depthTest:true, 
         side: THREE.DoubleSide
     }); 
-    var enttriangles = new THREE.Mesh(buffergeometry, enttrianglematerial);  
+    var enttriangles = new THREE.Mesh(entgeometry, enttrianglematerial);  
     scene.add(enttriangles); 
 
     var card = new THREE.Object3D();
@@ -504,20 +503,57 @@ function touchstartfunc(event)
     }
 }
 
+
+// selection procedure that will batchwise look for an intersection clicked
+// should be in its own object
+var isvxents = 0, minisvxents = -1, minsvxentdsq = -1, vStart = new THREE.Vector3(), vEnd = new THREE.Vector3(); 
+var selectbatchproctimeout = null; 
 var selectposx, selectposy; 
 var pickray = new THREE.Raycaster()
+function selectbatchproc()
+{
+    if (selectbatchproctimeout == null) {
+        isvxents = 0; 
+        minisvxents = -1; 
+        minsvxentdsq = -1; 
+        selectbatchproctimeout = setTimeout(selectbatchproc, 10); 
+        return; 
+    } else {
+        selectbatchproctimeout = null; 
+    }
+    
+    while (isvxents < svxents.length) {
+        vStart.fromArray(entgeometry.attributes.position.array, isvxents*9);
+        //var dsq = pickray.ray.distanceSqToPoint(vStart); 
+        vStart.project(camera); 
+        if (vStart.z > 0.0) {
+            var dx = vStart.x - selectposx, dy = vStart.y - selectposy; 
+            var dsq = dx*dx + dy*dy; 
+            if ((minisvxents == -1) || (dsq < minsvxentdsq)) {
+                minsvxentdsq = dsq; 
+                minisvxents = isvxents; 
+                vEnd.fromArray(entgeometry.attributes.position.array, isvxents*9);
+            }
+        }
+        isvxents++; 
+    }
+    console.log(minsvxentdsq, minisvxents, vEnd, svxents[minisvxents]); 
+    quantshowtextelement.textContent = "Entrance of: "+svxents[minisvxents][0]; 
+
+    //selectbatchproctimeout = setTimeout(selectbatchproc, 10); 
+}
+
 function selecteffort(px, py, sesource)
 {
     quantshowshow("SELECT"+px+" "+py+" "+sesource); 
-    var sx = (px/window.innerWidth)*2 - 1; 
-    var sy = -(py/window.innerHeight)*2 + 1; 
-    console.log("bbbb "+sx+" "+sy); 
-    pickray.setFromCamera({x:sx, y:sy}, camera); 
-//    rayorigin.setFromMatrixPosition(camera.matrixWorld);
-//    raydirection.set(sx, sy, 0.5).unproject(camera).sub(rayorigin).normalize();
+    selectposx = (px/window.innerWidth)*2 - 1; 
+    selectposy = -(py/window.innerHeight)*2 + 1; 
+    console.log("bbbb "+selectposx+" "+selectposy); 
+    pickray.setFromCamera({x:selectposx, y:selectposy}, camera); 
     var rfac = 150.0; 
     pickposmesh.position.set(pickray.ray.origin.x + pickray.ray.direction.x*rfac, pickray.ray.origin.y + pickray.ray.direction.y*rfac, pickray.ray.origin.z + pickray.ray.direction.z*rfac); 
     console.log(pickposmesh.position, "f", footposmesh.position); 
+    selectbatchproc(); 
 }; 
 
 function touchholdfunc(event) 
