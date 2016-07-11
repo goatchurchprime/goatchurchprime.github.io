@@ -122,7 +122,7 @@ void main()
     gl_Position = projectionMatrix * mvPosition; 
     float strianglesize = trianglesize*gl_Position.z; 
     if (pcorner != 0.0) {
-        // this is now attempting to draw the triangle fixed even with rotation of the screen
+        // this is now attempting to draw the triangle fixed even with spin rotation of the screen
         gl_Position += projectionMatrix*viewMatrix[1]*(-strianglesize) + projectionMatrix*viewMatrix[0]*((pcorner == 1.0 ? 1.0 : -1.0) * 0.57735*strianglesize); 
         //gl_Position.y += strianglesize*aspect; 
         //gl_Position.x += (pcorner == 1.0 ? 1.0 : -1.0) * 0.57735*strianglesize; 
@@ -130,7 +130,6 @@ void main()
 }
   </script>
   
-
 
   <script id="vertex_shader_enttriangle" type="x-shader/x-vertex">
 uniform float trianglesize; 
@@ -375,6 +374,8 @@ function LoadEntrances(scene)
         depthWrite:true, depthTest:true, 
         side: THREE.DoubleSide
     }); 
+    var enttriangles = new THREE.Mesh(buffergeometry, enttrianglematerial);  
+    scene.add(enttriangles); 
 
     var gents = new THREE.Geometry();
     var card = new THREE.Object3D();

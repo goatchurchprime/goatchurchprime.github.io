@@ -1,16 +1,17 @@
 
 // things to do
-// * do the mag check early on on startup
 // * picking (possibly light up a cave)
+// * drop straight into data if miles away
+// * put some passage widths into the picture using attributes
 // * other peaks in view into database
 // * break file into different javascript files
 // * clean version of data without fake cave junk
-// * drop straight into data if miles away
-// * gps directional navigation by 20m buttons
+// * do the mag check early on on startup
 // * small slight hopping as we go along
 // * click to find cave
 // * set up links to caves
 // * hard-coded fake position offset mode
+// * background image from camera
 
 // done
 // * set gfac to 1.0
