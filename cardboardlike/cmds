@@ -2,7 +2,7 @@
 // things to do
 // * find out why the 204 and 161 entrances are not all joined up
 // * derive length and depth when plotting a cave 
-// * sort out aspect ration when picking a point in xy
+// * sort out aspect ratio when picking a point in xy
 // * make this work off the github.io webpage
 // * light up the entrance labels that match as well
 // * picking of cave passage as well

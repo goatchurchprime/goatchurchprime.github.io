@@ -335,6 +335,7 @@ function LoadMountains(scene)
 }
 
 var centrelinematerial; 
+var centrelinebuffergeometry; 
 function LoadCentrelines(scene)
 {
     centrelinematerial = new THREE.ShaderMaterial({
@@ -364,7 +365,7 @@ function LoadCentrelines(scene)
         svxcaveindex[i*2] = svxleg[6]; 
         svxcaveindex[i*2+1] = svxleg[6]; 
     }
-    var centrelinebuffergeometry = new THREE.BufferGeometry(); 
+    centrelinebuffergeometry = new THREE.BufferGeometry(); 
     centrelinebuffergeometry.addAttribute('position', centrelinepositionsbuff);
     centrelinebuffergeometry.addAttribute('cosslope', new THREE.BufferAttribute(cosslope, 1)); 
     centrelinebuffergeometry.addAttribute('svxcaveindex', new THREE.BufferAttribute(svxcaveindex, 1)); 
@@ -552,26 +553,66 @@ function selectbatchproc()
         selectbatchproctimeout = null; 
     }
     
-    while (isvxents < svxents.length) {
-        vStart.fromArray(entgeometry.attributes.position.array, isvxents*9);
-        //var dsq = pickray.ray.distanceSqToPoint(vStart); 
-        vStart.project(camera); 
-        if (vStart.z > 0.0) {
-            var dx = vStart.x - selectposx, dy = vStart.y - selectposy; 
-            var dsq = dx*dx + dy*dy; 
-            if ((minisvxents == -1) || (dsq < minsvxentdsq)) {
-                minsvxentdsq = dsq; 
-                minisvxents = isvxents; 
-                vEnd.fromArray(entgeometry.attributes.position.array, isvxents*9);
+    for (var j = 501; j > 0; j--) { // batch in this callback to work through
+        if ((isvxents == svxents.length) && (minsvxentdsq != -1)) {
+            var pix2dist = Math.sqrt(minsvxentdsq)*window.innerHeight; 
+            if (pix2dist <= 60)
+                break; 
+        }
+        if (isvxents < svxents.length) {
+            vStart.fromArray(entgeometry.attributes.position.array, isvxents*9);
+            //var dsq = pickray.ray.distanceSqToPoint(vStart); 
+            vStart.project(camera); 
+            if (vStart.z > 0.0) {
+                var dx = (vStart.x - selectposx)*camera.aspect, dy = vStart.y - selectposy; 
+                var dsq = dx*dx + dy*dy; 
+                if ((minisvxents == -1) || (dsq < minsvxentdsq)) {
+                    minsvxentdsq = dsq; 
+                    minisvxents = isvxents; 
+                    vEnd.fromArray(entgeometry.attributes.position.array, isvxents*9);
+                }
             }
+        } else if (isvxents < svxents.length + svxlegs.length) {
+            var i = isvxents - svxents.length; 
+            vStart.fromArray(centrelinebuffergeometry.attributes.position.array, i*6);
+            vEnd.fromArray(centrelinebuffergeometry.attributes.position.array, i*6+3);
+            vStart.project(camera); 
+            vEnd.project(camera); 
+            if ((vStart.z > 0.0) && (vEnd.z > 0.0)) {
+                var dx = (selectposx - vStart.x)*camera.aspect, dy = selectposy - vStart.y; 
+                var vx = (vEnd.x - vStart.x)*camera.aspect, vy = vEnd.y - vStart.y; 
+                var vsq = vx*vx + vy*vy; 
+                var ddv = dx*vx + dy*vy; 
+                var lam = (((ddv <= 0) || (vsq == 0)) ? 0 : (ddv > vsq ? 1.0 : ddv/vsq)); 
+                var ex = dx - vx*lam, ey = dy - vy*lam; 
+                var esq = ex*ex + ey*ey; 
+                if ((minisvxents == -1) || (esq < minsvxentdsq)) {
+                    minsvxentdsq = esq; 
+                    minisvxents = isvxents; 
+                }
+            }
+        } else {
+            break; 
         }
         isvxents++; 
     }
-    console.log(minsvxentdsq, minisvxents, vEnd, svxents[minisvxents]); 
-    quantshowtextelement.textContent = "Entrance of: "+svxents[minisvxents][0]; 
-    setselectedindex(svxents[minisvxents][4]); 
-
-    //selectbatchproctimeout = setTimeout(selectbatchproc, 10); 
+    if (j == 0) {
+        selectbatchproctimeout = setTimeout(selectbatchproc, 10); 
+        console.log("batch", isvxents); 
+    } else {
+        if (minisvxents < svxents.length) {
+            console.log(minsvxentdsq, minisvxents, vEnd, svxents[minisvxents]); 
+            quantshowtextelement.textContent = "Entrance of: "+svxents[minisvxents][0]; 
+            setselectedindex(svxents[minisvxents][4]); 
+        } else if (minisvxents < svxents.length + svxlegs.length) {
+            var ni = svxlegs[minisvxents - svxents.length][6]; 
+            if (ni >= 0) {
+                quantshowtextelement.textContent = "Cave: "+svxnames[ni]; 
+                quantshowhidedelay(5000); 
+                setselectedindex(ni); 
+            }
+        }
+    }
 }
 
 function selecteffort(px, py, sesource)
@@ -748,8 +789,10 @@ init();
 animate();
 
 // add GPS reader to this or do fake positions
-var watchID = navigator.geolocation.watchPosition(geo_success, geo_error, {enableHighAccuracy:true, timeout:27000, maximumAge:30000}); 
-//fakegpsgenerator(); // for desktop use
+//var watchID = navigator.geolocation.watchPosition(geo_success, geo_error, {enableHighAccuracy:true, timeout:27000, maximumAge:30000}); 
+fakegpsgenerator(); // for desktop use
+
+
 console.log("dididi"); 
 
 
