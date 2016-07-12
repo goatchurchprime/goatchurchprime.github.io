@@ -598,21 +598,28 @@ function selectbatchproc()
     }
     if (j == 0) {
         selectbatchproctimeout = setTimeout(selectbatchproc, 10); 
-        console.log("batch", isvxents); 
-    } else {
-        if (minisvxents < svxents.length) {
-            console.log(minsvxentdsq, minisvxents, vEnd, svxents[minisvxents]); 
-            quantshowtextelement.textContent = "Entrance of: "+svxents[minisvxents][0]; 
-            setselectedindex(svxents[minisvxents][4]); 
-        } else if (minisvxents < svxents.length + svxlegs.length) {
-            var ni = svxlegs[minisvxents - svxents.length][6]; 
-            if (ni >= 0) {
-                quantshowtextelement.textContent = "Cave: "+svxnames[ni]; 
+        //console.log("batch", isvxents); 
+        return; 
+    } 
+    var ni = -1; 
+    if (minsvxentdsq >= 0) {
+        var pix2dist = Math.sqrt(minsvxentdsq)*window.innerHeight; 
+        if (pix2dist <= 80) {
+            if (minisvxents < svxents.length) {
+                quantshowtextelement.textContent = "Entrance of: "+svxents[minisvxents][0]; 
                 quantshowhidedelay(5000); 
-                setselectedindex(ni); 
+                ni = svxents[minisvxents][4]; 
+            } else if (minisvxents < svxents.length + svxlegs.length) {
+                var ni = svxlegs[minisvxents - svxents.length][6]; 
+                if (ni >= 0) {
+                    quantshowtextelement.textContent = "Cave: "+svxnames[ni]; 
+                    quantshowhidedelay(5000); 
+                }
             }
+            console.log("pix2dist", pix2dist, ni); 
         }
     }
+    setselectedindex(ni); 
 }
 
 function selecteffort(px, py, sesource)
@@ -620,7 +627,6 @@ function selecteffort(px, py, sesource)
     quantshowshow("SELECT"+px+" "+py+" "+sesource); 
     selectposx = (px/window.innerWidth)*2 - 1; 
     selectposy = -(py/window.innerHeight)*2 + 1; 
-    console.log("bbbb "+selectposx+" "+selectposy); 
     pickray.setFromCamera({x:selectposx, y:selectposy}, camera); 
     var rfac = 150.0; 
     if (pickposmesh) {
@@ -748,23 +754,6 @@ function init()
     LoadFootpos(scene); 
     //LoadPickPos(scene); 
     
-    var corners = [ [0,-1,0xFFFFFF]/*North*/, [1,0,0x55FFAA]/*east*/, [0,1,0xFF3333], [-1,0,0xFFFF33] ];
-    var g = new THREE.Geometry(); 
-    var dd = 500; 
-    for (var j = 0; j < corners.length; j++) {
-        var g1 = new THREE.Geometry();
-        
-        g1.vertices.push(new THREE.Vector3(dd*corners[j][0], alt0, dd*corners[j][1])); 
-        g1.vertices.push(new THREE.Vector3(dd*corners[j][0], alt0+dd, dd*corners[j][1])); 
-        var m0 = new THREE.LineBasicMaterial({ color:corners[j][2], opacity:0.7, linewidth:linewidth, depthWrite:true }); 
-        var contour = new THREE.Line(g1, m0, THREE.LineStrip); // for disjoint line segments use THREE.LinePieces
-        scene.add(contour); 
-        g.vertices.push(new THREE.Vector3(dd*corners[j][0], alt0, dd*corners[j][1])); 
-    }
-    g.vertices.push(new THREE.Vector3(dd*corners[0][0], alt0, dd*corners[0][1])); 
-    var m = new THREE.LineBasicMaterial({ color:0xFF0000, opacity:1.0, linewidth:linewidth, depthWrite:true }); 
-    var contour = new THREE.Line(g, m, THREE.LineStrip); 
-    scene.add(contour); 
     scene.fog = new THREE.Fog(0x202020, 10, 20000);  // near and far
         
     document.getElementById("camerahop").addEventListener("click", ZhopGo); 
