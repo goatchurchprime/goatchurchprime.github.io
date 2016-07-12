@@ -45,8 +45,10 @@
   <script id="fragment_shader_centreline" type="x-shader/x-fragment">
 uniform vec4 closecolour; 
 uniform float closedist; 
+uniform float selectedvsvxcaveindex; 
 varying float altitude; 
 varying float vcosslope; 
+varying float vsvxcaveindex; 
 float midlump(float v, float offset) 
 {
     float lv = (mod(v*0.1 + offset, 100.0) - 50.0)/50.0; 
@@ -57,20 +59,25 @@ void main(void)
     float redalt = 70.0; 
     vec4 ptcolour = vec4(midlump(altitude, redalt), midlump(altitude, redalt-67.0)*0.98, midlump(altitude, redalt-33.0), 1.0); 
     vec4 sptcolour = mix(ptcolour, vec4(0.0, 0.0, 0.0, 1.0), 0.6*(1.0-vcosslope)); 
-
     float fdepth = gl_FragCoord.z / gl_FragCoord.w; 
     float cfac = clamp((closedist - fdepth)*0.1, 0.0, 0.81); 
-    gl_FragColor = mix(sptcolour, closecolour, cfac); 
+    if (vsvxcaveindex == selectedvsvxcaveindex)
+        gl_FragColor = mix(sptcolour, vec4(0.0, 1.0, 1.0, 1.0), 0.8); 
+    else
+        gl_FragColor = mix(sptcolour, closecolour, cfac); 
 }
   </script>
   <script id="vertexShader_centreline" type="x-shader/x-vertex">
 attribute float cosslope; 
+attribute float svxcaveindex; 
 varying float altitude; 
 varying float vcosslope; 
+varying float vsvxcaveindex; 
 void main()
 {
     altitude = position.y; 
     vcosslope = cosslope; 
+    vsvxcaveindex = svxcaveindex;  
     vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
     gl_Position = projectionMatrix * mvPosition; 
 }
@@ -139,12 +146,15 @@ void main()
 uniform float trianglesize; 
 uniform float aspect; 
 attribute float pcorner; 
+attribute float svxcaveindex; 
 varying float altitude; 
 varying float vcosslope; 
+varying float vsvxcaveindex; 
 void main()
 {
     altitude = position.y; 
     vcosslope = 1.0; 
+    vsvxcaveindex = svxcaveindex; 
     vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
     gl_Position = projectionMatrix * mvPosition; 
     float strianglesize = trianglesize*gl_Position.z*10.0; 
@@ -255,7 +265,8 @@ function MakeLabel(card, text, fillstyle, p, scale)
     context1.font = "28px Helvetica";
     context1.fillStyle = fillstyle;
     context1.fillText(text, 0, 20); 
-    
+
+// this one we can highlight it individually with a selection boolean
     var texture1 = new THREE.Texture(canvas1);  
     texture1.needsUpdate = true; 
     var textlabelmaterial = new THREE.ShaderMaterial({
@@ -327,7 +338,8 @@ function LoadCentrelines(scene)
 {
     centrelinematerial = new THREE.ShaderMaterial({
         uniforms: { closecolour: { type: 'v4', value: new THREE.Vector4(1.0, 1.0, 1.0, 1.0) }, 
-                    closedist: { type: 'f', value: 5.0 } 
+                    closedist: { type: 'f', value: 5.0 }, 
+                    selectedvsvxcaveindex: { type: 'f', value: -1.0 }
                   }, 
         vertexShader: document.getElementById('vertexShader_centreline').textContent,
         fragmentShader: document.getElementById('fragment_shader_centreline').textContent, 
@@ -337,6 +349,7 @@ function LoadCentrelines(scene)
 
     var centrelinepositionsbuff = new THREE.BufferAttribute(new Float32Array(svxlegs.length*2*3), 3);
     var cosslope = new Float32Array(svxlegs.length*2); 
+    var svxcaveindex = new Float32Array(svxlegs.length*2); 
     for (var i = 0; i < svxlegs.length; i++) {
         var svxleg = svxlegs[i]; 
         var p0 = latlngtopt(svxleg[0], svxleg[1], svxleg[2]); 
@@ -347,10 +360,13 @@ function LoadCentrelines(scene)
         var lcosslope = Math.cos(Math.atan2(dy, Math.sqrt(dx*dx + dz*dz))); 
         cosslope[i*2] = lcosslope; 
         cosslope[i*2+1] = lcosslope; 
+        svxcaveindex[i*2] = svxleg[6]; 
+        svxcaveindex[i*2+1] = svxleg[6]; 
     }
     var centrelinebuffergeometry = new THREE.BufferGeometry(); 
     centrelinebuffergeometry.addAttribute('position', centrelinepositionsbuff);
     centrelinebuffergeometry.addAttribute('cosslope', new THREE.BufferAttribute(cosslope, 1)); 
+    centrelinebuffergeometry.addAttribute('svxcaveindex', new THREE.BufferAttribute(svxcaveindex, 1)); 
 
     var contour = new THREE.LineSegments(centrelinebuffergeometry, centrelinematerial);  
     scene.add(contour); 
@@ -362,15 +378,18 @@ function LoadEntrances(scene)
 {
     var entpositionbuff = new THREE.BufferAttribute(new Float32Array(svxents.length*9), 3); 
     var entcorner = new Float32Array(svxents.length*3); 
+    var svxcaveindex = new Float32Array(svxents.length*3); 
     
     entgeometry = new THREE.BufferGeometry(); 
     entgeometry.addAttribute('position', entpositionbuff); 
     entgeometry.addAttribute('pcorner', new THREE.BufferAttribute(entcorner, 1)); 
+    entgeometry.addAttribute('svxcaveindex', new THREE.BufferAttribute(svxcaveindex, 1)); 
     enttrianglematerial = new THREE.ShaderMaterial({
         uniforms: { trianglesize: {type: 'f', value: 10.0}, 
                     aspect: { type: 'f', value: 1.0 }, 
                     closecolour: { type: 'v4', value: new THREE.Vector4(1.0, 1.0, 1.0, 1.0) }, 
-                    closedist: { type: 'f', value: 5.0 } 
+                    closedist: { type: 'f', value: 5.0 }, 
+                    selectedvsvxcaveindex: { type: 'f', value: -1.0 }
                   }, 
         vertexShader: document.getElementById('vertex_shader_enttriangle').textContent,
         fragmentShader: document.getElementById('fragment_shader_centreline').textContent, 
@@ -385,6 +404,8 @@ function LoadEntrances(scene)
         var p = latlngtopt(svxents[i][1], svxents[i][2], svxents[i][3]); 
         entpositionbuff.setXYZ(i*3, p.x, p.y, p.z);  entpositionbuff.setXYZ(i*3+1, p.x, p.y, p.z);  entpositionbuff.setXYZ(i*3+2, p.x, p.y, p.z); 
         entcorner[i*3] = 0.0;  entcorner[i*3+1] = 1.0;  entcorner[i*3+2] = 2.0; 
+        svxcaveindex[i*3] = svxents[i][4];  svxcaveindex[i*3+1] = svxents[i][4];  svxcaveindex[i*3+2] = svxents[i][4]; 
+        
         if (svxents[i][0].match(/p\d+[a-z]?$/) !== null) {
             MakeLabel(card, svxents[i][0], "rgba(0,200,200,0.95)", p, 0.5);  // rgba(0,200,200,0.95)
         }
@@ -480,9 +501,17 @@ function quantshowshow(qtext)
 function setclosedistvalue(closedistvalue)
 {
     centrelinematerial.uniforms.closedist.value = closedistvalue; 
-    enttrianglematerial.uniforms.closedist.value = closedistvalue
+    enttrianglematerial.uniforms.closedist.value = closedistvalue; 
     for (var i = 0; i < textlabelmaterials.length; i++) 
         textlabelmaterials[i].uniforms.closedist.value = closedistvalue; 
+}
+
+function setselectedindex(selectedvsvxcaveindex)
+{
+    centrelinematerial.uniforms.selectedvsvxcaveindex.value = selectedvsvxcaveindex; 
+    enttrianglematerial.uniforms.selectedvsvxcaveindex.value = selectedvsvxcaveindex; 
+    //for (var i = 0; i < textlabelmaterials.length; i++) 
+    //    textlabelmaterials[i].uniforms.closedist.value = closedistvalue; 
 }
 
 var touchStart = new THREE.Vector2(), touchEnd = new THREE.Vector2(), touchDelta = new THREE.Vector2();
@@ -539,6 +568,7 @@ function selectbatchproc()
     }
     console.log(minsvxentdsq, minisvxents, vEnd, svxents[minisvxents]); 
     quantshowtextelement.textContent = "Entrance of: "+svxents[minisvxents][0]; 
+    setselectedindex(svxents[minisvxents][4]); 
 
     //selectbatchproctimeout = setTimeout(selectbatchproc, 10); 
 }
@@ -551,8 +581,10 @@ function selecteffort(px, py, sesource)
     console.log("bbbb "+selectposx+" "+selectposy); 
     pickray.setFromCamera({x:selectposx, y:selectposy}, camera); 
     var rfac = 150.0; 
-    pickposmesh.position.set(pickray.ray.origin.x + pickray.ray.direction.x*rfac, pickray.ray.origin.y + pickray.ray.direction.y*rfac, pickray.ray.origin.z + pickray.ray.direction.z*rfac); 
-    console.log(pickposmesh.position, "f", footposmesh.position); 
+    if (pickposmesh) {
+        pickposmesh.position.set(pickray.ray.origin.x + pickray.ray.direction.x*rfac, pickray.ray.origin.y + pickray.ray.direction.y*rfac, pickray.ray.origin.z + pickray.ray.direction.z*rfac); 
+        console.log(pickposmesh.position, "f", footposmesh.position); 
+    }
     selectbatchproc(); 
 }; 
 
@@ -672,7 +704,7 @@ function init()
     LoadEntrances(scene); 
     LoadTrail(scene); 
     LoadFootpos(scene); 
-    LoadPickPos(scene); 
+    //LoadPickPos(scene); 
     
     var corners = [ [0,-1,0xFFFFFF]/*North*/, [1,0,0x55FFAA]/*east*/, [0,1,0xFF3333], [-1,0,0xFFFF33] ];
     var g = new THREE.Geometry(); 
@@ -715,8 +747,8 @@ init();
 animate();
 
 // add GPS reader to this or do fake positions
-//var watchID = navigator.geolocation.watchPosition(geo_success, geo_error, {enableHighAccuracy:true, timeout:27000, maximumAge:30000}); 
-fakegpsgenerator(); 
+var watchID = navigator.geolocation.watchPosition(geo_success, geo_error, {enableHighAccuracy:true, timeout:27000, maximumAge:30000}); 
+//fakegpsgenerator(); 
 console.log("dididi"); 
 
 

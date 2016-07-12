@@ -1,8 +1,13 @@
 
 // things to do
-// * put the cave index as attribute to entrances and legs
+// * find out why the 204 and 161 entrances are not all joined up
+// * derive length and depth when plotting a cave 
+// * sort out aspect ration when picking a point in xy
+// * make this work off the github.io webpage
+// * light up the entrance labels that match as well
+// * picking of cave passage as well
+// * small hops and sideways hops (in relation to the screen, poss using the accelerometer)
 // * Rauchercan data
-// * picking (possibly light up a cave)
 // * picking to be its own class in another javascript file
 // * drop straight into data if miles away
 // * put some passage widths into the picture using attributes
@@ -17,6 +22,8 @@
 
 
 // done
+// * picking (possibly light up a cave)
+// * put the cave index as attribute to entrances and legs
 // * clean version of data without fake cave junk
 // * make the open out bit a button on the top right
 // * when dragging the alpha, fix the position even when device is moving (given up)
