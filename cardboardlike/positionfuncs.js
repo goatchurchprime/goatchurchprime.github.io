@@ -111,15 +111,23 @@ function geo_success(position)
 { 
     latG = position.coords.latitude; 
     lngG = position.coords.longitude; 
+    if (position.coords.altitude != 0.0) 
+        altG = position.coords.altitude; 
+    if (((latR === 0) && (altG != 0.0)) && ((Math.abs(latG - lat0) > 0.2) || (Math.abs(lngG - lng0) > 0.2))) {
+        latR = latG - lat0; 
+        lngR = lngG - lng0; 
+        altR = altG - alt0; 
+        quantshowshow("Moving GPS origin to the caves"); 
+        console.log("Moving GPS origin to the caves"); 
+        quantshowhidedelay(4500); 
+    }
+    
     document.getElementById('gpsrec').textContent = "Lat:"+latG.toFixed(7)+" Lng:"+lngG.toFixed(7)+
                                                     " (~"+position.coords.accuracy.toFixed(0)+"m)"+
                                                     " Alt:"+position.coords.altitude.toFixed(1)+
                                                     " (~"+position.coords.altitudeAccuracy.toFixed(0)+"m)"; 
     //document.getElementById('heading').textContent = position.coords.heading.toFixed(0); 
     //document.getElementById('speed').textContent = position.coords.speed.toFixed(2); 
-    
-    if (position.coords.altitude != 0.0)
-        altG = position.coords.altitude; 
     SetCameraPositionG();
 } 
     
@@ -132,6 +140,8 @@ function SetCameraPositionG()
 };
 
 function geo_error() 
-{  
+{
     document.getElementById('gpsrec').textContent = "gps error"; 
 }
+
+

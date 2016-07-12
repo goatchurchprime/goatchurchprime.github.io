@@ -34,7 +34,7 @@
           </div>
           <div>
               <input type="button" value="Hop" id="camerahop"/>
-              <input type="button" value="31" id="reset31"/>
+              <input type="button" value="Cen" id="reset31"/>
               <input type="button" value="Mag" id="magorientset"/>
               <input type="button" value="T1" id="test1"/>
           </div>
@@ -192,6 +192,7 @@ function SetBasePositions()
     
     SetCameraPositionG();
 }
+
 
 var peaks = [ 
     ["Schoneberg", 47.712315, 13.790972, 2000 ], 
@@ -748,7 +749,7 @@ animate();
 
 // add GPS reader to this or do fake positions
 var watchID = navigator.geolocation.watchPosition(geo_success, geo_error, {enableHighAccuracy:true, timeout:27000, maximumAge:30000}); 
-//fakegpsgenerator(); 
+//fakegpsgenerator(); // for desktop use
 console.log("dididi"); 
 
 
