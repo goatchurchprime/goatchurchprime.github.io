@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Ding</title>
+    <title>Groundwindow</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <style>
@@ -700,7 +700,8 @@ function touchendfunc(event)
 }
 
 var accthresh = 6.0; 
-var maxaccz = 0.0; 
+var sumaccz = 0.0; 
+var isumaccz = 0; 
 var hopsuppresstime = 0.0; 
 function devorientationevent(event)
 {
