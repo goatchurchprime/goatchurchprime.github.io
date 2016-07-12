@@ -18,6 +18,7 @@
     <script src="DeviceOrientationControls.js?2"></script>
     <script src="all3d.js"></script>
     <script src="positionfuncs.js"></script>
+    <script src="pickingfuncs.js"></script>
   </head>
   <body>
     <div id="main">
@@ -457,7 +458,7 @@ function animate(t)
     requestAnimationFrame(animate);
     if  ((touchmovestate == 1) && (clock.elapsedTime - touchtime > 1)) {
         touchmovestate = 5; 
-        selecteffort(touchStart.x, touchStart.y, "fromanimate")
+        PickingObject.selecteffort(touchStart.x, touchStart.y, "fromanimate")
     }
     update(clock.getDelta());
     render(clock.getDelta());
@@ -511,13 +512,6 @@ function setclosedistvalue(closedistvalue)
         textlabelmaterials[i].uniforms.closedist.value = closedistvalue; 
 }
 
-function setselectedindex(selectedvsvxcaveindex)
-{
-    centrelinematerial.uniforms.selectedvsvxcaveindex.value = selectedvsvxcaveindex; 
-    enttrianglematerial.uniforms.selectedvsvxcaveindex.value = selectedvsvxcaveindex; 
-    //for (var i = 0; i < textlabelmaterials.length; i++) 
-    //    textlabelmaterials[i].uniforms.closedist.value = closedistvalue; 
-}
 
 var touchStart = new THREE.Vector2(), touchEnd = new THREE.Vector2(), touchDelta = new THREE.Vector2();
 var alphaoffsetStart, touchtime; 
@@ -538,114 +532,13 @@ function touchstartfunc(event)
 }
 
 
-// selection procedure that will batchwise look for an intersection clicked
-// should be in its own object
-var isvxents = 0, minisvxents = -1, minsvxentdsq = -1, vStart = new THREE.Vector3(), vEnd = new THREE.Vector3(); 
-var selectbatchproctimeout = null; 
-var selectposx, selectposy; 
-var pickray = new THREE.Raycaster()
-function selectbatchproc()
-{
-    if (selectbatchproctimeout == null) {
-        isvxents = 0; 
-        minisvxents = -1; 
-        minsvxentdsq = -1; 
-        selectbatchproctimeout = setTimeout(selectbatchproc, 10); 
-        return; 
-    } else {
-        selectbatchproctimeout = null; 
-    }
-    
-    for (var j = 501; j > 0; j--) { // batch in this callback to work through
-        if ((isvxents == svxents.length) && (minsvxentdsq != -1)) {
-            var pix2dist = Math.sqrt(minsvxentdsq)*window.innerHeight; 
-            if (pix2dist <= 60)
-                break; 
-        }
-        if (isvxents < svxents.length) {
-            vStart.fromArray(entgeometry.attributes.position.array, isvxents*9);
-            //var dsq = pickray.ray.distanceSqToPoint(vStart); 
-            vStart.project(camera); 
-            if (vStart.z > 0.0) {
-                var dx = (vStart.x - selectposx)*camera.aspect, dy = vStart.y - selectposy; 
-                var dsq = dx*dx + dy*dy; 
-                if ((minisvxents == -1) || (dsq < minsvxentdsq)) {
-                    minsvxentdsq = dsq; 
-                    minisvxents = isvxents; 
-                    vEnd.fromArray(entgeometry.attributes.position.array, isvxents*9);
-                }
-            }
-        } else if (isvxents < svxents.length + svxlegs.length) {
-            var i = isvxents - svxents.length; 
-            vStart.fromArray(centrelinebuffergeometry.attributes.position.array, i*6);
-            vEnd.fromArray(centrelinebuffergeometry.attributes.position.array, i*6+3);
-            vStart.project(camera); 
-            vEnd.project(camera); 
-            if ((vStart.z > 0.0) && (vEnd.z > 0.0)) {
-                var dx = (selectposx - vStart.x)*camera.aspect, dy = selectposy - vStart.y; 
-                var vx = (vEnd.x - vStart.x)*camera.aspect, vy = vEnd.y - vStart.y; 
-                var vsq = vx*vx + vy*vy; 
-                var ddv = dx*vx + dy*vy; 
-                var lam = (((ddv <= 0) || (vsq == 0)) ? 0 : (ddv > vsq ? 1.0 : ddv/vsq)); 
-                var ex = dx - vx*lam, ey = dy - vy*lam; 
-                var esq = ex*ex + ey*ey; 
-                if ((minisvxents == -1) || (esq < minsvxentdsq)) {
-                    minsvxentdsq = esq; 
-                    minisvxents = isvxents; 
-                }
-            }
-        } else {
-            break; 
-        }
-        isvxents++; 
-    }
-    if (j == 0) {
-        selectbatchproctimeout = setTimeout(selectbatchproc, 10); 
-        //console.log("batch", isvxents); 
-        return; 
-    } 
-    var ni = -1; 
-    if (minsvxentdsq >= 0) {
-        var pix2dist = Math.sqrt(minsvxentdsq)*window.innerHeight; 
-        if (pix2dist <= 80) {
-            if (minisvxents < svxents.length) {
-                quantshowtextelement.textContent = "Entrance of: "+svxents[minisvxents][0]; 
-                quantshowhidedelay(5000); 
-                ni = svxents[minisvxents][4]; 
-            } else if (minisvxents < svxents.length + svxlegs.length) {
-                var ni = svxlegs[minisvxents - svxents.length][6]; 
-                if (ni >= 0) {
-                    quantshowtextelement.textContent = "Cave: "+svxnames[ni]; 
-                    quantshowhidedelay(5000); 
-                }
-            }
-            console.log("pix2dist", pix2dist, ni); 
-        }
-    }
-    setselectedindex(ni); 
-}
-
-function selecteffort(px, py, sesource)
-{
-    quantshowshow("SELECT"+px+" "+py+" "+sesource); 
-    selectposx = (px/window.innerWidth)*2 - 1; 
-    selectposy = -(py/window.innerHeight)*2 + 1; 
-    pickray.setFromCamera({x:selectposx, y:selectposy}, camera); 
-    var rfac = 150.0; 
-    if (pickposmesh) {
-        pickposmesh.position.set(pickray.ray.origin.x + pickray.ray.direction.x*rfac, pickray.ray.origin.y + pickray.ray.direction.y*rfac, pickray.ray.origin.z + pickray.ray.direction.z*rfac); 
-        console.log(pickposmesh.position, "f", footposmesh.position); 
-    }
-    selectbatchproc(); 
-}; 
-
 function touchholdfunc(event) 
 { 
     event.preventDefault(); 
     event.stopPropagation(); 
     if (touchmovestate == 1) {
         touchmovestate = 5; 
-        selecteffort(event.pageX, event.pageY, "contextevent"); 
+        PickingObject.selecteffort(event.pageX, event.pageY, "contextevent"); 
     }
     return false 
 }; 
@@ -667,7 +560,7 @@ function touchmovefunc(event)
         }
         if  ((touchmovestate == 1) && (clock.elapsedTime - touchtime > 1)) {
             touchmovestate = 5; 
-            selecteffort(touchStart.x, touchStart.y, "touchholdmove")
+            PickingObject.selecteffort(touchStart.x, touchStart.y, "touchholdmove")
         }
 
         if (touchmovestate == 2) {
@@ -703,6 +596,7 @@ var accthresh = 6.0;
 var sumaccz = 0.0; 
 var isumaccz = 0; 
 var hopsuppresstime = 0.0; 
+var maxaccz = 0; 
 function devorientationevent(event)
 {
     if (event.acceleration.z > accthresh) {
