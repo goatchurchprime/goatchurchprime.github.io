@@ -8,10 +8,12 @@
       body { margin: 0px; overflow: hidden; }
       #viz { position: absolute; top: 0; left: 0; right: 0; bottom: 0; }
       #quantbutton { position: absolute; right:0; top: 0; border: thin red solid; background:#ddf; display: block }
-      #quantshow { position: absolute; right:0; top: 0; width: 75%; border: thin red solid; background:#ddf; display: block }
+      #quantshow { position: absolute; right:0; top: 0; width: 75%; bo0rder: thin red solid; background:#ddf; display: block }
       #quantshowtext { font-size: 200%; position: relative; left: 0; top: 0; display: none }
       #postext { position: relative; left: 0; top: 0; display: block }
       #postext input, #quantbutton input { font-size: 150%}
+      #dcamara { position: absolute; left: 0; bottom: 0; width:50%; height:50%; display: none; background: red }
+      #camara { width:100%; height:100%;  }
     </style>
     <link rel="manifest" href="manifest.json">
     <script src="three.min.js"></script>
@@ -41,6 +43,9 @@
               <input type="button" value="T1" id="test1"/>
           </div>
         </div>
+      </div>
+      <div id="dcamara">
+        <video id="camara" autoplay controls></video>
       </div>
     </div>
 
@@ -420,6 +425,44 @@ function LoadEntrances(scene)
 }
 
 
+var backgroundscene = null, backgroundcamera = null; 
+var videotexture; 
+var backgroundvideo = null; 
+window.URL = window.URL || window.webkitURL; 
+navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia; 
+var bshowvideobackground = false; 
+function LoadVideoBackground()
+{
+    if (bshowvideobackground) {
+        bshowvideobackground = false; 
+        return; 
+    }
+    if (backgroundscene) {
+        bshowvideobackground = true; 
+        return; 
+    }
+        
+    backgroundvideo = document.createElement("video"); 
+    backgroundvideo.width = vizcontainer.offsetWidth; 
+    backgroundvideo.height = vizcontainer.offsetHeight; 
+    backgroundvideo.autoplay = true; 
+    
+    navigator.getUserMedia({"audio":false, "video":true}, function(streamVideo) { 
+        backgroundvideo.src = window.URL.createObjectURL(streamVideo); 
+        alert(backgroundvideo.src); 
+        videotexture = new THREE.Texture(backgroundvideo); 
+        var backgroundmesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 2, 0), new THREE.MeshBasicMaterial({map: videotexture})); 
+        backgroundmesh.material.depthTest = false; 
+        backgroundmesh.material.depthWrite = false; 
+        backgroundscene = new THREE.Scene(); 
+        backgroundcamera = new THREE.Camera(); 
+        backgroundscene.add(backgroundcamera); 
+        backgroundscene.add(backgroundmesh); 
+        bshowvideobackground = true; 
+    }, function() { alert("bad"); }); 
+}
+
+
 function resize() 
 {
     var width = vizcontainer.offsetWidth;
@@ -447,6 +490,14 @@ function update(dt)
 
 function render(dt) 
 {
+    renderer.autoClear = false; 
+    renderer.clear(); 
+    if (bshowvideobackground && backgroundscene) {
+        if (backgroundvideo.readyState === backgroundvideo.HAVE_ENOUGH_DATA) {
+            videotexture.needsUpdate = true; 
+        }
+        renderer.render(backgroundscene, backgroundcamera);
+    }
     renderer.render(scene, camera);
 }
 
@@ -625,6 +676,7 @@ function devorientationevent(event)
 }
 
 
+
 var geomeshtorus, flatmaterial; 
 function init() 
 {
@@ -681,12 +733,13 @@ function init()
     LoadTrail(scene); 
     LoadFootpos(scene); 
     //LoadPickPos(scene); 
+    //LoadVideoBackground(); 
     
     scene.fog = new THREE.Fog(0x202020, 10, 20000);  // near and far
         
     document.getElementById("camerahop").addEventListener("click", function() { ZhopGo(1500); }); 
     document.getElementById("reset31").addEventListener("click", reset31); 
-    document.getElementById("test1").addEventListener("click", function(event) {  event.stopPropagation(); console.log("hihi"); return true; }, true); 
+    document.getElementById("test1").addEventListener("click", LoadVideoBackground); 
     document.getElementById("magorientset").addEventListener("click", function(event) { event.preventDefault(); window.addEventListener('absolutedeviceorientation', tryabsoluteorient); }); 
 
     quantshowelement.addEventListener("click", quantshowhide); 

@@ -5,7 +5,6 @@
 // * picking of cave passage as well
 // * small hops and sideways hops (in relation to the screen, poss using the accelerometer)
 // * Rauchercan data -- can't find
-// * picking to be its own class in another javascript file
 // * put some passage widths into the picture using attributes
 // * other peaks in view into database
 // * break file into different javascript files
@@ -16,6 +15,7 @@
 
 
 // done
+// * picking to be its own class in another javascript file
 // * make this work off the github.io webpage
 // * find out why the 204 and 161 entrances are not all joined up
 // * hard-coded fake position offset mode
