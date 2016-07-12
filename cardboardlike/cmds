@@ -1,27 +1,27 @@
 
 // things to do
-// * find out why the 204 and 161 entrances are not all joined up
 // * derive length and depth when plotting a cave 
-// * sort out aspect ratio when picking a point in xy
 // * make this work off the github.io webpage
 // * light up the entrance labels that match as well
 // * picking of cave passage as well
 // * small hops and sideways hops (in relation to the screen, poss using the accelerometer)
 // * Rauchercan data
 // * picking to be its own class in another javascript file
-// * drop straight into data if miles away
 // * put some passage widths into the picture using attributes
 // * other peaks in view into database
 // * break file into different javascript files
 // * do the mag check early on on startup
 // * small slight hopping as we go along
-// * click to find cave
 // * set up links to caves
-// * hard-coded fake position offset mode
 // * background image from camera
 
 
 // done
+// * find out why the 204 and 161 entrances are not all joined up
+// * hard-coded fake position offset mode
+// * click to find cave
+// * drop straight into data if miles away
+// * sort out aspect ratio when picking a point in xy
 // * picking (possibly light up a cave)
 // * put the cave index as attribute to entrances and legs
 // * clean version of data without fake cave junk
