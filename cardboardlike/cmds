@@ -1,5 +1,8 @@
 
 // things to do
+// * move mountains into include file
+// * make yorkshire include file
+// * assign date attribute onto legs
 // * derive length and depth when plotting a cave 
 // * light up the entrance labels that match as well
 // * picking of cave passage as well
@@ -9,12 +12,17 @@
 // * other peaks in view into database
 // * break file into different javascript files
 // * do the mag check early on on startup
-// * small slight hopping as we go along
+// * small slight hopping as we go along when jiggling to the side
 // * set up links to caves
-// * background image from camera
+// * analyse campsite data
+
+Bad Aussee to Garda Big Sur 6hr50mins  534km via Innsbruck
+Garda Big Sur to Geneva 5hr5mins 442km via Mont Blanc tunnel Euro44.20
+  or if going South of this place, 6hr2mins 551km via Chambery
 
 
 // done
+// * background image from camera
 // * picking to be its own class in another javascript file
 // * make this work off the github.io webpage
 // * find out why the 204 and 161 entrances are not all joined up

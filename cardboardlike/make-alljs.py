@@ -1,4 +1,4 @@
-import os, time, re, sys
+import os, time, re, sys, datetime
 import pyproj
 import json
 
@@ -6,14 +6,29 @@ fjs = "/home/goatchurch/geom3d/goatchurchprime.github.io/cardboardlike/all3d.js"
 fsvx = "/home/goatchurch/caving/expoloser/all.svx"
 f3d = "/home/goatchurch/caving/allding.3d"
 
+"""# leck fell version must have a proj string included for OSGB
+fjs = "/home/goatchurch/geom3d/goatchurchprime.github.io/cardboardlike/allleck3d.js"
+fsvx = "/home/goatchurch/caving/NorthernEngland/ThreeCountiesArea/survexdata/leckfell.svx"
+f3d = "/home/goatchurch/caving/allding2.3d"
+"""
+
 # *FIX 0_7 reference 35419.56 82237.16 1769.77 ;Brauning Nase
 #cs = "+proj=tmerc +lat_0=0 +lon_0=13d20 +k=1 +x_0=0 +y_0=-5200000 +ellps=bessel +towgs84=577.326,90.129,463.919,5.137,1.474,5.297,2.4232"
 #proj = pyproj.Proj(cs)
 #print(proj(35419.56, 82237.16, inverse=True))
 
 os.system("cavern -sq %s --output=%s" % (fsvx, f3d))
-dd3d = os.popen("dump3d %s" % f3d)
+dd3d = os.popen("dump3d -d %s" % f3d)
 lines = dd3d.readlines()
+
+# we try to get the dates for all the survey legs (ignoring date ranges), 
+# and use connectivity to get to the entrances.  Could use connectivity 
+# to push back dates to ensure passages can only appear in the timeline 
+# when they can connect to the surface.
+# The melt through time would have a sparkle whenever two caves get connected
+# Roll back in time, then zoom out and replay showing the Appelhaus data
+# and Raucherkhan data.  
+# It's a bit like OpenStreetmap a year of edits
 
 proj = None
 g = (l  for l in lines)
@@ -30,8 +45,8 @@ conts = [ ]
 segsnamemap = { }
 stationsnamemap = { }
 entsmap = { }
-sallnames = set()
 connlinks = { }
+sallnames = set()
 for l in g:
     ls = l.split()
     if ls[0] in ["MOVE", "NODE", "LINE"]:
@@ -47,16 +62,25 @@ for l in g:
         elif ls[0] == "LINE":
             toplevelname = re.match("\[([^\]\.]*)", ls[4]).group(1)
             styles = ls[5].split("=")[1:]+ls[6:]
+            
+            # calculate the date as a fractional year
+            if styles and not re.match("[A-Z]*$", styles[-1]):
+                date = styles.pop()
+            else:
+                date = "1900.01.01"
+            ddate = datetime.datetime.strptime(date[:10], "%Y.%m.%d") # ignore date ranges
+            fdate = ddate.year + (ddate - datetime.datetime(ddate.year, 1, 1)).days/365.0
             if prevp:
                 stationsnamemap[prevp] = toplevelname
             stationsnamemap[p] = toplevelname
+            
             if "SURFACE" not in styles and "SPLAY" not in styles and "DUPLICATE" not in styles:
                 sallnames.add(toplevelname)
                 conts[-1].append(p)
                 if prevp is not None:
                     if toplevelname not in segsnamemap:
                         segsnamemap[toplevelname] = []
-                    segsnamemap[toplevelname].append((prevp, p))
+                    segsnamemap[toplevelname].append((prevp, p, fdate))
             else:
                 if prevp not in connlinks:
                     connlinks[prevp] = set()
@@ -70,6 +94,7 @@ for l in g:
             tags = ls[5].split() if len(ls) >= 6 else []
             if ("ENTRANCE" in tags and "." not in name) or name in ["t2006-09", "gps2010-01", "gps2010-07"]:
                 entsmap[name] = p
+                
                 
 assocnamesents = { }
 for e, p in entsmap.items():
@@ -111,9 +136,25 @@ svxents.sort(key=lambda X: -X[3])
 svxsegs = [ ]
 for sname, segs in segsnamemap.items():
     i = allnames.index(sname)
-    for p, p1 in segs:
-        svxsegs.append((p[0], p[1], p[2], p1[0], p1[1], p1[2], i))
+    for p, p1, fdate in segs:
+        svxsegs.append((p[0], p[1], p[2], p1[0], p1[1], p1[2], i, fdate))
 svxsegs.sort(key=lambda X: -max(X[2], X[5]))
+
+
+peaks = [ 
+    ["Schoneberg", 47.712315, 13.790972, 2000 ], 
+    ["Dachstein", 47.47527777777778, 13.606388888888889, 2995 ], 
+    ["Loser", 47.66083333333333, 13.771111111111113, 1837 ],
+    ["Trisselwand", 47.64611111111111, 13.813333333333334, 1754 ],
+    
+    ["Trissenstein", 47.626666666666665, 13.789166666666667, 1201 ],
+    ["Brauning Nase", 47.678381045318616, 13.805098487465617, 1769 ],
+    ["Rotelstein", 47.593488, 13.847536, 1614 ],
+    ["Sarstein", 47.602606, 13.699005, 1975 ]
+];
+
+# this is subtracted from the data positions
+basepositionOrigin = [ "Hilde", 47.6160995, 13.8121137, 748 ];  
 
 fout = open(fjs, "w")
 fout.write("// generated %s from running %s\n\n" % (time.asctime(), sys.argv[0]))
@@ -125,6 +166,12 @@ fout.write(json.dumps(svxents))
 fout.write(";\n\n")
 fout.write("var svxlegs = ") 
 fout.write(json.dumps(svxsegs))
+fout.write(";\n\n")
+fout.write("var peaks = ") 
+fout.write(json.dumps(peaks))
+fout.write(";\n\n")
+fout.write("var basepositionOrigin = ") 
+fout.write(json.dumps(basepositionOrigin))
 fout.write(";\n")
-fout.close()
 
+fout.close()

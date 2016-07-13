@@ -177,7 +177,6 @@ var basepositionOrigin, latR, lngR, altR, latG, lngG, altG;
 var nyfac, nxfac, eyfac, exfac, lat0, lng0, alt0, camera3JSAlt; 
 function SetBasePositions()
 {
-    basepositionOrigin = [ "Hilde", 47.6160995, 13.8121137, 748 ];  // this is subtracted from the data positions
     latG = basepositionOrigin[1]; 
     lngG = basepositionOrigin[2]; 
     altG = basepositionOrigin[3]; 
@@ -200,20 +199,6 @@ function SetBasePositions()
     SetCameraPositionG();
 }
 
-
-var peaks = [ 
-    ["Schoneberg", 47.712315, 13.790972, 2000 ], 
-    ["Dachstein", 47.47527777777778, 13.606388888888889, 2995 ], 
-    ["Loser", 47.66083333333333, 13.771111111111113, 1837 ],
-    ["Trisselwand", 47.64611111111111, 13.813333333333334, 1754 ],
-    
-    ["Trissenstein", 47.626666666666665, 13.789166666666667, 1201 ],
-    ["Brauning Nase", 47.678381045318616, 13.805098487465617, 1769 ],
-    //["Hildestein", 47.610426, 13.814096, 900 ],
-    ["Rotelstein", 47.593488, 13.847536, 1614 ],
-    ["Sarstein", 47.602606, 13.699005, 1975 ]
-];
-
 function reset31() 
 {
     latR = latG - lat0; 
@@ -221,7 +206,6 @@ function reset31()
     altR = altG - alt0; 
     SetCameraPositionG(); 
 }
-
 
 var camera, scene, renderer, controls, threejselement, vizcontainer;
 var quantshowelement, quantshowtextelement, postextelement; 
