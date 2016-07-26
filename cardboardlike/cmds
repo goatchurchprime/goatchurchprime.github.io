@@ -1,27 +1,34 @@
 
 // things to do
-// * move mountains into include file
-// * make yorkshire include file
-// * assign date attribute onto legs
+// * move the shaders into own compiled include file
+// * vfac and redalt say it's about the colours
+// * provide an offset and digit rounding to the java file to shorten it
+// * dot trail to spawn off the dots from currrent position
+// * offset the positions of everything by the base position origin
+// * separate makefiles for the svx on loser and on leckfell
+// * other peaks in view into database (put them into the svx files as visible peaks if possible???)
+// * assign date attribute onto legs as a year float
+// * provide option of which cave data to load
+// * make the camera view slightly faded (would require specual shader rather that basicmaterial)
 // * derive length and depth when plotting a cave 
 // * light up the entrance labels that match as well
 // * picking of cave passage as well
 // * small hops and sideways hops (in relation to the screen, poss using the accelerometer)
 // * Rauchercan data -- can't find
 // * put some passage widths into the picture using attributes
-// * other peaks in view into database
 // * break file into different javascript files
 // * do the mag check early on on startup
-// * small slight hopping as we go along when jiggling to the side
 // * set up links to caves
-// * analyse campsite data
-
-Bad Aussee to Garda Big Sur 6hr50mins  534km via Innsbruck
-Garda Big Sur to Geneva 5hr5mins 442km via Mont Blanc tunnel Euro44.20
-  or if going South of this place, 6hr2mins 551km via Chambery
 
 
 // done
+// * leck fell to have entrance names and separate caves
+// * check out the WestKingsdaleSystem and make all works -- move the all.svx to the top level NorthernCaves
+// * scale colours for the altitude
+// * recalc the latest survey data from expo
+// * make yorkshire include file [needs cs setting in that file]
+// * analyse underground camping data
+// * move mountains into include file
 // * background image from camera
 // * picking to be its own class in another javascript file
 // * make this work off the github.io webpage
@@ -57,7 +64,7 @@ Garda Big Sur to Geneva 5hr5mins 442km via Mont Blanc tunnel Euro44.20
 
 // copy the file to the phone
 
-adb push dongcheck.html /storage/emulated/legacy/Cardboard/
+adb push groundwindow.html /storage/emulated/legacy/Cardboard/
 
 // generate gps flight from igc file in Python
 

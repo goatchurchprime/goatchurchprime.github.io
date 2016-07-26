@@ -2,20 +2,16 @@ import os, time, re, sys, datetime
 import pyproj
 import json
 
+bexpoloser=False
 fjs = "/home/goatchurch/geom3d/goatchurchprime.github.io/cardboardlike/all3d.js"
 fsvx = "/home/goatchurch/caving/expoloser/all.svx"
 f3d = "/home/goatchurch/caving/allding.3d"
 
-"""# leck fell version must have a proj string included for OSGB
-fjs = "/home/goatchurch/geom3d/goatchurchprime.github.io/cardboardlike/allleck3d.js"
-fsvx = "/home/goatchurch/caving/NorthernEngland/ThreeCountiesArea/survexdata/leckfell.svx"
-f3d = "/home/goatchurch/caving/allding2.3d"
-"""
-
-# *FIX 0_7 reference 35419.56 82237.16 1769.77 ;Brauning Nase
-#cs = "+proj=tmerc +lat_0=0 +lon_0=13d20 +k=1 +x_0=0 +y_0=-5200000 +ellps=bessel +towgs84=577.326,90.129,463.919,5.137,1.474,5.297,2.4232"
-#proj = pyproj.Proj(cs)
-#print(proj(35419.56, 82237.16, inverse=True))
+if not bexpoloser:
+    fjs = "/home/goatchurch/geom3d/goatchurchprime.github.io/cardboardlike/allleck3d.js"
+    fsvx = "/home/goatchurch/caving/NorthernEngland/ThreeCountiesArea/survexdata/leckfell.svx"
+    fsvx = "/home/goatchurch/caving/NorthernEngland/ThreeCountiesArea/survexdata/all.svx"
+    f3d = "/home/goatchurch/caving/allding2.3d"
 
 os.system("cavern -sq %s --output=%s" % (fsvx, f3d))
 dd3d = os.popen("dump3d -d %s" % f3d)
@@ -30,72 +26,83 @@ lines = dd3d.readlines()
 # and Raucherkhan data.  
 # It's a bit like OpenStreetmap a year of edits
 
-proj = None
-g = (l  for l in lines)
-for l in g:
-    if l.strip() == '--':
-        break
-    c, v = l.split(maxsplit=1)
-    if c == "CS":
-        print(v)
-        proj = pyproj.Proj(v)
+def LoadParseDmp(g):
+    proj = None
+    for l in g:
+        if l.strip() == '--':
+            break
+        c, v = l.split(maxsplit=1)
+        if c == "CS":
+            print(v)
+            proj = pyproj.Proj(v)
 
-prevp = None
-conts = [ ]
-segsnamemap = { }
-stationsnamemap = { }
-entsmap = { }
-connlinks = { }
-sallnames = set()
-for l in g:
-    ls = l.split()
-    if ls[0] in ["MOVE", "NODE", "LINE"]:
-        lng, lat = proj(float(ls[1]), float(ls[2]), inverse=True)
-        #lng, lat = float(ls[1]), float(ls[2])
-        alt = float(ls[3])
-        p = (lat, lng, alt)
-        if ls[0] == "MOVE":
-            if conts and len(conts[-1]) == 1:
-                conts.pop()
-            conts.append([])
-            prevp = p
-        elif ls[0] == "LINE":
-            toplevelname = re.match("\[([^\]\.]*)", ls[4]).group(1)
-            styles = ls[5].split("=")[1:]+ls[6:]
-            
-            # calculate the date as a fractional year
-            if styles and not re.match("[A-Z]*$", styles[-1]):
-                date = styles.pop()
-            else:
-                date = "1900.01.01"
-            ddate = datetime.datetime.strptime(date[:10], "%Y.%m.%d") # ignore date ranges
-            fdate = ddate.year + (ddate - datetime.datetime(ddate.year, 1, 1)).days/365.0
-            if prevp:
-                stationsnamemap[prevp] = toplevelname
-            stationsnamemap[p] = toplevelname
-            
-            if "SURFACE" not in styles and "SPLAY" not in styles and "DUPLICATE" not in styles:
-                sallnames.add(toplevelname)
-                conts[-1].append(p)
-                if prevp is not None:
-                    if toplevelname not in segsnamemap:
-                        segsnamemap[toplevelname] = []
-                    segsnamemap[toplevelname].append((prevp, p, fdate))
-            else:
-                if prevp not in connlinks:
-                    connlinks[prevp] = set()
-                if p not in connlinks:
-                    connlinks[p] = set()
-                connlinks[prevp].add(p)
-                connlinks[p].add(prevp)
-            prevp = p
-        elif ls[0] == "NODE":
-            name = ls[4].strip("[]")
-            tags = ls[5].split() if len(ls) >= 6 else []
-            if ("ENTRANCE" in tags and "." not in name) or name in ["t2006-09", "gps2010-01", "gps2010-07"]:
-                entsmap[name] = p
-                
-                
+    prevp = None
+    segsnamemap = { }
+    stationsnamemap = { }
+    entsmap = { }
+    connlinks = { }
+    sallnames = set()
+    for l in g:
+        ls = l.split()
+        if ls[0] in ["MOVE", "NODE", "LINE"]:
+            lng, lat = proj(float(ls[1]), float(ls[2]), inverse=True)
+            #lng, lat = float(ls[1]), float(ls[2])
+            alt = float(ls[3])
+            p = (lat, lng, alt)
+            if ls[0] == "MOVE":
+                prevp = p
+            elif ls[0] == "LINE":
+                levelname = re.match("\[([^\]]*)", ls[4]).group(1)
+                levelnames = levelname.split(".")
+                while len(levelnames) > 1 and levelnames[0] in ["all", "leckfell", "easegill", "wks"]:
+                    levelnames.pop(0)
+                toplevelname = levelnames[0]
+                styles = ls[5].split("=")[1:]+ls[6:]
+
+                # calculate the date as a fractional year
+                if styles and not re.match("[A-Z]*$", styles[-1]):
+                    date = styles.pop()
+                else:
+                    date = "1900.01.01"
+                ddate = datetime.datetime.strptime(date[:10], "%Y.%m.%d") # ignore date ranges
+                fdate = ddate.year + (ddate - datetime.datetime(ddate.year, 1, 1)).days/365.0
+                if prevp:
+                    stationsnamemap[prevp] = toplevelname
+                stationsnamemap[p] = toplevelname
+
+                if "SURFACE" not in styles and "SPLAY" not in styles and "DUPLICATE" not in styles:
+                    sallnames.add(toplevelname)
+                    if prevp is not None:
+                        if toplevelname not in segsnamemap:
+                            segsnamemap[toplevelname] = []
+                        segsnamemap[toplevelname].append((prevp, p, fdate))
+                else:
+                    if prevp not in connlinks:
+                        connlinks[prevp] = set()
+                    if p not in connlinks:
+                        connlinks[p] = set()
+                    connlinks[prevp].add(p)
+                    connlinks[p].add(prevp)
+                prevp = p
+            elif ls[0] == "NODE":
+                name = ls[4].strip("[]")
+                tags = ls[5].split() if len(ls) >= 6 else []
+                if "ENTRANCE" in tags:
+                    if bexpoloser:
+                        if "." not in name:
+                            entsmap[name] = p
+                    else:
+                        es = name.split(".")
+                        while es[-1] == "entrance":
+                            es.pop()
+                        name = re.sub("entrance|tag$|phanger", "", es[-1])
+                        entsmap[name] = p
+                        
+    return segsnamemap, entsmap, stationsnamemap, sallnames 
+
+
+segsnamemap, entsmap, stationsnamemap, sallnames = LoadParseDmp((l  for l in lines))
+
 assocnamesents = { }
 for e, p in entsmap.items():
     toplevelsurvname = stationsnamemap.get(p)
@@ -140,6 +147,11 @@ for sname, segs in segsnamemap.items():
         svxsegs.append((p[0], p[1], p[2], p1[0], p1[1], p1[2], i, fdate))
 svxsegs.sort(key=lambda X: -max(X[2], X[5]))
 
+altmin = min(min(X[2], X[5])  for X in svxsegs)
+altmax = max(max(X[2], X[5])  for X in svxsegs)
+vfac = 0.9/(altmax - altmin)
+redalt = (0.5 - altmax*vfac) % 1
+
 
 peaks = [ 
     ["Schoneberg", 47.712315, 13.790972, 2000 ], 
@@ -154,7 +166,16 @@ peaks = [
 ];
 
 # this is subtracted from the data positions
-basepositionOrigin = [ "Hilde", 47.6160995, 13.8121137, 748 ];  
+if not bexpoloser:
+    basepositionOrigin = [ "Hilde", 47.6160995, 13.8121137, 748 ];  
+
+    # yorkshire ones
+    peaks = [["Ingleborough", 54.166389, -2.397778, 723], 
+             ["Great Coum", 54.2467,-2.4607, 687],
+             ["Gragareth", 54.2085,-2.4814, 628], 
+             ["Heysham", 54.0299033,-2.9157409, 0]];
+    basepositionOrigin = ["Pos", 54.19063016552769, -2.500253529735059, 383.05];
+
 
 fout = open(fjs, "w")
 fout.write("// generated %s from running %s\n\n" % (time.asctime(), sys.argv[0]))
@@ -173,5 +194,6 @@ fout.write(";\n\n")
 fout.write("var basepositionOrigin = ") 
 fout.write(json.dumps(basepositionOrigin))
 fout.write(";\n")
+fout.write("var vfac = %f, redalt = %f;\n" % (vfac, redalt)) 
 
 fout.close()

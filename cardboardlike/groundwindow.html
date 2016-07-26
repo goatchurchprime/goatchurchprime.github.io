@@ -18,9 +18,10 @@
     <link rel="manifest" href="manifest.json">
     <script src="three.min.js"></script>
     <script src="DeviceOrientationControls.js?2"></script>
-    <script src="all3d.js"></script>
+    <script src="allleck3d.js"></script>
     <script src="positionfuncs.js"></script>
     <script src="pickingfuncs.js"></script>
+    <script src="shaders.js"></script>
   </head>
   <body>
     <div id="main">
@@ -48,131 +49,11 @@
         <video id="camara" autoplay controls></video>
       </div>
     </div>
-
-  <script id="fragment_shader_centreline" type="x-shader/x-fragment">
-uniform vec4 closecolour; 
-uniform float closedist; 
-uniform float selectedvsvxcaveindex; 
-varying float altitude; 
-varying float vcosslope; 
-varying float vsvxcaveindex; 
-float midlump(float v, float offset) 
-{
-    float lv = (mod(v*0.1 + offset, 100.0) - 50.0)/50.0; 
-    return clamp(1.0 - lv*lv*1.0, 0.0, 1.0); 
-}
-void main(void) 
-{
-    float redalt = 70.0; 
-    vec4 ptcolour = vec4(midlump(altitude, redalt), midlump(altitude, redalt-67.0)*0.98, midlump(altitude, redalt-33.0), 1.0); 
-    vec4 sptcolour = mix(ptcolour, vec4(0.0, 0.0, 0.0, 1.0), 0.6*(1.0-vcosslope)); 
-    float fdepth = gl_FragCoord.z / gl_FragCoord.w; 
-    float cfac = clamp((closedist - fdepth)*0.1, 0.0, 0.81); 
-    if (vsvxcaveindex == selectedvsvxcaveindex)
-        gl_FragColor = mix(sptcolour, vec4(0.0, 1.0, 1.0, 1.0), 0.8); 
-    else
-        gl_FragColor = mix(sptcolour, closecolour, cfac); 
-}
-  </script>
-  <script id="vertexShader_centreline" type="x-shader/x-vertex">
-attribute float cosslope; 
-attribute float svxcaveindex; 
-varying float altitude; 
-varying float vcosslope; 
-varying float vsvxcaveindex; 
-void main()
-{
-    altitude = position.y; 
-    vcosslope = cosslope; 
-    vsvxcaveindex = svxcaveindex;  
-    vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
-    gl_Position = projectionMatrix * mvPosition; 
-}
-  </script>
-
-
-
-  <script id="fragment_shader_textlabel" type="x-shader/x-fragment">
-uniform vec4 closecolour; 
-uniform float closedist; 
-uniform sampler2D texture;
-varying vec2 vUv;
-void main() 
-{
-    vec2 uv = vec2(vUv.x, vUv.y);
-    vec3 color = texture2D(texture, uv).rgb;
-    if (color.y == 0.0)
-        discard; 
-    vec4 sptcolour = vec4(color, 1.0);
-
-    // color.y >= 0.5 separates out the aliased dark part of the text texture from the internal pixels of the letters
-    float fdepth = gl_FragCoord.z / gl_FragCoord.w; 
-    float cfac = clamp((closedist - fdepth)*0.1, 0.0, 0.81); 
-    gl_FragColor = mix(sptcolour, closecolour, (color.y >= 0.5 ? cfac : 0.0)); 
-}
-  </script>
-  
-  
-  <script id="vertex_shader_textlabel" type="x-shader/x-fragment">
-uniform float aspect; 
-uniform float pixelsize; 
-uniform float textureaspect; 
-varying vec2 vUv;
-void main()
-{
-    vUv = uv;
-    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-    gl_Position = projectionMatrix * mvPosition; 
-    float spixelsize = pixelsize*gl_Position.z; 
-    gl_Position.x += uv.x*spixelsize*textureaspect; 
-    gl_Position.y += uv.y*spixelsize*aspect; 
-}
-  </script>
-
-
-  <script id="vertexShader_peaktriangle" type="x-shader/x-vertex">
-uniform float trianglesize; 
-uniform float aspect; 
-attribute float pcorner; 
-void main()
-{
-    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-    gl_Position = projectionMatrix * mvPosition; 
-    float strianglesize = trianglesize*gl_Position.z; 
-    if (pcorner != 0.0) {
-        // this is now attempting to draw the triangle fixed even with spin rotation of the screen
-        gl_Position += projectionMatrix*viewMatrix[1]*(-strianglesize) + projectionMatrix*viewMatrix[0]*((pcorner == 1.0 ? 1.0 : -1.0) * 0.57735*strianglesize); 
-        //gl_Position.y += strianglesize*aspect; 
-        //gl_Position.x += (pcorner == 1.0 ? 1.0 : -1.0) * 0.57735*strianglesize; 
-    }
-}
-  </script>
-  
-
-  <script id="vertex_shader_enttriangle" type="x-shader/x-vertex">
-uniform float trianglesize; 
-uniform float aspect; 
-attribute float pcorner; 
-attribute float svxcaveindex; 
-varying float altitude; 
-varying float vcosslope; 
-varying float vsvxcaveindex; 
-void main()
-{
-    altitude = position.y; 
-    vcosslope = 1.0; 
-    vsvxcaveindex = svxcaveindex; 
-    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-    gl_Position = projectionMatrix * mvPosition; 
-    float strianglesize = trianglesize*gl_Position.z*10.0; 
-    if (pcorner != 0.0) {
-        gl_Position.y += strianglesize*aspect; 
-        gl_Position.x += (pcorner == 1.0 ? 1.0 : -1.0) * 0.57735*strianglesize*0.5; 
-    }
-}
-  </script>
   
   <script>
+//function getshader(k) { document.getElementById(k).textContent; };
+function getshader(k) { return shaders[k]; };
+      
 var basepositionOrigin, latR, lngR, altR, latG, lngG, altG; 
 var nyfac, nxfac, eyfac, exfac, lat0, lng0, alt0, camera3JSAlt; 
 function SetBasePositions()
@@ -269,10 +150,12 @@ function MakeLabel(card, text, fillstyle, p, scale)
                     textureaspect: { type: 'f', value: canvas1.width/canvas1.height }, 
                     texture: { value: texture1 },
                     closecolour: { type: 'v4', value: new THREE.Vector4(1.0, 1.0, 1.0, 1.0) }, 
-                    closedist: { type: 'f', value: 5.0 } 
+                    closedist: { type: 'f', value: 5.0 },  
+                    redalt: { type: 'f', value: redalt },
+                    vfac: { type: 'f', value: vfac } 
                   }, 
-        vertexShader: document.getElementById('vertex_shader_textlabel').textContent,
-        fragmentShader: document.getElementById('fragment_shader_textlabel').textContent, 
+        vertexShader: getshader('vertex_shader_textlabel'),
+        fragmentShader: getshader('fragment_shader_textlabel'), 
         depthWrite:true, depthTest:true, 
         side: THREE.DoubleSide
     }); 
@@ -318,7 +201,7 @@ function LoadMountains(scene)
         uniforms: { trianglesize: {type: 'f', value: 15.0}, 
                     aspect: { type: 'f', value: 1.0 }
                   }, 
-        vertexShader: document.getElementById('vertexShader_peaktriangle').textContent,
+        vertexShader: getshader('vertexShader_peaktriangle'),
         depthWrite:true, depthTest:true, 
         side: THREE.DoubleSide
     }); 
@@ -334,10 +217,12 @@ function LoadCentrelines(scene)
     centrelinematerial = new THREE.ShaderMaterial({
         uniforms: { closecolour: { type: 'v4', value: new THREE.Vector4(1.0, 1.0, 1.0, 1.0) }, 
                     closedist: { type: 'f', value: 5.0 }, 
-                    selectedvsvxcaveindex: { type: 'f', value: -1.0 }
+                    selectedvsvxcaveindex: { type: 'f', value: -1.0 }, 
+                    redalt: { type: 'f', value: redalt },
+                    vfac: { type: 'f', value: vfac } 
                   }, 
-        vertexShader: document.getElementById('vertexShader_centreline').textContent,
-        fragmentShader: document.getElementById('fragment_shader_centreline').textContent, 
+        vertexShader: getshader('vertexShader_centreline'),
+        fragmentShader: getshader('fragment_shader_centreline'), 
         depthWrite:true, depthTest:true,  // not sure these work
         linewidth:3 
     });
@@ -384,10 +269,12 @@ function LoadEntrances(scene)
                     aspect: { type: 'f', value: 1.0 }, 
                     closecolour: { type: 'v4', value: new THREE.Vector4(1.0, 1.0, 1.0, 1.0) }, 
                     closedist: { type: 'f', value: 5.0 }, 
-                    selectedvsvxcaveindex: { type: 'f', value: -1.0 }
+                    selectedvsvxcaveindex: { type: 'f', value: -1.0 }, 
+                    redalt: { type: 'f', value: redalt },
+                    vfac: { type: 'f', value: vfac } 
                   }, 
-        vertexShader: document.getElementById('vertex_shader_enttriangle').textContent,
-        fragmentShader: document.getElementById('fragment_shader_centreline').textContent, 
+        vertexShader: getshader('vertex_shader_enttriangle'),
+        fragmentShader: getshader('fragment_shader_centreline'), 
         depthWrite:true, depthTest:true, 
         side: THREE.DoubleSide
     }); 
@@ -433,7 +320,7 @@ function LoadVideoBackground()
     
     navigator.getUserMedia({"audio":false, "video":true}, function(streamVideo) { 
         backgroundvideo.src = window.URL.createObjectURL(streamVideo); 
-        alert(backgroundvideo.src); 
+        //alert(backgroundvideo.src); 
         videotexture = new THREE.Texture(backgroundvideo); 
         var backgroundmesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 2, 0), new THREE.MeshBasicMaterial({map: videotexture})); 
         backgroundmesh.material.depthTest = false; 
