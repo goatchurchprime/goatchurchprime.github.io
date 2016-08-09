@@ -1,27 +1,28 @@
 
 // things to do
-// * move the shaders into own compiled include file
+// * initialize with high view looking down
+// * dot trail to spawn off the dots from current position
+// * offset the positions of everything by the base position origin
 // * vfac and redalt say it's about the colours
 // * provide an offset and digit rounding to the java file to shorten it
-// * dot trail to spawn off the dots from currrent position
-// * offset the positions of everything by the base position origin
 // * separate makefiles for the svx on loser and on leckfell
 // * other peaks in view into database (put them into the svx files as visible peaks if possible???)
 // * assign date attribute onto legs as a year float
 // * provide option of which cave data to load
 // * make the camera view slightly faded (would require specual shader rather that basicmaterial)
+// * break file into different javascript files
 // * derive length and depth when plotting a cave 
 // * light up the entrance labels that match as well
 // * picking of cave passage as well
 // * small hops and sideways hops (in relation to the screen, poss using the accelerometer)
 // * Rauchercan data -- can't find
 // * put some passage widths into the picture using attributes
-// * break file into different javascript files
 // * do the mag check early on on startup
 // * set up links to caves
 
 
 // done
+// * move the shaders into own compiled include file
 // * leck fell to have entrance names and separate caves
 // * check out the WestKingsdaleSystem and make all works -- move the all.svx to the top level NorthernCaves
 // * scale colours for the altitude

@@ -105,9 +105,9 @@ var PickingObject = {
         this.pickray.setFromCamera({x:this.selectposx, y:this.selectposy}, camera); 
         var ray = this.pickray.ray; 
         var rfac = 150.0; 
-        if (pickposmesh) {
-            pickposmesh.position.set(ray.origin.x + ray.direction.x*rfac, ray.origin.y + ray.direction.y*rfac, ray.origin.z + ray.direction.z*rfac); 
-            console.log(pickposmesh.position, "f", footposmesh.position); 
+        if (PositionObject.pickposmesh) {
+            PositionObject.pickposmesh.position.set(ray.origin.x + ray.direction.x*rfac, ray.origin.y + ray.direction.y*rfac, ray.origin.z + ray.direction.z*rfac); 
+            console.log(PositionObject.pickposmesh.position, "f", PositionObject.footposmesh.position); 
         }
         this.selectbatchproc(); 
     }, 

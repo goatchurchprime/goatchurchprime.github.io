@@ -41,7 +41,7 @@
               <input type="button" value="Hop" id="camerahop"/>
               <input type="button" value="Cen" id="reset31"/>
               <input type="button" value="Mag" id="magorientset"/>
-              <input type="button" value="T1" id="test1"/>
+              <input type="button" value="See" id="camera"/>
           </div>
         </div>
       </div>
@@ -77,7 +77,7 @@ function SetBasePositions()
     eyfac = 0; 
     exfac = nyfac*Math.cos(lat0*Math.PI/180); 
     
-    SetCameraPositionG();
+    PositionObject.SetCameraPositionG();
 }
 
 function reset31() 
@@ -85,7 +85,7 @@ function reset31()
     latR = latG - lat0; 
     lngR = lngG - lng0; 
     altR = altG - alt0; 
-    SetCameraPositionG(); 
+    PositionObject.SetCameraPositionG(); 
 }
 
 var camera, scene, renderer, controls, threejselement, vizcontainer;
@@ -548,7 +548,6 @@ function devorientationevent(event)
 
 
 
-var geomeshtorus, flatmaterial; 
 function init() 
 {
     renderer = new THREE.WebGLRenderer();
@@ -571,26 +570,24 @@ function init()
 
     SetBasePositions(); 
 
-    /*var gsurf = new THREE.TorusGeometry(10hopmode, 4, 90, 30); 
-    flatmaterial = new THREE.MeshPhongMaterial({ color: "rgb(220,50,210)", opacity: 0.1, specular: 0x222222, shininess: 40, side: THREE.DoubleSide, vertexColors: THREE.FaceColors, shading: THREE.FlatShading });  
-    gsurf.computeBoundingSphere();
-    geomeshtorus = new THREE.Mesh(gsurf, flatmaterial); 
-    geomeshtorus.rotateX(Math.PI/2); 
-    geomeshtorus.translateZ(-(alt0-50)); 
-    scene.add(geomeshtorus);  */
-
     controls = new THREE.DeviceOrientationControls(camera, true);
     controls.connect();
     controls.update();
-    window.addEventListener('keydown', function(event) {
-        if (event.keyCode == 37) 
-            GdeviceOrientation.gamma += 5; 
-        else if (event.keyCode == 39) 
-            GdeviceOrientation.gamma -= 5; 
-        else if (event.keyCode == 38)
-            GdeviceOrientation.beta += 5; 
-        else if (event.keyCode == 40)
-            GdeviceOrientation.beta -= 5; 
+    window.addEventListener('keydown', function(event) { 
+        var mv = { }; 
+        if (event.keyCode == 37)       mv[event.shiftKey ? "x" : "rx"] = -1;   // left cursor
+        else if (event.keyCode == 39)  mv[event.shiftKey ? "x" : "rx"] = 1;    // right cursor
+        else if (event.keyCode == 38)  mv[event.shiftKey ? "z" : "rz"] = 1;    // up cursor
+        else if (event.keyCode == 40)  mv[event.shiftKey ? "z" : "rz"] = -1;   // down cursor
+        else if (event.keyCode == 33)  mv[event.shiftKey ? "y" : "ry"] = 1;    // page up
+        else if (event.keyCode == 34)  mv[event.shiftKey ? "y" : "ry"] = -1;   // page down
+        if (mv.rx || mv.ry || mv.rz)  {
+            if (mv.rx)  GdeviceOrientation.gamma += mv.rx*5; 
+            if (mv.rz)  GdeviceOrientation.beta += mv.rz*5; 
+            if (mv.ry)  GdeviceOrientation.alpha += mv.ry*5; 
+        } else if (mv.x || mv.y || mv.z) {
+            PositionObject.geo_set(latG + (mv.x|0)*0.01, lngG + (mv.z|0)*0.005, altG + (mv.y|0)*10, 0, 0);  
+        }
     });
 
     
@@ -601,16 +598,16 @@ function init()
     LoadMountains(scene); 
     LoadCentrelines(scene); 
     LoadEntrances(scene); 
-    LoadTrail(scene); 
-    LoadFootpos(scene); 
-    //LoadPickPos(scene); 
+    PositionObject.LoadTrail(scene); 
+    PositionObject.LoadFootpos(scene); 
+    //PositionObject.LoadPickPos(scene); 
     //LoadVideoBackground(); 
     
     scene.fog = new THREE.Fog(0x202020, 10, 20000);  // near and far
         
     document.getElementById("camerahop").addEventListener("click", function() { ZhopGo(1500); }); 
     document.getElementById("reset31").addEventListener("click", reset31); 
-    document.getElementById("test1").addEventListener("click", LoadVideoBackground); 
+    document.getElementById("camera").addEventListener("click", LoadVideoBackground); 
     document.getElementById("magorientset").addEventListener("click", function(event) { event.preventDefault(); window.addEventListener('absolutedeviceorientation', tryabsoluteorient); }); 
 
     quantshowelement.addEventListener("click", quantshowhide); 
@@ -632,12 +629,8 @@ init();
 animate();
 
 // add GPS reader to this or do fake positions
-var watchID = navigator.geolocation.watchPosition(geo_success, geo_error, {enableHighAccuracy:true, timeout:27000, maximumAge:30000}); 
+var watchID = navigator.geolocation.watchPosition(PositionObject.geo_success, PositionObject.geo_error, {enableHighAccuracy:true, timeout:27000, maximumAge:30000}); 
 //fakegpsgenerator(); // for desktop use
-
-
-console.log("dididi"); 
-
 
   </script>
   </body>
