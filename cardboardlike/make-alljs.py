@@ -1,4 +1,6 @@
-import os, time, re, sys, datetime
+#! /usr/bin/python3
+
+import os, time, re, sys, datetime, math
 import pyproj
 import json
 
@@ -98,10 +100,10 @@ def LoadParseDmp(g):
                         name = re.sub("entrance|tag$|phanger", "", es[-1])
                         entsmap[name] = p
                         
-    return segsnamemap, entsmap, stationsnamemap, sallnames 
+    return segsnamemap, entsmap, stationsnamemap, sallnames, connlinks 
 
 
-segsnamemap, entsmap, stationsnamemap, sallnames = LoadParseDmp((l  for l in lines))
+segsnamemap, entsmap, stationsnamemap, sallnames, connlinks = LoadParseDmp((l  for l in lines))
 
 assocnamesents = { }
 for e, p in entsmap.items():
@@ -166,13 +168,13 @@ peaks = [
 ];
 
 # this is subtracted from the data positions
+basepositionOrigin = [ "Hilde", 47.6160995, 13.8121137, 748 ];  
 if not bexpoloser:
-    basepositionOrigin = [ "Hilde", 47.6160995, 13.8121137, 748 ];  
-
     # yorkshire ones
     peaks = [["Ingleborough", 54.166389, -2.397778, 723], 
              ["Great Coum", 54.2467,-2.4607, 687],
              ["Gragareth", 54.2085,-2.4814, 628], 
+             ["Casterton", 54.2261829,-2.5390144, 410],
              ["Heysham", 54.0299033,-2.9157409, 0]];
     basepositionOrigin = ["Pos", 54.19063016552769, -2.500253529735059, 383.05];
 
@@ -197,3 +199,33 @@ fout.write(";\n")
 fout.write("var vfac = %f, redalt = %f;\n" % (vfac, redalt)) 
 
 fout.close()
+
+
+
+def CalcSurveyLengthPerYear(svxsegs):
+    lat0, lng0 = svxsegs[0][0], svxsegs[0][1]
+    earthrad = 6378137; 
+    nyfac = 2*math.pi*earthrad/360; 
+    exfac = nyfac*math.cos(lat0*math.pi/180); 
+    def latlngtopt(lat, lng, alt):
+        rlat = lat - lat0 
+        rlng = lng - lng0
+        return -rlng*exfac, +rlat*nyfac, alt 
+    def vs(s):
+        x0, y0, z0 = latlngtopt(s[0], s[1], s[2])
+        x1, y1, z1 = latlngtopt(s[3], s[4], s[5])
+        return x1-x0, y1-y0, z1-z0
+    def lens(s):
+        vx, vy, vz = vs(s)
+        return math.sqrt(vx**2 + vy**2 + vz**2)
+    def hangle(s):
+        vx, vy, vz = vs(s)
+        h = math.sqrt(vx**2 + vy**2)
+        return math.degrees(math.atan2(abs(vz), h))
+    survlengths = [ (year, 
+                sum(lens(s)  for s in svxsegs  if int(s[7])==year), 
+                sum(abs(s[5]-s[2])  for s in svxsegs  if int(s[7])==year),
+                sum(lens(s)  for s in svxsegs  if int(s[7])==year and hangle(s) > 45)) \
+                   for year in range(1976, 2017) ]
+    return survlengths
+print(CalcSurveyLengthPerYear(svxsegs))

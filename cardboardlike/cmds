@@ -1,6 +1,10 @@
 
+    centrelinematerial.uniforms.yeartime.value = 2014; 
+
 // things to do
+// * altG etc into the positionobject
 // * initialize with high view looking down
+// * trail should work with key motions
 // * dot trail to spawn off the dots from current position
 // * offset the positions of everything by the base position origin
 // * vfac and redalt say it's about the colours
@@ -22,6 +26,8 @@
 
 
 // done
+// * dot tracking changed to vertical lines from sea level
+// * the north position thing  set gamma=0.1
 // * move the shaders into own compiled include file
 // * leck fell to have entrance names and separate caves
 // * check out the WestKingsdaleSystem and make all works -- move the all.svx to the top level NorthernCaves

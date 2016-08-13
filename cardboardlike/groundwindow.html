@@ -18,6 +18,7 @@
     <link rel="manifest" href="manifest.json">
     <script src="three.min.js"></script>
     <script src="DeviceOrientationControls.js?2"></script>
+    <!--script src="all3d.js"></script-->
     <script src="allleck3d.js"></script>
     <script src="positionfuncs.js"></script>
     <script src="pickingfuncs.js"></script>
@@ -42,6 +43,9 @@
               <input type="button" value="Cen" id="reset31"/>
               <input type="button" value="Mag" id="magorientset"/>
               <input type="button" value="See" id="camera"/>
+              <input type="button" value="Lab" id="labelsonoff"/>
+              <input type="button" value="Top" id="highabove"/>
+              <input type="button" value="9999" id="yearcycle"/>
           </div>
         </div>
       </div>
@@ -86,6 +90,14 @@ function reset31()
     lngR = lngG - lng0; 
     altR = altG - alt0; 
     PositionObject.SetCameraPositionG(); 
+}
+
+function HighTopView()
+{
+    GdeviceOrientation.gamma = 0.1;   // required for alpha to change position
+    GdeviceOrientation.beta = 0; 
+    GdeviceOrientation.alpha = -90; 
+    PositionObject.geo_set(latG, lngG, altG + 10000, 0, 0);  
 }
 
 var camera, scene, renderer, controls, threejselement, vizcontainer;
@@ -212,11 +224,14 @@ function LoadMountains(scene)
 
 var centrelinematerial; 
 var centrelinebuffergeometry; 
+var minyearvalue = 9999.0, maxyearvalue = 9999.0; 
+var minaltvalue = 0.0, maxaltvalue = 0.0; 
 function LoadCentrelines(scene)
 {
     centrelinematerial = new THREE.ShaderMaterial({
         uniforms: { closecolour: { type: 'v4', value: new THREE.Vector4(1.0, 1.0, 1.0, 1.0) }, 
                     closedist: { type: 'f', value: 5.0 }, 
+                    yeartime: { type: 'f', value: 9999.0 },
                     selectedvsvxcaveindex: { type: 'f', value: -1.0 }, 
                     redalt: { type: 'f', value: redalt },
                     vfac: { type: 'f', value: vfac } 
@@ -226,10 +241,10 @@ function LoadCentrelines(scene)
         depthWrite:true, depthTest:true,  // not sure these work
         linewidth:3 
     });
-
     var centrelinepositionsbuff = new THREE.BufferAttribute(new Float32Array(svxlegs.length*2*3), 3);
     var cosslope = new Float32Array(svxlegs.length*2); 
     var svxcaveindex = new Float32Array(svxlegs.length*2); 
+    var svxyearvalue = new Float32Array(svxlegs.length*2); 
     for (var i = 0; i < svxlegs.length; i++) {
         var svxleg = svxlegs[i]; 
         var p0 = latlngtopt(svxleg[0], svxleg[1], svxleg[2]); 
@@ -242,11 +257,24 @@ function LoadCentrelines(scene)
         cosslope[i*2+1] = lcosslope; 
         svxcaveindex[i*2] = svxleg[6]; 
         svxcaveindex[i*2+1] = svxleg[6]; 
+        svxyearvalue[i*2] = svxleg[7]; 
+        svxyearvalue[i*2+1] = svxleg[7]; 
+        
+        if (svxleg[7] != 1900) {
+            if ((i == 0) || (svxleg[7] < minyearvalue))  minyearvalue = svxleg[7]; 
+            if ((i == 0) || (svxleg[7] > maxyearvalue))  maxyearvalue = svxleg[7]; 
+        }
+        
+        if ((i == 0) || (svxleg[2] < minaltvalue))  minaltvalue = svxleg[2]; 
+        if (            (svxleg[5] < minaltvalue))  minaltvalue = svxleg[5]; 
+        if ((i == 0) || (svxleg[2] > minaltvalue))  maxaltvalue = svxleg[2]; 
+        if (            (svxleg[5] > minaltvalue))  maxaltvalue = svxleg[5]; 
     }
     centrelinebuffergeometry = new THREE.BufferGeometry(); 
     centrelinebuffergeometry.addAttribute('position', centrelinepositionsbuff);
     centrelinebuffergeometry.addAttribute('cosslope', new THREE.BufferAttribute(cosslope, 1)); 
     centrelinebuffergeometry.addAttribute('svxcaveindex', new THREE.BufferAttribute(svxcaveindex, 1)); 
+    centrelinebuffergeometry.addAttribute('svxyearvalue', new THREE.BufferAttribute(svxyearvalue, 1)); 
 
     var contour = new THREE.LineSegments(centrelinebuffergeometry, centrelinematerial);  
     scene.add(contour); 
@@ -254,6 +282,7 @@ function LoadCentrelines(scene)
 
 var enttrianglematerial; 
 var entgeometry; 
+var entlabelscard = null; 
 function LoadEntrances(scene)
 {
     var entpositionbuff = new THREE.BufferAttribute(new Float32Array(svxents.length*9), 3); 
@@ -281,7 +310,7 @@ function LoadEntrances(scene)
     var enttriangles = new THREE.Mesh(entgeometry, enttrianglematerial);  
     scene.add(enttriangles); 
 
-    var card = new THREE.Object3D();
+    entlabelscard = new THREE.Object3D();
     for (var i = 0; i < svxents.length; i++) {
         var p = latlngtopt(svxents[i][1], svxents[i][2], svxents[i][3]); 
         entpositionbuff.setXYZ(i*3, p.x, p.y, p.z);  entpositionbuff.setXYZ(i*3+1, p.x, p.y, p.z);  entpositionbuff.setXYZ(i*3+2, p.x, p.y, p.z); 
@@ -289,10 +318,10 @@ function LoadEntrances(scene)
         svxcaveindex[i*3] = svxents[i][4];  svxcaveindex[i*3+1] = svxents[i][4];  svxcaveindex[i*3+2] = svxents[i][4]; 
         
         if (svxents[i][0].match(/p\d+[a-z]?$/) !== null) {
-            MakeLabel(card, svxents[i][0], "rgba(0,200,200,0.95)", p, 0.5);  // rgba(0,200,200,0.95)
+            MakeLabel(entlabelscard, svxents[i][0], "rgba(0,200,200,0.95)", p, 0.5);  // rgba(0,200,200,0.95)
         }
     }
-    scene.add(card);
+    scene.add(entlabelscard);
 }
 
 
@@ -372,6 +401,7 @@ function render(dt)
     renderer.render(scene, camera);
 }
 
+var yeartimestep = 0; 
 function animate(t) 
 {
     if (hopmode !== 0)
@@ -382,8 +412,16 @@ function animate(t)
         touchmovestate = 5; 
         PickingObject.selecteffort(touchStart.x, touchStart.y, "fromanimate")
     }
-    update(clock.getDelta());
-    render(clock.getDelta());
+    var cd = clock.getDelta(); 
+    if (yeartimestep != 0) {
+        centrelinematerial.uniforms.yeartime.value = Math.min(maxyearvalue+1, Math.max(minyearvalue, centrelinematerial.uniforms.yeartime.value + cd*yeartimestep)); 
+        document.getElementById("yearcycle").value = centrelinematerial.uniforms.yeartime.value; 
+        if ((centrelinematerial.uniforms.yeartime.value >= maxyearvalue+1) && (yeartimestep > 0))
+            yeartimestep = 0; 
+    }
+    
+    update(cd);
+    render(cd);
 }
 
 function tryabsoluteorient(event)
@@ -547,7 +585,8 @@ function devorientationevent(event)
 }
 
 
-
+var keylatlngstep = 0.0003; 
+var keyaltstep = 10.0; 
 function init() 
 {
     renderer = new THREE.WebGLRenderer();
@@ -586,7 +625,7 @@ function init()
             if (mv.rz)  GdeviceOrientation.beta += mv.rz*5; 
             if (mv.ry)  GdeviceOrientation.alpha += mv.ry*5; 
         } else if (mv.x || mv.y || mv.z) {
-            PositionObject.geo_set(latG + (mv.x|0)*0.01, lngG + (mv.z|0)*0.005, altG + (mv.y|0)*10, 0, 0);  
+            PositionObject.geo_set(latG + (mv.z|0)*keylatlngstep, lngG + (mv.x|0)*keylatlngstep, altG + (mv.y|0)*keyaltstep, 0, 0);  
         }
     });
 
@@ -598,7 +637,8 @@ function init()
     LoadMountains(scene); 
     LoadCentrelines(scene); 
     LoadEntrances(scene); 
-    PositionObject.LoadTrail(scene); 
+    //PositionObject.LoadTrail(scene); 
+    PositionObject.LoadTrailRods(scene); 
     PositionObject.LoadFootpos(scene); 
     //PositionObject.LoadPickPos(scene); 
     //LoadVideoBackground(); 
@@ -609,6 +649,11 @@ function init()
     document.getElementById("reset31").addEventListener("click", reset31); 
     document.getElementById("camera").addEventListener("click", LoadVideoBackground); 
     document.getElementById("magorientset").addEventListener("click", function(event) { event.preventDefault(); window.addEventListener('absolutedeviceorientation', tryabsoluteorient); }); 
+    document.getElementById("highabove").addEventListener("click", HighTopView); 
+    
+    
+    document.getElementById("labelsonoff").addEventListener("click", function(event) { entlabelscard.visible = !entlabelscard.visible; PositionObject.footposmesh.visible = !PositionObject.footposmesh.visible; }); 
+    document.getElementById("yearcycle").addEventListener("click", function(event) { yeartimestep = (yeartimestep == -1.0 ? 1.0 : -1.0); }); 
 
     quantshowelement.addEventListener("click", quantshowhide); 
     document.getElementById("qshow").addEventListener("click", function(event) { quantshowshow(false); }); 
