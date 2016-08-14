@@ -142,6 +142,9 @@ var PositionObject =
         scene.add(this.pickposmesh); 
     }, 
 
+
+
+
     geo_set: function(platitude, plongitude, paltitude, paccuracy, paltitudeaccuracy) 
     { 
         this.bgpserror = false; 
@@ -151,11 +154,11 @@ var PositionObject =
             altG = paltitude; 
         if ((latR === 0) && (altG != 0.0)) {
             var llmax = Math.max(Math.abs(latG - lat0), Math.abs(lngG - lng0)); 
-            if (llmax > 0.2) {
+            if (llmax > 0.1) {  
                 latR = latG - lat0; 
                 lngR = lngG - lng0; 
                 altR = altG - alt0; 
-                quantshowshow("Moving GPS origin to the caves d>"+llmax+"deg"); 
+                quantshowshow("Moving GPS origin to the caves d>"+llmax.toFixed(3)+"deg"); 
                 console.log("Moving GPS origin to the caves d>"+llmax+"deg"); 
                 quantshowhidedelay(4500); 
             }
@@ -187,7 +190,7 @@ var PositionObject =
     geo_error: function() 
     {
         this.bgpserror = true; 
-        document.getElementById('gpsrec').textContent = "gps error"; 
+        document.getElementById('gpsrec').textContent = "gps errror"; 
     }
 }
 

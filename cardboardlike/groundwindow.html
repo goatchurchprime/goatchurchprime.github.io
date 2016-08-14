@@ -84,12 +84,23 @@ function SetBasePositions()
     PositionObject.SetCameraPositionG();
 }
 
-function reset31() 
+function reset31(event) 
 {
-    latR = latG - lat0; 
-    lngR = lngG - lng0; 
-    altR = altG - alt0; 
+    event.preventDefault(); 
+    if ((latR != 0) && (latR != 0.0000001)) {
+        latR = 0.0000001;   // prevents retrigger of set in geo_set
+        lngR = 0; 
+        altR = 0; 
+        quantshowshow("Moving GPS origin back to reality"); 
+    } else {
+        latR = latG - lat0; 
+        lngR = lngG - lng0; 
+        altR = altG - alt0; 
+        quantshowshow("Moving GPS origin to the caves"); 
+    }
     PositionObject.SetCameraPositionG(); 
+    quantshowhidedelay(1500); 
+    return false; 
 }
 
 function HighTopView()
@@ -655,7 +666,7 @@ function init()
     document.getElementById("labelsonoff").addEventListener("click", function(event) { entlabelscard.visible = !entlabelscard.visible; PositionObject.footposmesh.visible = !PositionObject.footposmesh.visible; }); 
     document.getElementById("yearcycle").addEventListener("click", function(event) { yeartimestep = (yeartimestep == -1.0 ? 1.0 : -1.0); }); 
 
-    quantshowelement.addEventListener("click", quantshowhide); 
+    quantshowelement.addEventListener("click", quantshowhide, true); // so that the preventdefault stops it hiding
     document.getElementById("qshow").addEventListener("click", function(event) { quantshowshow(false); }); 
 
     vizcontainer.addEventListener('touchstart', touchstartfunc, false);
@@ -674,7 +685,8 @@ init();
 animate();
 
 // add GPS reader to this or do fake positions
-var watchID = navigator.geolocation.watchPosition(PositionObject.geo_success, PositionObject.geo_error, {enableHighAccuracy:true, timeout:27000, maximumAge:30000}); 
+// [must put anonymous functions in here to get this=obect rather than PositionObject.geo_success pointer directly which gets this=Window]
+var watchID = navigator.geolocation.watchPosition(function(p) { PositionObject.geo_success(p); }, function() { PositionObject.geo_error(); }, {enableHighAccuracy:true, timeout:27000, maximumAge:30000}); 
 //fakegpsgenerator(); // for desktop use
 
   </script>
