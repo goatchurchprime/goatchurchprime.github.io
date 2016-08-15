@@ -3,7 +3,26 @@ http://tinyurl.com/jzjxvmu  is http://goatchurchprime.github.io/cardboardlike/gr
 
 
 // things to do
+// * explain the alt discrepancy in the GPS reading
+// * find what GPS reading should be the vent valley entrance
 // * altG etc into the positionobject
+*fix	3c20ae	69907.233	77407.244	268.392	;sdE 0.0007m, sdN 0.0005m, sdElev 0.0013m
+GPS readings were 54.195764  -2.5627084   275 (but in system is 322)
+getting readings in field of 140 from gpsstatus 187 on app   -- always 47m too high!
+
+
+
+
+
+// * datalogging picture into the talk slides
+// * tunnocks entrance photo
+// * go through again and copy to phone and then to Becka's computer
+
+// * sump diving picture
+// * charging of batteries, gopros
+// * load up bos3 waypoints onto 6030
+
+
 // * initialize with high view looking down
 // * trail should work with key motions
 // * dot trail to spawn off the dots from current position

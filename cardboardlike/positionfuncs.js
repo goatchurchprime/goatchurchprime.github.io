@@ -80,8 +80,8 @@ var PositionObject =
             if (Math.max(Math.abs(pp.x - pc.x), Math.abs(pp.z - pc.z)) >= trailstep) {
                 this.trailrodsbuffindex++; 
                 var i = this.trailrodsbuffindex % (trailrodsbuff.vertices.length/2); 
-                trailrodsbuff.vertices[i*2].set(pc.x, 0, pc.z); 
                 trailrodsbuff.vertices[i*2+1].set(pc.x, pc.y, pc.z); 
+                trailrodsbuff.vertices[i*2].set(pc.x, pc.y-50, pc.z); 
                 document.getElementById('testout').textContent = " :::"+this.trailgeometryindex+" "+pc.x.toFixed(0)+","+pc.y.toFixed(0)+","+pc.z.toFixed(0); 
                 trailrodsbuff.verticesNeedUpdate = true; 
                 trailrodsbuff.computeBoundingSphere(); 
@@ -168,8 +168,8 @@ var PositionObject =
                                                         " (~"+paccuracy.toFixed(0)+"m)"+
                                                         " Alt:"+paltitude.toFixed(1)+
                                                         " (~"+paltitudeaccuracy.toFixed(0)+"m)"; 
-        //document.getElementById('heading').textContent = position.coords.heading.toFixed(0); 
         //document.getElementById('speed').textContent = position.coords.speed.toFixed(2); 
+        //document.getElementById('heading').textContent = position.coords.heading.toFixed(0); 
         this.SetCameraPositionG();
     }, 
     
@@ -181,16 +181,34 @@ var PositionObject =
         this.TrailUpdate(); 
     }, 
 
+    geosetcount: 0,
     geo_success: function(position) 
     { 
         this.bgpserror = false; 
-        this.geo_set(position.coords.latitude, position.coords.longitude, position.coords.altitude, position.coords.accuracy, position.coords.altitudeAccuracy); 
+
+        // use valley entrance settings calculated as follows from the SVX fix positions
+        // cs = "CS +proj=tmerc +lat_0=49 +lon_0=-2 +k=0.9996012717 +x_0=100000 +y_0=-500000 +ellps=airy +datum=OSGB36 +units=m +no_defs"
+        // proj = pyproj.Proj(cs)
+        // lng, lat = proj(77407.244, 69907.233, inverse=True)
+
+        var latVentReal = 54.195764; lngVentReal = -2.4627084; 
+        var latVentCalc = 54.124351228332046; lngVentCalc = -2.3457319933824166;   
+        var altVentDispl = 47; 
+        
+        this.geo_set(position.coords.latitude - latVentReal + latVentCalc, 
+                     position.coords.longitude - lngVentReal + lngVentCalc, 
+                     position.coords.altitude - altVentDispl, 
+                     position.coords.accuracy, position.coords.altitudeAccuracy); 
+        document.getElementById('gpsrecV').textContent = " "+(position.coords.speed|0).toFixed(1)+"m/s "+(position.coords.heading|0).toFixed(1)+"D"; 
+        document.getElementById('testout2').textContent = "#"+(this.geosetcount++)+"#"+position.coords.altitude; 
     },
     
+    geoerrcount: 0,
     geo_error: function() 
     {
         this.bgpserror = true; 
         document.getElementById('gpsrec').textContent = "gps errror"; 
+        document.getElementById('testout2').textContent = "#E"+(this.geoerrcount++); 
     }
 }
 
