@@ -7,21 +7,28 @@
     <style>
       body { margin: 0px; overflow: hidden; }
       #viz { position: absolute; top: 0; left: 0; right: 0; bottom: 0; }
-      #quantbutton { position: absolute; right:0; top: 0; border: thin red solid; background:#ddf; display: block }
+      #quantbutton { position: absolute; right:0; top: 0; border: thin red solid; background:#ddf; display: none }
       #quantshow { position: absolute; right:0; top: 0; width: 75%; border: thin red solid; background:#fdd; display: none }
       #quantshowtext { font-size: 200%; position: relative; left: 0; top: 0; display: none }
       input.selected { background-color: #8e8; } 
       #postext { position: relative; left: 0; top: 0; display: block }
-      #postext input, #quantbutton input { font-size: 150%}
+      #postext input, #quantbutton input { font-size: 150%} 
       #dcamara { position: absolute; left: 0; bottom: 0; width:50%; height:50%; display: none; background: red }
       #camara { width:100%; height:100%; }
       #choicesplash { position: relative; background-color: #fcc; margin-left:auto; margin-right:auto; margin-top:10%; width:80%; display:block; text-align:center; }
       #choicejs { list-style-type: none; padding-left:0; font-size: 150% }
-      #choicejs a:hover { color: blue; font-weight: bold }
+      #choicejs a:hover { color: blue; font-weight: bold; cursor: pointer }
+      #blocknamessplash { position: relative; background-color: #cfc; margin-left:auto; margin-right:auto; margin-top:10%; width:80%; height: 200px; text-align:left; overflow: scroll; display: none }
+      #listblocknames { margin:0px; padding:0px; border:thin black solid; }
+      #listblocknames li { white-space:pre; }
+      #instructionssplash { position: relative; background-color: #ddd; margin-left:auto; margin-right:auto; margin-top:10%; width:80%; height: 400; text-align:left; overflow: auto; display: none }
+      #instructionssplash h2, #instructionssplash p { margin: 0px;  }
+      
     </style>
     <link rel="manifest" href="manifest.json">
     <script src="three.min.js"></script>
     <script src="DeviceOrientationControls.js?2"></script>
+    <script src="plotgraphics.js"></script>
     <script src="plottedgeometry.js"></script>
     <script src="positionfuncs.js"></script>
     <script src="pickingfuncs.js"></script>
@@ -32,7 +39,7 @@
     <div id="main">
       <div id="viz"></div>
       <div id="quantbutton">
-        <input type="button" value="Q" id="qshow"/>
+        <input type="button" value="?" id="qshow"/>
         <span id="debugtext"></span>
       </div>
       <div id="quantshow">
@@ -53,12 +60,38 @@
               <input type="button" value="Top" id="highabove"/>
               <input type="button" value="Drg" id="draggsm"/>
               <input type="button" value="Psg" id="passagesonoff"/>
+              <input type="button" value="Bak" id="pagefront"/>
+              <input type="button" value="?" id="instructionsup"/>
           </div>
         </div>
       </div>
       <div id="choicesplash">
-          <ul id="choicejs">
-          </ul>
+          <ul id="choicejs"></ul>
+      </div>
+      <div id="blocknamessplash">
+          <ul id="listblocknames"></ul>
+      </div>
+      <div id="instructionssplash">
+          <h2>Instructions <input type="button" value="hide" id="instructionhide"></h2>
+          <p><b>Groundwindow</b> shows augmented reality view of cave underground projected on a phone according to your GPS and phone orientation.  
+            The orientation to the north depends on gyros and needs to be set by hand using the control ($) below.
+            Looking vertically down shows you two green triangles at your feet pointing north.  
+            When you walk with the device, a line points from the tip in the direction of motion.  </p>
+          <p><b>Hop</b> Hop camera (also can be done by bouncing phone upwards)</p>
+          <p><b>Cen</b> Shift GPS location to the cave, or back to reality</p>
+          <p><b>Mag</b> Try to get the magnetic orientation correct</p>
+          <p><b>See</b> Show the back camera image</p>
+          <p><b>Lab</b> Turn off or on labels</p>
+          <p><b>Top</b> Reorient view to see from above</p>
+          <p><b>Drg</b> Mode for dragging virtual foot position</p>
+          <p><b>Psg</b> Hide LRUD-based passages</p>
+          <p><b>Bak</b> Return to front screen to choose cave</p>
+          <p><b>?</b> This help page</p>
+
+          <p><b>($)</b> <i>Touch then drag right</i> to spin the north orientation</p>
+          <p><i>Touch then drag up or down</i> to change lighting distance</p>
+          <p><i>Two finger touch then pinch</i> to change field of view</p>
+          <p><i>Touch and hold for one second</i> to select a cave section or entrance</p>
       </div>
       <div id="dcamara">
         <video id="camara" autoplay controls></video>
@@ -98,105 +131,21 @@ function HighTopView()
     PositionObject.geosetdirect(PositionObject.gslongitude, PositionObject.gslatitude, PositionObject.gsaltitude + 100, 0, 0);  
 }
 
-var camera, scene, renderer, controls, threejselement, vizcontainer;
 var quantshowelement, quantshowtextelement, postextelement; 
-var clock = new THREE.Clock();
-var linewidth = 3; 
 
 
-
-var backgroundscene = null, backgroundcamera = null; 
-var videotexture; 
-var backgroundvideo = null; 
-var backgroundcamerascale = 1.67; // may need different scale on y and x or by aspect ratio of something
-window.URL = window.URL || window.webkitURL; 
-navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia; 
-var bshowvideobackground = false; 
-function LoadVideoBackground()
-{
-    if (bshowvideobackground) {
-        bshowvideobackground = false; 
-        document.getElementById("backcamera").className = ""; 
-        return; 
-    }
-    if (backgroundscene) {
-        bshowvideobackground = true; 
-        document.getElementById("backcamera").className = "selected"; 
-        return; 
-    }
-        
-    backgroundvideo = document.createElement("video"); 
-    backgroundvideo.width = vizcontainer.offsetWidth; 
-    backgroundvideo.height = vizcontainer.offsetHeight; 
-    backgroundvideo.autoplay = true; 
-    
-    navigator.getUserMedia({"audio":false, "video":true}, function(streamVideo) { 
-        backgroundvideo.src = window.URL.createObjectURL(streamVideo); 
-        //alert(backgroundvideo.src); 
-        videotexture = new THREE.Texture(backgroundvideo); 
-        var backgroundmesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 2, 0), new THREE.MeshBasicMaterial({map: videotexture})); 
-        backgroundmesh.material.depthTest = false; 
-        backgroundmesh.material.depthWrite = false; 
-        backgroundscene = new THREE.Scene(); 
-        backgroundcamera = new THREE.Camera(); 
-        backgroundcamera.projectionMatrix.makeScale(backgroundcamerascale, backgroundcamerascale, backgroundcamerascale); 
-        backgroundscene.add(backgroundcamera); 
-        backgroundscene.add(backgroundmesh); 
-        bshowvideobackground = true; 
-        document.getElementById("backcamera").className = "selected"; 
-    }, function() { alert("bad camera"); }); 
-}
-
-
-function resize() 
-{
-    var width = vizcontainer.offsetWidth;
-    var height = vizcontainer.offsetHeight;
-    camera.aspect = width / height;
-    PlotGeometryObject.resizeP(width, height); 
-    camera.updateProjectionMatrix();
-    renderer.setSize(width, height);
-}
-
-function update(dt) 
-{
-    resize();
-    camera.updateProjectionMatrix();
-    controls.update(dt);
-}
-
-function render(dt) 
-{
-    renderer.autoClear = false; 
-    renderer.clear(); 
-    if (bshowvideobackground && backgroundscene) {
-        if (backgroundvideo.readyState === backgroundvideo.HAVE_ENOUGH_DATA) {
-            videotexture.needsUpdate = true; 
-        }
-        renderer.render(backgroundscene, backgroundcamera);
-    }
-    renderer.render(scene, camera);
-}
-
-var yeartimestep = 0; 
 function animate(t) 
 {
     PositionObject.SetCameraPositionG(); // mainly to get the hop value
     requestAnimationFrame(animate);
-    if  ((PokeUI.touchmovestate == 1) && (clock.elapsedTime - PokeUI.touchtime > 1)) {
+    if  ((PokeUI.touchmovestate == 1) && (PlotGraphics.clock.elapsedTime - PokeUI.touchtime > 1)) {
         PokeUI.touchmovestate = 5; 
         PickingObject.selecteffort(PokeUI.touchStart.x, PokeUI.touchStart.y, "fromanimate")
     }
-    var cd = clock.getDelta(); 
-    if (yeartimestep != 0) {
-        PlotGeometryObject.centrelinematerial.uniforms.yeartime.value = Math.min(PlotGeometryObject.maxyearvalue+1, Math.max(PlotGeometryObject.minyearvalue, PlotGeometryObject.centrelinematerial.uniforms.yeartime.value + cd*yeartimestep)); 
-        document.getElementById("yearcycle").value = PlotGeometryObject.centrelinematerial.uniforms.yeartime.value; 
-        if ((PlotGeometryObject.centrelinematerial.uniforms.yeartime.value >= PlotGeometryObject.maxyearvalue+1) && (yeartimestep > 0))
-            yeartimestep = 0; 
-    }
+    var cd = PlotGraphics.clock.getDelta(); 
     
-    update(cd);
-    render(cd);
+    PlotGraphics.update(cd);
+    PlotGraphics.render(cd);
 }
 
 function tryabsoluteorient(event)
@@ -258,29 +207,16 @@ var minlightdistance = 10;
 var fardistance = 70000; 
 function init() 
 {
-    renderer = new THREE.WebGLRenderer();
-    threejselement = renderer.domElement;
-    vizcontainer = document.getElementById('viz');
-    vizcontainer.appendChild(threejselement);
-    
-    scene = new THREE.Scene();
-    PlotGeometryObject.scene = scene; 
-    var fieldofview = 30; // degrees (smaller is more tunnel like)
-    var aspect = 1;       // reset in resize()
-    camera = new THREE.PerspectiveCamera(fieldofview, aspect, neardistance, fardistance);
-    camera.position.set(0, 0, 0); 
-    scene.add(camera); 
-
-    controls = new THREE.DeviceOrientationControls(camera, true);
-    controls.connect();
-    controls.update();
-
+    document.getElementById("quantbutton").style.display = "block"; 
+    PlotGraphics.init(); 
     window.addEventListener('keydown', function(event) { PokeUI.keydowncontrols(event); });
 
-    
-    var light = new THREE.PointLight(0xffffff);
-    light.position.set(0, 2500, 0);
-    scene.add(light);
+    /*var listblocknames = document.getElementById('listblocknames'); 
+    for (var i = 0; i < svx3d.blocknames.length; i++) {
+        var li = document.createElement("li"); 
+        li.textContent = svx3d.blocknames[i]; 
+        listblocknames.appendChild(li); 
+    }*/
 
     if (svx3d.cumupassagexcsseq !== undefined)
         PlotGeometryObject.LoadPassageTubesP(svx3d.cumupassagexcsseq, svx3d.passagexcs, 1.0/svx3d.scale); // before centrelines because they overwrite in the depth buffer
@@ -293,41 +229,42 @@ function init()
     
     PlotGeometryObject.setredalts(PlotGeometryObject.redalt, PlotGeometryObject.vfac); 
  
-    PositionObject.LoadTrail(scene); 
+    PositionObject.LoadTrail(PlotGraphics.scene); 
     //PositionObject.LoadTrailRods(scene); 
     
 
-    PositionObject.LoadFootpos(scene); 
+    PositionObject.LoadFootpos(PlotGraphics.scene); 
     //PositionObject.LoadPickPos(scene); 
     //LoadVideoBackground(); 
     
-    scene.fog = new THREE.Fog(0x202020, 10, 20000);  // near and far
+    PlotGraphics.scene.fog = new THREE.Fog(0x202020, 10, 20000);  // near and far
         
     document.getElementById("camerahop").addEventListener("click", function() { PositionObject.ZhopGo(1500); }); 
     document.getElementById("reset31").addEventListener("click", reset31); 
-    document.getElementById("backcamera").addEventListener("click", LoadVideoBackground); 
+    document.getElementById("backcamera").addEventListener("click", function() { PlotGraphics.LoadVideoBackground(); }); 
     document.getElementById("magorientset").addEventListener("click", function(event) { event.preventDefault(); window.addEventListener('absolutedeviceorientation', tryabsoluteorient); }); 
     document.getElementById("highabove").addEventListener("click", HighTopView); 
     document.getElementById("draggsm").addEventListener("click", function(event) { event.preventDefault(); PokeUI.bdraggsmmode = !PokeUI.bdraggsmmode; document.getElementById("draggsm").className = (PokeUI.bdraggsmmode ? "selected" : ""); }); 
     
     document.getElementById("labelsonoff").addEventListener("click", function(event) { PlotGeometryObject.togglelabels(event); }); 
     document.getElementById("passagesonoff").addEventListener("click", function(event) { PlotGeometryObject.togglepassages(event); }); 
-
-    //document.getElementById("yearcycle").addEventListener("click", function(event) { yeartimestep = (yeartimestep == -1.0 ? 1.0 : -1.0); }); 
+    document.getElementById("instructionsup").addEventListener("click", function(event) { document.getElementById("instructionssplash").style.display = "block"; }); 
+    document.getElementById("instructionhide").addEventListener("click", function(event) { document.getElementById("instructionssplash").style.display = "none"; }); 
+    document.getElementById("pagefront").addEventListener("click", function(event) { window.location.hash = ""; window.location.reload(); }); 
 
     quantshowelement.addEventListener("click", quantshowhide, true); // so that the preventdefault stops it hiding
     document.getElementById("qshow").addEventListener("click", function(event) { quantshowshow(false); }); 
 
-    vizcontainer.addEventListener('touchstart',  function(event) { PokeUI.touchstartfunc(event) }, false);
-    vizcontainer.addEventListener('touchend',    function(event) { PokeUI.touchendfunc(event) }, false);
-    vizcontainer.addEventListener('touchcancel', function(event) { PokeUI.touchendfunc(event) }, false);
-    vizcontainer.addEventListener('touchmove',   function(event) { PokeUI.touchmovefunc(event) }, false);
-    vizcontainer.addEventListener('contextmenu', function(event) { PokeUI.touchholdfunc(event) }, false); 
+    PlotGraphics.vizcontainer.addEventListener('touchstart',  function(event) { PokeUI.touchstartfunc(event) }, false);
+    PlotGraphics.vizcontainer.addEventListener('touchend',    function(event) { PokeUI.touchendfunc(event) }, false);
+    PlotGraphics.vizcontainer.addEventListener('touchcancel', function(event) { PokeUI.touchendfunc(event) }, false);
+    PlotGraphics.vizcontainer.addEventListener('touchmove',   function(event) { PokeUI.touchmovefunc(event) }, false);
+    PlotGraphics.vizcontainer.addEventListener('contextmenu', function(event) { PokeUI.touchholdfunc(event) }, false); 
 
-    window.addEventListener('resize', resize);
+    window.addEventListener('resize', function() { PlotGraphics.resize() });
     window.addEventListener('devicemotion', function(event) { PokeUI.devorientationevent(event) }, false);
 
-    setTimeout(resize, 1);
+    setTimeout(function() { PlotGraphics.resize() }, 1);
 }
 
 function LoadScript(jsname)
@@ -343,18 +280,18 @@ function LoadSvx3d(lsvx3d)
     svx3d = lsvx3d; 
     svx3d.scaleInv = 1.0/svx3d.scale; 
     svx3d.nlegs = svx3d.legindexes.length/2; 
-    svx3d.nentrances = svx3d.legentrances.length/2; 
+    svx3d.nentrances = svx3d.legentrances.length/3; 
 
     init();
     if (svx3d.latp0 !== undefined) {
         svxview = svx3d; 
         PositionObject.geosetdirect(svx3d.lngp0, svx3d.latp0, svx3d.altp0, 0, 0);  
     }
-    
+    quantshowshow("Loaded: "+window.location.hash.substr(1)); 
     animate();
 }
 
-function AddSvx3dtolist(svxname, svxjs)
+function AddSvx3dtolist(svxname, svxjs, hashmatchlis)
 {
     var li = document.createElement("li"); 
     var a = document.createElement("a"); 
@@ -362,21 +299,29 @@ function AddSvx3dtolist(svxname, svxjs)
     li.addEventListener("click", function() { 
         document.getElementById('choicesplash').style.display = "none"; 
         quantshowshow("Loading "+svxjs); 
-        LoadScript(svxjs); 
+        window.location.hash = svxjs; 
+        LoadScript(svxjs); // this then callsback to LoadSvx3d()
     }); 
     li.appendChild(a); 
     document.getElementById('choicejs').appendChild(li); 
+    
+    if (window.location.hash.substr(1) == svxjs)
+        hashmatchlis.push(li); 
 }
 
 // callback from svx3dlist.js include file
 function LoadSvx3dList(lsvx3dlist)
 {
+    var hashmatchlis = [ ]; 
     for (var i = 0; i < lsvx3dlist.length; i++) 
-        AddSvx3dtolist(lsvx3dlist[i]["svxname"], lsvx3dlist[i]["svxjs"]); 
+        AddSvx3dtolist(lsvx3dlist[i]["svxname"], lsvx3dlist[i]["svxjs"], hashmatchlis); 
+    if (hashmatchlis.length != 0)
+        hashmatchlis[0].click(); 
 }
 
 initelements(); 
-LoadScript('svx3dlist.js'); 
+LoadScript('svx3dlist.js');  // this then callsback to LoadSvx3dList()
+
 
 
 // add GPS reader to this or do fake positions

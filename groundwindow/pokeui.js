@@ -16,14 +16,14 @@ var PokeUI = {
     touchstartfunc: function(event) 
     {
         event.stopPropagation(); 
-        this.touchtime = clock.elapsedTime; 
+        this.touchtime = PlotGraphics.clock.elapsedTime; 
         if (event.touches.length == 1) {
             this.touchStart.set(event.touches[0].pageX, event.touches[0].pageY); 
             this.touchmovestate = 1; // pre-single move, but don't know direction of drag
         } else if ((event.touches.length == 2) && (this.touchmovestate <= 1)) {
             this.touchStart.set(event.touches[1].pageX - event.touches[0].pageX, event.touches[1].pageX - event.touches[0].pageY); 
-            this.touchmovevalueStart = (bshowvideobackground ? backgroundcamerascale : camera.fov); 
-            quantshowshow("**"); 
+            this.touchmovevalueStart = (PlotGraphics.bshowvideobackground ? PlotGraphics.backgroundcamerascale : PlotGraphics.camera.fov); 
+            quantshowshow("**"+this.touchmovevalueStart); 
             this.touchmovestate = 4; 
         }
         if (this.bdraggsmmode) {
@@ -57,12 +57,12 @@ var PokeUI = {
             this.touchDelta.subVectors(this.touchEnd, this.touchStart); 
             if ((this.touchmovestate == 1) && (Math.max(Math.abs(this.touchDelta.x), Math.abs(this.touchDelta.y)*2) > touchmovepixelsrequired)) {
                 this.touchmovestate = (Math.abs(this.touchDelta.x) >= Math.abs(this.touchDelta.y) ? 2 : 3); 
-                this.touchmovevalueStart = (this.touchmovestate == 2 ? controls.alphaoffset : PlotGeometryObject.centrelinematerial.uniforms.closedist.value); 
+                this.touchmovevalueStart = (this.touchmovestate == 2 ? PlotGraphics.controls.alphaoffset : PlotGeometryObject.centrelinematerial.uniforms.closedist.value); 
                 quantshowshow("**");   // drops through
                 //if (this.touchmovestate == 2)
                 //    controls.alphalock = true; 
             }
-            if  ((this.touchmovestate == 1) && (clock.elapsedTime - this.touchtime > 1.00)) {
+            if  ((this.touchmovestate == 1) && (PlotGraphics.clock.elapsedTime - this.touchtime > 1.00)) {
                 this.touchmovestate = 5; 
                 PickingObject.selecteffort(this.touchStart.x, this.touchStart.y, "touchholdmove")
             }
@@ -78,7 +78,7 @@ var PokeUI = {
             }
         } else if (event.touches.length == 2) {  // pinch gesture
             if (this.touchmovestate == 4) {
-                this.touchEnd.set(event.touches[1].pageX - event.touches[0].pageX, event.touches[1].pageX - event.touches[0].pageY); 
+                this.touchEnd.set(event.touches[1].pageX - event.touches[0].pageX, event.touches[1].pageY - event.touches[0].pageY); 
                 touchmovestateN = 4; 
                 touchmovedistance = this.touchStart.length()/this.touchEnd.length(); 
                 if (this.bdraggsmmode)
@@ -89,19 +89,19 @@ var PokeUI = {
         // activate the gesture
         if (!this.bdraggsmmode) {
             if (touchmovestateN == 2) {
-                controls.alphaoffset = this.touchmovevalueStart + touchmovedistance*0.3;  
-                quantshowtextelement.textContent = "A-offs: "+controls.alphaoffset.toFixed(0); 
+                PlotGraphics.controls.alphaoffset = this.touchmovevalueStart + touchmovedistance*0.3;  
+                quantshowtextelement.textContent = "A-offs: "+PlotGraphics.controls.alphaoffset.toFixed(0); 
             } else if (touchmovestateN == 3) {
                 PlotGeometryObject.setclosedistvalueP(Math.max(minlightdistance, this.touchmovevalueStart - Math.max(1.0, this.touchmovevalueStart)*touchmovedistance*(touchmovedistance < 0 ? 0.02 : 0.005))); 
                 quantshowtextelement.textContent = "Light: "+(PlotGeometryObject.centrelinematerial.uniforms.closedist.value).toFixed(0)+"m"; 
             } else if (touchmovestateN == 4) { 
-                if (bshowvideobackground) {
-                    backgroundcamerascale = this.touchmovevalueStart/touchmovedistance; 
-                    backgroundcamera.projectionMatrix.makeScale(backgroundcamerascale, backgroundcamerascale, backgroundcamerascale); 
-                    quantshowtextelement.textContent = "Backcamm scale: "+backgroundcamerascale.toFixed(2); 
+                if (PlotGraphics.bshowvideobackground) {
+                    PlotGraphics.backgroundcamerascale = this.touchmovevalueStart/touchmovedistance; 
+                    PlotGraphics.backgroundcamera.projectionMatrix.makeScale(PlotGraphics.backgroundcamerascale, PlotGraphics.backgroundcamerascale, PlotGraphics.backgroundcamerascale); 
+                    quantshowtextelement.textContent = "Backcamm scale: "+PlotGraphics.backgroundcamerascale.toFixed(2); 
                 } else {
-                    camera.fov = Math.min(175.0, Math.max(1.0, this.touchmovevalueStart*touchmovedistance)); 
-                    quantshowtextelement.textContent = "FOV: "+camera.fov.toFixed(0)+"deg"; 
+                    PlotGraphics.camera.fov = Math.min(175.0, Math.max(1.0, this.touchmovevalueStart*touchmovedistance)); 
+                    quantshowtextelement.textContent = "FOV: "+PlotGraphics.camera.fov.toFixed(0)+"deg"; 
                 }
             } 
         } else {
@@ -168,7 +168,7 @@ var PokeUI = {
             }
         } else {
             if ((this.maxaccz > 0.0) && (PositionObject.hopmode == 0)) {
-                if (this.hopsuppresstime > clock.elapsedTime) { 
+                if (this.hopsuppresstime > PlotGraphics.clock.elapsedTime) { 
                     PositionObject.ZhopGo((this.maxaccz-5.5)*(this.maxaccz-5.5)*300); 
                     document.getElementById('debugtext').textContent = this.maxaccz.toFixed(3); 
                 }
@@ -176,7 +176,7 @@ var PokeUI = {
                 if (PositionObject.hopmode == 2) {
                     PositionObject.ZhopGo(0); 
                 } else {
-                    this.hopsuppresstime = clock.elapsedTime + 2; 
+                    this.hopsuppresstime = PlotGraphics.clock.elapsedTime + 2; 
                 }
             }
             this.maxaccz = 0.0; 
