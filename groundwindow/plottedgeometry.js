@@ -305,6 +305,9 @@ var PlotGeometryObject =
             this.enttrianglematerial.uniforms.aspect.value = aspect; 
             this.enttrianglematerial.uniforms.trianglesize.value = 5/width; 
         }
+        if (PositionObject.footposmesh) {
+            PositionObject.footposmesh.scale.set(Math.max(aspect, 1), 1.0, Math.max(aspect, 1)); 
+        }
     },
     setredalts: function(redalt, vfac)
     {

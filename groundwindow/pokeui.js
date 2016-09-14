@@ -170,7 +170,7 @@ var PokeUI = {
             if ((this.maxaccz > 0.0) && (PositionObject.hopmode == 0)) {
                 if (this.hopsuppresstime > PlotGraphics.clock.elapsedTime) { 
                     PositionObject.ZhopGo((this.maxaccz-5.5)*(this.maxaccz-5.5)*300); 
-                    document.getElementById('debugtext').textContent = this.maxaccz.toFixed(3); 
+                    //document.getElementById('debugtext').textContent = this.maxaccz.toFixed(3); 
                 }
             } else if (this.maxaccz < 0.0) {
                 if (PositionObject.hopmode == 2) {

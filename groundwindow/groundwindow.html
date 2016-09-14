@@ -9,7 +9,7 @@
       #viz { position: absolute; top: 0; left: 0; right: 0; bottom: 0; }
       #quantbutton { position: absolute; right:0; top: 0; border: thin red solid; background:#ddf; display: none }
       #quantshow { position: absolute; right:0; top: 0; width: 75%; border: thin red solid; background:#fdd; display: none }
-      #quantshowtext { font-size: 200%; position: relative; left: 0; top: 0; display: none }
+      #quantshowtext { font-size: 200%; position: relative; left: 0; top: 0; overflow-x: hidden; display: none }
       input.selected { background-color: #8e8; } 
       #postext { position: relative; left: 0; top: 0; display: block }
       #postext input, #quantbutton input { font-size: 150%} 
@@ -27,7 +27,7 @@
     </style>
     <link rel="manifest" href="manifest.json">
     <script src="three.min.js"></script>
-    <script src="DeviceOrientationControls.js?2"></script>
+    <script src="DeviceOrientationControls.js"></script>
     <script src="plotgraphics.js"></script>
     <script src="plottedgeometry.js"></script>
     <script src="positionfuncs.js"></script>
@@ -61,7 +61,7 @@
               <input type="button" value="Drg" id="draggsm"/>
               <input type="button" value="Psg" id="passagesonoff"/>
               <input type="button" value="Bak" id="pagefront"/>
-              <input type="button" value="?" id="instructionsup"/>
+              <input type="button" value="Help" id="instructionsup"/>
           </div>
         </div>
       </div>
@@ -83,7 +83,7 @@
           <p><b>See</b> Show the back camera image</p>
           <p><b>Lab</b> Turn off or on labels</p>
           <p><b>Top</b> Reorient view to see from above</p>
-          <p><b>Drg</b> Mode for dragging virtual foot position</p>
+          <p><b>Drg</b> Mode for dragging virtual foot position (horizontal/vertical for Lat and Lng, and use pinch gesture to shift in Z)</p>
           <p><b>Psg</b> Hide LRUD-based passages</p>
           <p><b>Bak</b> Return to front screen to choose cave</p>
           <p><b>?</b> This help page</p>
@@ -288,6 +288,7 @@ function LoadSvx3d(lsvx3d)
         PositionObject.geosetdirect(svx3d.lngp0, svx3d.latp0, svx3d.altp0, 0, 0);  
     }
     quantshowshow("Loaded: "+window.location.hash.substr(1)); 
+    quantshowhidedelay(2500); 
     animate();
 }
 
@@ -298,7 +299,7 @@ function AddSvx3dtolist(svxname, svxjs, hashmatchlis)
     a.textContent = svxname; 
     li.addEventListener("click", function() { 
         document.getElementById('choicesplash').style.display = "none"; 
-        quantshowshow("Loading "+svxjs); 
+        quantshowshow("Loading: "+svxjs); 
         window.location.hash = svxjs; 
         LoadScript(svxjs); // this then callsback to LoadSvx3d()
     }); 

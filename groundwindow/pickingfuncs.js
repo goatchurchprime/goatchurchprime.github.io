@@ -113,7 +113,7 @@ var PickingObject = {
             if (this.minisvxents < svx3d.nentrances)
                 quantshowtextelement.textContent = "Entrance of:"+blockname+" sel:"+selblockname; 
             else
-                quantshowtextelement.textContent = "Block of: "+blockname; 
+                quantshowtextelement.textContent = "svxblock: "+blockname; 
             quantshowhidedelay(5000); 
         }
         this.setselectedblock(selblockname); 

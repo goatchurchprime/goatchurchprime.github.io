@@ -214,7 +214,7 @@ var PositionObject =
         var z = ralt; 
         console.assert((x !== undefined) && (x !== NaN)); 
         this.cameraactualposition.set(-(x+this.gsmdisplacementx), (z+this.gsmdisplacementz), (y+this.gsmdisplacementy)); 
-        if (PlotGraphics.camera !== undefined) 
+        if (PlotGraphics.camera !== null) 
             PlotGraphics.camera.position.set(this.cameraactualposition.x, this.cameraactualposition.y+this.Zhopdisplacement(), this.cameraactualposition.z); 
     }, 
 
@@ -272,7 +272,7 @@ var PositionObject =
 
 
 //var ifakegpsstart = 0, fakegpslongitude = 0.823994+0.001, fakegpslatitude = 43.033223, fakegpsaltitude = 500;  
-var ifakegpsstart = 0, fakegpslongitude = 0.82225744, fakegpslatitude = 43.0327787, fakegpsaltitude = 477;  
+var ifakegpsstart = 0, fakegpslongitude = -2.971909, fakegpslatitude = 53.396103+1, fakegpsaltitude = 90;  
 function fakegpsgenerator()
 {
     var ioffs = 30, ifac = 1.0/6; 
