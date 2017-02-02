@@ -342,10 +342,11 @@ var PlotGeometryObject =
     }, 
 
     togglelabels: function(event) {
-        if (this.entlabelscard)
+        if (this.entlabelscard) {
             this.entlabelscard.visible = !this.entlabelscard.visible; 
-        PositionObject.footposmesh.visible = !PositionObject.footposmesh.visible; 
-        document.getElementById("labelsonoff").className = (PositionObject.footposmesh.visible ? "" : "selected"); 
+            document.getElementById("labelsonoff").className = (this.entlabelscard.visible ? "" : "selected"); 
+        }
+        //PositionObject.footposmesh.visible = !PositionObject.footposmesh.visible; 
     }, 
     togglepassages: function(event) {
         this.passagetubes.visible = !this.passagetubes.visible; 

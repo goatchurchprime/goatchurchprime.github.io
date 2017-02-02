@@ -127,8 +127,8 @@ var PokeUI = {
         event.preventDefault(); 
         //if (this.touchmovestate == 2)
         //    controls.alphalock = false; 
-        if (this.touchmovestate > 0)
-            quantshowhidedelay(1500); 
+        if ((this.touchmovestate > 0) && (this.touchmovestate != 5))
+            quantshowhidedelay(1501); 
         this.touchmovestate = 0; 
     }, 
     

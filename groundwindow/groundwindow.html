@@ -9,7 +9,7 @@
       #viz { position: absolute; top: 0; left: 0; right: 0; bottom: 0; }
       #quantbutton { position: absolute; right:0; top: 0; border: thin red solid; background:#ddf; display: none }
       #quantshow { position: absolute; right:0; top: 0; width: 75%; border: thin red solid; background:#fdd; display: none }
-      #quantshowtext { font-size: 200%; position: relative; left: 0; top: 0; overflow-x: hidden; display: none }
+      #quantshowtext { font-size: 200%; position: relative; left: 0; top: 0; word-break: break-all; overflow-x: hidden; display: none }
       input.selected { background-color: #8e8; } 
       #postext { position: relative; left: 0; top: 0; display: block }
       #postext input, #quantbutton input { font-size: 150%} 
@@ -92,6 +92,8 @@
           <p><i>Touch then drag up or down</i> to change lighting distance</p>
           <p><i>Two finger touch then pinch</i> to change field of view</p>
           <p><i>Touch and hold for one second</i> to select a cave section or entrance</p>
+          <p><b>Best to walk in a straight line and then ($) spin the north orientation so that 
+                the walking line is always up ahead of you.</b></p>
       </div>
       <div id="dcamara">
         <video id="camara" autoplay controls></video>
@@ -164,15 +166,14 @@ function tryabsoluteorient(event)
 var quantshowhidetimeout = null; 
 function quantshowhide()  
 {
+console.log("hide", quantshowhidetimeout); 
     quantshowelement.style.display = "none";  
-    if (quantshowhidetimeout !== null) {
-        clearTimeout(quantshowhidetimeout);  
-        quantshowhidetimeout = null; 
-    }
+    quantshowhidetimeout = null; 
 }
 
 function quantshowhidedelay(dt)  
 {
+console.log("hidedelay", dt, quantshowhidetimeout); 
     if (quantshowhidetimeout !== null)
         clearTimeout(quantshowhidetimeout);  
     quantshowhidetimeout = setTimeout(quantshowhide, dt);  
