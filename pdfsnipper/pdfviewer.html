@@ -139,7 +139,7 @@ $(window).ready(function()
     while (match = search.exec(query))
         urlParams[decode(match[1])] = decode(match[2]);
         
-    pdfdocumentfunc((urlParams.f == undefined ? '/pdf/SN06894.pdf' : '/pdf/'+urlParams.f+'.pdf'), (urlParams.p == undefined ? 1 : parseInt(urlParams.p))); 
+    pdfdocumentfunc((urlParams.f == undefined ? 'pdf/cherrysds.pdf' : 'pdf/'+urlParams.f+'.pdf'), (urlParams.p == undefined ? 1 : parseInt(urlParams.p))); 
     
     $("#loadissues").click(function() {
         $("ul#issueslist").clear(); 
