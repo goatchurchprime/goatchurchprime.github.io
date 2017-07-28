@@ -21,7 +21,7 @@ var PokeUI = {
             this.touchStart.set(event.touches[0].pageX, event.touches[0].pageY); 
             this.touchmovestate = 1; // pre-single move, but don't know direction of drag
         } else if ((event.touches.length == 2) && (this.touchmovestate <= 1)) {
-            this.touchStart.set(event.touches[1].pageX - event.touches[0].pageX, event.touches[1].pageX - event.touches[0].pageY); 
+            this.touchStart.set(event.touches[1].pageX - event.touches[0].pageX, event.touches[1].pageY - event.touches[0].pageY); 
             this.touchmovevalueStart = (PlotGraphics.bshowvideobackground ? PlotGraphics.backgroundcamerascale : PlotGraphics.camera.fov); 
             quantshowshow("**"+this.touchmovevalueStart); 
             this.touchmovestate = 4; 
@@ -81,8 +81,9 @@ var PokeUI = {
                 this.touchEnd.set(event.touches[1].pageX - event.touches[0].pageX, event.touches[1].pageY - event.touches[0].pageY); 
                 touchmovestateN = 4; 
                 touchmovedistance = this.touchStart.length()/this.touchEnd.length(); 
-                if (this.bdraggsmmode)
+                if (this.bdraggsmmode) {
                     touchmovedistance = this.touchEnd.length() - this.touchStart.length(); 
+                }
             } 
         }
             

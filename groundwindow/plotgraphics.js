@@ -62,6 +62,10 @@ var PlotGraphics =
         this.camera.position.set(0, 0, 0); 
         this.scene.add(this.camera); 
 
+        if (THREE.DeviceOrientationControls === undefined) {
+            alert("THREE.DeviceOrientationControls failed to load"); 
+        }
+        
         this.controls = new THREE.DeviceOrientationControls(this.camera, true);
         this.controls.connect();
         this.controls.update();

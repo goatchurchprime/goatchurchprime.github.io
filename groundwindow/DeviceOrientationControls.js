@@ -17,7 +17,6 @@
 
 var GdeviceOrientation; // global version for access in other code
 (function() {
-
   var deviceOrientation = { alpha:0.0, beta:90.0, gamma:90.0, absolute:false }; 
   GdeviceOrientation = deviceOrientation; 
   var screenOrientation = window.orientation || 0;

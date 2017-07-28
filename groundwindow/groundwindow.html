@@ -39,7 +39,7 @@
     <div id="main">
       <div id="viz"></div>
       <div id="quantbutton">
-        <input type="button" value="?" id="qshow"/>
+        <input type="button" value="3?" id="qshow"/>
         <span id="debugtext"></span>
       </div>
       <div id="quantshow">
@@ -107,6 +107,7 @@ function getshader(k) { return shaders[k]; };
 var svx3d = undefined;   // current cave survey object
 var svxviewcurrentgps = { latp0:0, lngp0:0, altp0:0, nyfac:111319.49079327358, nxfac:0, eyfac:0, exfac:111319.49079327358 }; // replacement view when too far from svxview position
 var svxview = svxviewcurrentgps; // reset to svx3d if all attributes there; svxviewcurrentgps also rewritten if gps reading comes through so we can project into local space
+
 
 function reset31(event) 
 {
@@ -265,7 +266,8 @@ function init()
     window.addEventListener('resize', function() { PlotGraphics.resize() });
     window.addEventListener('devicemotion', function(event) { PokeUI.devorientationevent(event) }, false);
 
-    setTimeout(function() { PlotGraphics.resize() }, 1);
+    // make the labels off by default
+    setTimeout(function() { PlotGraphics.resize(); document.getElementById("labelsonoff").click() }, 1);
 }
 
 function LoadScript(jsname)
@@ -290,6 +292,7 @@ function LoadSvx3d(lsvx3d)
     }
     quantshowshow("Loaded: "+window.location.hash.substr(1)); 
     quantshowhidedelay(2500); 
+
     animate();
 }
 
@@ -322,9 +325,16 @@ function LoadSvx3dList(lsvx3dlist)
 }
 
 initelements(); 
-LoadScript('svx3dlist.js');  // this then callsback to LoadSvx3dList()
 
-
+function waitforcontrolslibrary() {
+    if (THREE.DeviceOrientationControls === undefined) {
+        setTimeout(waitforcontrolslibrary, 200);
+        console.log("waiting for controls library"); 
+    } else {
+        LoadScript('svx3dlist.js');  // this then callsback to LoadSvx3dList()
+    }
+}
+waitforcontrolslibrary(); // we have had bugs with the library not loading yet
 
 // add GPS reader to this or do fake positions
 // [must put anonymous functions in here to get this=obect rather than PositionObject.geo_success pointer directly which gets this=Window]
