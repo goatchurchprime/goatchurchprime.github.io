@@ -23,7 +23,8 @@
       #listblocknames li { white-space:pre; }
       #instructionssplash { position: relative; background-color: #ddd; margin-left:auto; margin-right:auto; margin-top:10%; width:80%; height: 400; text-align:left; overflow: auto; display: none }
       #instructionssplash h2, #instructionssplash p { margin: 0px;  }
-      
+      #instructionhide, #instructionhide2 { font-size:120%; background-color: #ffa; }
+          
     </style>
     <link rel="manifest" href="manifest.json">
     <script src="three.min.js"></script>
@@ -39,7 +40,7 @@
     <div id="main">
       <div id="viz"></div>
       <div id="quantbutton">
-        <input type="button" value="3?" id="qshow"/>
+        <input type="button" value="4?" id="qshow"/>
         <span id="debugtext"></span>
       </div>
       <div id="quantshow">
@@ -94,6 +95,7 @@
           <p><i>Touch and hold for one second</i> to select a cave section or entrance</p>
           <p><b>Best to walk in a straight line and then ($) spin the north orientation so that 
                 the walking line is always up ahead of you.</b></p>
+          <input type="button" value="hide" id="instructionhide2">
       </div>
       <div id="dcamara">
         <video id="camara" autoplay controls></video>
@@ -252,6 +254,7 @@ function init()
     document.getElementById("passagesonoff").addEventListener("click", function(event) { PlotGeometryObject.togglepassages(event); }); 
     document.getElementById("instructionsup").addEventListener("click", function(event) { document.getElementById("instructionssplash").style.display = "block"; }); 
     document.getElementById("instructionhide").addEventListener("click", function(event) { document.getElementById("instructionssplash").style.display = "none"; }); 
+    document.getElementById("instructionhide2").addEventListener("click", function(event) { document.getElementById("instructionssplash").style.display = "none"; }); 
     document.getElementById("pagefront").addEventListener("click", function(event) { window.location.hash = ""; window.location.reload(); }); 
 
     quantshowelement.addEventListener("click", quantshowhide, true); // so that the preventdefault stops it hiding
