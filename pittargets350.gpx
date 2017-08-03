@@ -1,0 +1,1862 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xsi:schemaLocation="http://www.topografix.com/GPX/1/0 http://www.topografix.com/GPX/1/0/gpx.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.topografix.com/GPX/1/0" version="1.0" creator="gpx.py -- https://github.com/tkrajina/gpxpy">
+<wpt lat="47.694596916649594" lon="13.821616058704297">
+<ele>1911.32</ele>
+<name>2004-18to2006-09.p2006-09</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69278936017433" lon="13.820952455426898">
+<ele>1877.68</ele>
+<name>p204c</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.6936041895717" lon="13.818108724288725">
+<ele>1833.02</ele>
+<name>p204h</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.6910757810474" lon="13.82131745106964">
+<ele>1858.14</ele>
+<name>t204b</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.698666039667096" lon="13.823890163171942">
+<ele>1880.29</ele>
+<name>2015-mf-06.purplelupine.a4</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.700790860889185" lon="13.82110912207491">
+<ele>1905.28</ele>
+<name>2012-ns-10.1</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.699363441101816" lon="13.822090038001964">
+<ele>1909.8</ele>
+<name>2010-03.1</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69881751912839" lon="13.8215707952355">
+<ele>1919.29</ele>
+<name>2012-ns-03.1</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69667268178751" lon="13.82054409717155">
+<ele>1866.51</ele>
+<name>2012-ns-01.2012-ns-01-tag</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69662246965258" lon="13.820858836236978">
+<ele>1877.25</ele>
+<name>2012-ns-01.antsinyourpants.15</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.694965909505676" lon="13.82052061824075">
+<ele>1895.6</ele>
+<name>p2010-06</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.690864151830034" lon="13.819943196355293">
+<ele>1837.25</ele>
+<name>p2006-08</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69268079246272" lon="13.820325738108023">
+<ele>1869.36</ele>
+<name>pquarriesd</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69261334479935" lon="13.820329258477427">
+<ele>1863.06</ele>
+<name>p2002-08</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69282554855916" lon="13.82063019291371">
+<ele>1875.69</ele>
+<name>p2002-07</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.6927149525317" lon="13.821697376783838">
+<ele>1907.58</ele>
+<name>p2002-05</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69148331657329" lon="13.820522928346163">
+<ele>1849.47</ele>
+<name>p2001-03</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.697209753125364" lon="13.817108262309661">
+<ele>1820.02</ele>
+<name>p263</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69312526432777" lon="13.817308329506869">
+<ele>1798.59</ele>
+<name>t251</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.691116010095875" lon="13.822185701484123">
+<ele>1877.9</ele>
+<name>p244</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69258004133367" lon="13.821264892707735">
+<ele>1881.62</ele>
+<name>p242</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.6925266466422" lon="13.820420770780716">
+<ele>1865.36</ele>
+<name>p204f</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69216904648644" lon="13.82208229321028">
+<ele>1890.31</ele>
+<name>p241</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69101177020142" lon="13.821909657968869">
+<ele>1866.03</ele>
+<name>p231f</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69073960363531" lon="13.81800967372259">
+<ele>1813.99</ele>
+<name>t2004-15b</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69385173127995" lon="13.819569392967072">
+<ele>1865.99</ele>
+<name>p2004-18</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69385173127995" lon="13.819569392967072">
+<ele>1865.99</ele>
+<name>2004-18to2006-09.p2004-18</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69484526652528" lon="13.82102138756675">
+<ele>1909.06</ele>
+<name>p258b</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69484526652528" lon="13.82102138756675">
+<ele>1909.06</ele>
+<name>2004-18to2006-09.p258b</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69486947439523" lon="13.820899161763558">
+<ele>1903.88</ele>
+<name>p258a</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69486947439523" lon="13.820899161763558">
+<ele>1903.88</ele>
+<name>2004-18to2006-09.p258a</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.693572281122776" lon="13.818155690658909">
+<ele>1833.36</ele>
+<name>p204i</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69361525181692" lon="13.81779381958394">
+<ele>1822.71</ele>
+<name>p204g</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.692986252989805" lon="13.817579479435729">
+<ele>1807.3</ele>
+<name>243.5</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.6912299898499" lon="13.821561317019592">
+<ele>1858.56</ele>
+<name>p231i</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69134046765244" lon="13.821664907559938">
+<ele>1862.0</ele>
+<name>p231b</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69130897022768" lon="13.821909760297817">
+<ele>1870.0</ele>
+<name>p231c</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69114999439879" lon="13.821666000355133">
+<ele>1861.93</ele>
+<name>p231a</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.691138447071005" lon="13.821768208585702">
+<ele>1861.85</ele>
+<name>p231h</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69109775747432" lon="13.821801375415134">
+<ele>1866.83</ele>
+<name>p231g</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69113876720017" lon="13.821729287857766">
+<ele>1861.9</ele>
+<name>p231d</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.6910239740254" lon="13.821757460789437">
+<ele>1864.0</ele>
+<name>p231e</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69154955271849" lon="13.821093148012386">
+<ele>1856.67</ele>
+<name>p2001-02</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69240527098975" lon="13.820298768752782">
+<ele>1861.19</ele>
+<name>p204e</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69213653228041" lon="13.817268718291132">
+<ele>1781.07</ele>
+<name>p245</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.692606451645865" lon="13.818077030885606">
+<ele>1818.44</ele>
+<name>t204d</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69708896561889" lon="13.824924172142621">
+<ele>1912.8</ele>
+<name>p264</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69708896561889" lon="13.824924172142621">
+<ele>1912.8</ele>
+<name>gps02.p2005-05</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69429264427051" lon="13.824724855394786">
+<ele>1924.81</ele>
+<name>gps02.p2002-ad-03</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.690930508486936" lon="13.824347171446135">
+<ele>1946.81</ele>
+<name>gps02.p2002-x09</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.698264321980204" lon="13.819233071988933">
+<ele>1846.8</ele>
+<name>gps02.p2002-x15</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.696750671487166" lon="13.817726935988421">
+<ele>1846.81</ele>
+<name>gps02.p2002-x16</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.696298714903705" lon="13.818268935774876">
+<ele>1846.81</ele>
+<name>gps02.p2002-x17</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.694636194808126" lon="13.817920674293774">
+<ele>1846.81</ele>
+<name>gps02.p2002-x18</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69264739621369" lon="13.824576316380222">
+<ele>1906.81</ele>
+<name>gps02.p2002-ad-01</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69277987584424" lon="13.825150396487299">
+<ele>1903.81</ele>
+<name>gps02.p2002-ad-02</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69441089721124" lon="13.824419533111765">
+<ele>1948.81</ele>
+<name>gps02.p2002-ad-04</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.690913529180655" lon="13.819871185392287">
+<ele>2046.81</ele>
+<name>gps03_bis.p2003-x18</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69237518016987" lon="13.823028522256065">
+<ele>1918.81</ele>
+<name>gps04.p247</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69399829647314" lon="13.81776823515252">
+<ele>1846.81</ele>
+<name>gps04.p2004-10</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69282039989477" lon="13.817690777819532">
+<ele>1806.81</ele>
+<name>gps04.p2004-21</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69323692464616" lon="13.819160001494163">
+<ele>1877.81</ele>
+<name>gps04.p2004-16</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.693461801287874" lon="13.819161987469316">
+<ele>1880.81</ele>
+<name>gps04.p2004-17</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.694955512588535" lon="13.819002581605261">
+<ele>1847.81</ele>
+<name>gps06.2006-05</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69158950488652" lon="13.823767174935126">
+<ele>1915.81</ele>
+<name>p2007-04</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69271869553446" lon="13.822605390774518">
+<ele>1829.81</ele>
+<name>p2007-12</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.695308097465094" lon="13.822816044701622">
+<ele>1934.81</ele>
+<name>p2009-01</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69578270551463" lon="13.823313280816858">
+<ele>1918.8</ele>
+<name>p2009-02</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69538554531744" lon="13.823655941069479">
+<ele>1933.8</ele>
+<name>p2009-03</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69529778901317" lon="13.823135606192576">
+<ele>1932.81</ele>
+<name>p2009-04</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69639032221991" lon="13.822119957468098">
+<ele>1905.8</ele>
+<name>p2010-02</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.699359712084856" lon="13.821814485684994">
+<ele>1906.8</ele>
+<name>p2010-04</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69882223844693" lon="13.821303185772875">
+<ele>1931.8</ele>
+<name>p2010-05</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69441668615038" lon="13.822649926555535">
+<ele>1948.81</ele>
+<name>p2012-hw-01</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69524997674931" lon="13.82248336349893">
+<ele>1919.81</ele>
+<name>p2012-hw-02</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.699087083239824" lon="13.825448266111112">
+<ele>1939.8</ele>
+<name>p2012-ok-01</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.698491500399214" lon="13.821769672005177">
+<ele>1922.8</ele>
+<name>p2012-ns-02</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69884927788016" lon="13.821561682530938">
+<ele>1921.8</ele>
+<name>p2012-ns-03</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69960294968516" lon="13.82221139845768">
+<ele>1913.8</ele>
+<name>p2012-ns-05</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.699730031379666" lon="13.822328494537784">
+<ele>1916.8</ele>
+<name>p2012-ns-06</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.700145567382606" lon="13.822479081404571">
+<ele>1922.8</ele>
+<name>p2012-ns-07</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.700511841467566" lon="13.822230911803775">
+<ele>1928.8</ele>
+<name>p2012-ns-08</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.700690341734685" lon="13.822080272174803">
+<ele>1934.8</ele>
+<name>p2012-ns-09</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.700824466521496" lon="13.821130890398015">
+<ele>1909.8</ele>
+<name>p2012-ns-10</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.70010814026484" lon="13.820587229957168">
+<ele>1923.8</ele>
+<name>p2012-ns-11</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.701150181983024" lon="13.821296691481002">
+<ele>1925.8</ele>
+<name>p2012-ns-12</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.698012887460436" lon="13.82246033285434">
+<ele>1931.8</ele>
+<name>p2012-ns-13</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69870292364166" lon="13.823950911114114">
+<ele>1934.8</ele>
+<name>p2012-ns-14</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69897092105931" lon="13.821999049543775">
+<ele>1921.8</ele>
+<name>p2012-ns-15</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69913597776306" lon="13.823677664981199">
+<ele>1935.8</ele>
+<name>p2012-dd-01</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69915305390097" lon="13.823877609512012">
+<ele>1925.8</ele>
+<name>p2012-dd-02</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.699476390063104" lon="13.823987229108269">
+<ele>1925.8</ele>
+<name>p2012-dd-03</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.6920033088761" lon="13.818197674866363">
+<ele>1762.0</ele>
+<name>p2012-js-1</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69898975423901" lon="13.815682492309913">
+<ele>1848.81</ele>
+<name>p2014-ms-01</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.699456297813256" lon="13.815953293367096">
+<ele>1862.81</ele>
+<name>p2014-ms-02</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69968444037709" lon="13.815156000795783">
+<ele>1865.81</ele>
+<name>p2014-ms-03</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69676958262342" lon="13.815355726584855">
+<ele>1806.81</ele>
+<name>p2014-ms-08</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.696833417641535" lon="13.81811664183941">
+<ele>1812.81</ele>
+<name>t273</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69815807261276" lon="13.818832422293326">
+<ele>1868.81</ele>
+<name>p2014-sd-01</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.698300150754484" lon="13.817950206678853">
+<ele>1847.81</ele>
+<name>p2014-bl888</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.690942059184955" lon="13.821421212866673">
+<ele>1859.21</ele>
+<name>p204a</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.70091822285697" lon="13.81692599658545">
+<ele>1906.8</ele>
+<name>upsidedown.8</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.70115217517197" lon="13.823296677873063">
+<ele>1951.8</ele>
+<name>262.0</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.6920033088761" lon="13.818197674866363">
+<ele>1762.0</ele>
+<name>2012-js-1.tag</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69870292364166" lon="13.823950911114114">
+<ele>1934.8</ele>
+<name>2012-ns-14.a1</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.699359712084856" lon="13.821814485684994">
+<ele>1906.8</ele>
+<name>2010-04.tag</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.69399829647314" lon="13.81776823515252">
+<ele>1846.81</ele>
+<name>p2004-10</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.6926788913559" lon="13.82139273577602">
+<ele>1907.81</ele>
+<name>p2002-06</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.699675186659626" lon="13.815235782979457">
+<ele>1876.81</ele>
+<name>e28.0</name>
+<sym>Circle, Red</sym></wpt>
+<wpt lat="47.6957007113168" lon="13.822065786321902">
+<ele>1835.88</ele>
+<name>N0</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.698677707571264" lon="13.825450797522066">
+<ele>1878.48</ele>
+<name>N1</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.692735318615426" lon="13.820693265048977">
+<ele>1817.94</ele>
+<name>N3</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.6929922332573" lon="13.82468557750329">
+<ele>1846.81</ele>
+<name>N4</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69402417753042" lon="13.820904092921829">
+<ele>1831.3</ele>
+<name>N5</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69889195682417" lon="13.824406360233658">
+<ele>1875.51</ele>
+<name>N6</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.693982255655634" lon="13.819452365417755">
+<ele>1812.99</ele>
+<name>N7</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.700395141967675" lon="13.817454860704997">
+<ele>1831.25</ele>
+<name>N8</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.697533658462895" lon="13.815693612775735">
+<ele>1767.24</ele>
+<name>N9</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70092354665075" lon="13.818962420568878">
+<ele>1855.7</ele>
+<name>N10</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69172340356446" lon="13.823794548529916">
+<ele>1837.8</ele>
+<name>N12</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.6934409591205" lon="13.821063840293697">
+<ele>1852.66</ele>
+<name>N13</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69276379329197" lon="13.818213808066274">
+<ele>1769.6</ele>
+<name>N14</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.698207928434904" lon="13.81913038428662">
+<ele>1806.65</ele>
+<name>N16</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.692662105275026" lon="13.824079957325388">
+<ele>1861.08</ele>
+<name>N17</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.696905148236276" lon="13.82106571042471">
+<ele>1832.63</ele>
+<name>N18</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69720047968355" lon="13.824417731165623">
+<ele>1847.87</ele>
+<name>N19</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70068436691589" lon="13.815835512440282">
+<ele>1856.36</ele>
+<name>N21</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69697995359544" lon="13.824849185898662">
+<ele>1852.81</ele>
+<name>N22</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69829973805218" lon="13.824566286736431">
+<ele>1874.79</ele>
+<name>N23</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.701796896230135" lon="13.81814293662744">
+<ele>1857.15</ele>
+<name>N24</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69270627687324" lon="13.820494015703348">
+<ele>1820.49</ele>
+<name>N25</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.6932140112286" lon="13.820869050039105">
+<ele>1844.54</ele>
+<name>N26</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69939769480951" lon="13.821955846551548">
+<ele>1852.06</ele>
+<name>N27</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.697535033815704" lon="13.815826863424348">
+<ele>1767.78</ele>
+<name>N28</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.696603906117616" lon="13.820646007777297">
+<ele>1817.56</ele>
+<name>N30</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69301322719581" lon="13.824978300222035">
+<ele>1848.13</ele>
+<name>N32</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69859565430614" lon="13.825346013070803">
+<ele>1884.54</ele>
+<name>N33</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70167123039744" lon="13.818172435730652">
+<ele>1854.36</ele>
+<name>N34</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.697769124315926" lon="13.824591542522205">
+<ele>1868.69</ele>
+<name>N35</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69852314244879" lon="13.825294328294827">
+<ele>1885.59</ele>
+<name>N36</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.6929613082548" lon="13.820794785320379">
+<ele>1832.7</ele>
+<name>N37</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69870587255027" lon="13.822931083176446">
+<ele>1868.06</ele>
+<name>N38</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69762785609968" lon="13.822222298356335">
+<ele>1863.93</ele>
+<name>N39</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.691358829799924" lon="13.820710975429307">
+<ele>1801.15</ele>
+<name>N40</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69919713012864" lon="13.824332856078758">
+<ele>1870.37</ele>
+<name>N41</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69736090157635" lon="13.82426751524548">
+<ele>1849.38</ele>
+<name>N43</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69334920899842" lon="13.825277275132562">
+<ele>1846.56</ele>
+<name>N44</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69673217491433" lon="13.820869690491786">
+<ele>1828.41</ele>
+<name>N45</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69589894387338" lon="13.823847240905858">
+<ele>1851.36</ele>
+<name>N46</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69988661212881" lon="13.822251393001324">
+<ele>1867.39</ele>
+<name>N47</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69284381556515" lon="13.82074412649484">
+<ele>1826.74</ele>
+<name>N48</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69961865426976" lon="13.822444030526523">
+<ele>1857.56</ele>
+<name>N49</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69229831350813" lon="13.823701658322777">
+<ele>1857.2</ele>
+<name>N50</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69580852366513" lon="13.822050030117834">
+<ele>1844.96</ele>
+<name>N53</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69219338338313" lon="13.824876777953214">
+<ele>1848.14</ele>
+<name>N54</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70053921115286" lon="13.817464931251754">
+<ele>1839.78</ele>
+<name>N55</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69844201319774" lon="13.823523472733493">
+<ele>1871.07</ele>
+<name>N56</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70152771033121" lon="13.818215667449772">
+<ele>1854.68</ele>
+<name>N59</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.693300941736844" lon="13.824078920606526">
+<ele>1875.26</ele>
+<name>N60</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.693274287944284" lon="13.817109451044013">
+<ele>1741.49</ele>
+<name>N61</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69436246440603" lon="13.825814264577225">
+<ele>1868.01</ele>
+<name>N62</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.697693588478636" lon="13.823367044505357">
+<ele>1856.28</ele>
+<name>N63</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69986301977401" lon="13.817333607711968">
+<ele>1825.35</ele>
+<name>N64</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.690960381772825" lon="13.816095662830769">
+<ele>1732.47</ele>
+<name>N66</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.698616910415254" lon="13.824785740602167">
+<ele>1881.38</ele>
+<name>N67</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70111719995411" lon="13.818544844383743">
+<ele>1859.44</ele>
+<name>N68</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.6979523154823" lon="13.824907303465848">
+<ele>1877.61</ele>
+<name>N69</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.698020881580995" lon="13.81669552895429">
+<ele>1770.19</ele>
+<name>N70</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70104695495726" lon="13.817839990744645">
+<ele>1855.84</ele>
+<name>N71</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69916217605973" lon="13.817429431152407">
+<ele>1812.03</ele>
+<name>N72</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.699512756450886" lon="13.822646345632855">
+<ele>1855.84</ele>
+<name>N73</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70094482979339" lon="13.819281836961109">
+<ele>1862.8</ele>
+<name>N74</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70173749586063" lon="13.82550202458924">
+<ele>1921.02</ele>
+<name>N75</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70195352949711" lon="13.818499287196712">
+<ele>1864.03</ele>
+<name>N76</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69948169504518" lon="13.82312687726122">
+<ele>1856.47</ele>
+<name>N77</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70021802015057" lon="13.824736424983303">
+<ele>1871.83</ele>
+<name>N78</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.6961230184765" lon="13.823762234324644">
+<ele>1850.57</ele>
+<name>N80</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69873056076846" lon="13.823583623008435">
+<ele>1872.33</ele>
+<name>N81</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69700830561436" lon="13.824981829167518">
+<ele>1852.07</ele>
+<name>N82</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69973500026148" lon="13.8153905072353">
+<ele>1828.79</ele>
+<name>N83</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.691808246995045" lon="13.82154042534883">
+<ele>1818.73</ele>
+<name>N84</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69155149838775" lon="13.817574867771942">
+<ele>1769.9</ele>
+<name>N85</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69870466646509" lon="13.82369083338028">
+<ele>1874.44</ele>
+<name>N87</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.700152182994586" lon="13.824457999120778">
+<ele>1871.55</ele>
+<name>N88</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.699970199478834" lon="13.823382458011144">
+<ele>1865.4</ele>
+<name>N89</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.6980982947165" lon="13.82510394775188">
+<ele>1885.32</ele>
+<name>N90</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.697545059009016" lon="13.825556207907619">
+<ele>1877.96</ele>
+<name>N91</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69943938946392" lon="13.821635019270367">
+<ele>1849.32</ele>
+<name>N92</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69878078318615" lon="13.821463262482915">
+<ele>1869.23</ele>
+<name>N93</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69299848101621" lon="13.823539313409889">
+<ele>1882.27</ele>
+<name>N94</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69339253808019" lon="13.824236786546606">
+<ele>1875.28</ele>
+<name>N95</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70142674843536" lon="13.815405494292836">
+<ele>1880.41</ele>
+<name>N96</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69084673656321" lon="13.81816383873848">
+<ele>1770.02</ele>
+<name>N97</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.695340796456286" lon="13.823819811136799">
+<ele>1877.48</ele>
+<name>N98</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.6935337219901" lon="13.817836576933944">
+<ele>1771.63</ele>
+<name>N99</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.691501124912264" lon="13.825811869544058">
+<ele>1822.55</ele>
+<name>N100</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.693972624291646" lon="13.820265546291157">
+<ele>1825.55</ele>
+<name>N101</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.6978150586882" lon="13.824683807729425">
+<ele>1873.96</ele>
+<name>N102</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69923640007138" lon="13.825531547975125">
+<ele>1888.43</ele>
+<name>N103</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.6979811795942" lon="13.82333391662391">
+<ele>1858.0</ele>
+<name>N104</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.6993999130752" lon="13.8230487460591">
+<ele>1858.31</ele>
+<name>N105</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.697433413888845" lon="13.824319197470123">
+<ele>1856.09</ele>
+<name>N106</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.7013528779071" lon="13.816966678868441">
+<ele>1860.49</ele>
+<name>N107</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70041684392824" lon="13.823065842057948">
+<ele>1877.81</ele>
+<name>N110</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69389147546891" lon="13.819374451143483">
+<ele>1819.92</ele>
+<name>N111</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.694415211752" lon="13.82569313386535">
+<ele>1865.28</ele>
+<name>N112</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70036795684801" lon="13.825319526297713">
+<ele>1879.92</ele>
+<name>N114</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69086946185625" lon="13.816004435460979">
+<ele>1735.56</ele>
+<name>N115</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69838825484441" lon="13.819166297139446">
+<ele>1815.62</ele>
+<name>N116</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69982490069216" lon="13.823252440065032">
+<ele>1857.11</ele>
+<name>N117</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.698810448790816" lon="13.8243548787403">
+<ele>1879.83</ele>
+<name>N118</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69472294580677" lon="13.81798295179516">
+<ele>1782.72</ele>
+<name>N119</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69582059041827" lon="13.820597034624209">
+<ele>1826.26</ele>
+<name>N120</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69940568269032" lon="13.8253678018073">
+<ele>1888.46</ele>
+<name>N121</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69239900224076" lon="13.8194881034578">
+<ele>1801.32</ele>
+<name>N122</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69910538480863" lon="13.818030501627069">
+<ele>1810.88</ele>
+<name>N123</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69229069101753" lon="13.820330139194255">
+<ele>1809.6</ele>
+<name>N125</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.699677526542345" lon="13.819417084388324">
+<ele>1840.22</ele>
+<name>N126</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69459853033022" lon="13.825142593017947">
+<ele>1861.73</ele>
+<name>N127</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.700076437701924" lon="13.818834937865754">
+<ele>1842.55</ele>
+<name>N129</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.699676457596965" lon="13.822815932986181">
+<ele>1855.25</ele>
+<name>N130</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69957907820779" lon="13.821218681570484">
+<ele>1853.37</ele>
+<name>N131</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70058844678342" lon="13.82312862412335">
+<ele>1884.12</ele>
+<name>N132</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.701253100352936" lon="13.816888961756687">
+<ele>1859.62</ele>
+<name>N133</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69967738414705" lon="13.822029517466916">
+<ele>1865.5</ele>
+<name>N135</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69914789232345" lon="13.81778962613251">
+<ele>1814.92</ele>
+<name>N136</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69576930938643" lon="13.819985115696188">
+<ele>1815.72</ele>
+<name>N137</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.6924365409762" lon="13.820513425773933">
+<ele>1816.56</ele>
+<name>N138</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69732723958137" lon="13.824494850194379">
+<ele>1855.79</ele>
+<name>N139</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69274425030341" lon="13.82243889488349">
+<ele>1865.76</ele>
+<name>N141</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.697295473115354" lon="13.824029080271767">
+<ele>1856.49</ele>
+<name>N142</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.699152422483536" lon="13.818229367216249">
+<ele>1816.04</ele>
+<name>N145</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.696010323120646" lon="13.820672722281097">
+<ele>1827.32</ele>
+<name>N147</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69939681727477" lon="13.818370458798261">
+<ele>1821.23</ele>
+<name>N148</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69975392524393" lon="13.825106732502544">
+<ele>1877.84</ele>
+<name>N149</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69584233425232" lon="13.817464523734001">
+<ele>1756.03</ele>
+<name>N150</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.697442090764696" lon="13.822533029926884">
+<ele>1865.25</ele>
+<name>N151</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69962638307428" lon="13.817072385846613">
+<ele>1820.18</ele>
+<name>N152</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.694834188888976" lon="13.818300297214561">
+<ele>1786.64</ele>
+<name>N153</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.6929710287043" lon="13.819115362326787">
+<ele>1811.62</ele>
+<name>N156</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.697891221963566" lon="13.823335940884053">
+<ele>1858.88</ele>
+<name>N157</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.698920456907004" lon="13.825432016204392">
+<ele>1888.82</ele>
+<name>N158</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70118745376689" lon="13.817503586304891">
+<ele>1859.98</ele>
+<name>N159</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.697828934882125" lon="13.823403983742056">
+<ele>1858.09</ele>
+<name>N160</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.697814222466995" lon="13.823724192725406">
+<ele>1855.22</ele>
+<name>N161</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.7015913667927" lon="13.818280874675033">
+<ele>1856.32</ele>
+<name>N162</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.698922912129035" lon="13.825671874579733">
+<ele>1893.65</ele>
+<name>N163</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69274250757723" lon="13.81789444207252">
+<ele>1767.78</ele>
+<name>N164</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.6940228081489" lon="13.820770850973686">
+<ele>1833.94</ele>
+<name>N166</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69256223113497" lon="13.815246461268341">
+<ele>1695.37</ele>
+<name>N167</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70143354948449" lon="13.825695460732424">
+<ele>1916.6</ele>
+<name>N169</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69084729121894" lon="13.825226856605774">
+<ele>1850.89</ele>
+<name>N170</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69753552379138" lon="13.816746496726527">
+<ele>1762.66</ele>
+<name>N171</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69123149157243" lon="13.816209465289523">
+<ele>1731.91</ele>
+<name>N172</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.691793818488634" lon="13.819261882311588">
+<ele>1790.35</ele>
+<name>N174</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.699893013125816" lon="13.819372232614517">
+<ele>1841.28</ele>
+<name>N175</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.6913110843499" lon="13.817820181555797">
+<ele>1764.85</ele>
+<name>N176</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69714774488593" lon="13.816661974764129">
+<ele>1757.51</ele>
+<name>N178</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69305153976036" lon="13.82081940493332">
+<ele>1838.68</ele>
+<name>N179</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69341416851626" lon="13.817586063877647">
+<ele>1762.1</ele>
+<name>N180</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.699246487024446" lon="13.825637950302315">
+<ele>1889.37</ele>
+<name>N182</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.697545458646935" lon="13.824716523700326">
+<ele>1868.55</ele>
+<name>N183</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69247005278321" lon="13.82377775704529">
+<ele>1864.16</ele>
+<name>N184</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69747810009603" lon="13.82341187778878">
+<ele>1860.5</ele>
+<name>N186</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.698673384056804" lon="13.817147259354856">
+<ele>1797.4</ele>
+<name>N188</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70053660134116" lon="13.817211740333832">
+<ele>1843.86</ele>
+<name>N189</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69923823368621" lon="13.82219935418301">
+<ele>1860.69</ele>
+<name>N190</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69238287564295" lon="13.818795470482808">
+<ele>1784.09</ele>
+<name>N191</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69404572424314" lon="13.816878765887516">
+<ele>1740.53</ele>
+<name>N192</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.692558252039056" lon="13.824482099570742">
+<ele>1862.74</ele>
+<name>N193</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.692625041060865" lon="13.820469193923325">
+<ele>1822.46</ele>
+<name>N194</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69171946221572" lon="13.818157445158723">
+<ele>1767.03</ele>
+<name>N195</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69974751390588" lon="13.81660313941304">
+<ele>1827.33</ele>
+<name>N196</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.693262515971206" lon="13.824719484756125">
+<ele>1853.91</ele>
+<name>N197</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69669163442702" lon="13.816059209772403">
+<ele>1743.14</ele>
+<name>N199</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69477251601537" lon="13.815809452965576">
+<ele>1694.48</ele>
+<name>N201</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69989618339826" lon="13.823184191920467">
+<ele>1859.1</ele>
+<name>N202</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69289690485973" lon="13.822408803801737">
+<ele>1870.05</ele>
+<name>N203</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.6958059807891" lon="13.823556121549426">
+<ele>1854.31</ele>
+<name>N204</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.692848333955894" lon="13.8211838150462">
+<ele>1836.87</ele>
+<name>N205</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.698097714532885" lon="13.823291309336913">
+<ele>1862.46</ele>
+<name>N206</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69679225645483" lon="13.824093708695887">
+<ele>1854.43</ele>
+<name>N207</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.701557277486266" lon="13.820214379710476">
+<ele>1877.48</ele>
+<name>N208</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69956506142715" lon="13.817233717516505">
+<ele>1818.47</ele>
+<name>N209</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.6923892274169" lon="13.823792901634102">
+<ele>1861.73</ele>
+<name>N210</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69589670879697" lon="13.815757340656829">
+<ele>1702.25</ele>
+<name>N211</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.693427169338115" lon="13.82498232718924">
+<ele>1856.61</ele>
+<name>N212</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69838478018161" lon="13.824084552926553">
+<ele>1879.4</ele>
+<name>N213</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69411546034926" lon="13.820155705742414">
+<ele>1831.06</ele>
+<name>N214</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.694072076122126" lon="13.819437010554832">
+<ele>1819.85</ele>
+<name>N215</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.698586024268074" lon="13.821774206339045">
+<ele>1877.12</ele>
+<name>N216</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.700539819967005" lon="13.824529257577936">
+<ele>1888.27</ele>
+<name>N217</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.700532539639646" lon="13.815945582565403">
+<ele>1857.46</ele>
+<name>N218</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70125989678737" lon="13.818421657762862">
+<ele>1864.21</ele>
+<name>N219</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69114552001901" lon="13.816597881081702">
+<ele>1744.94</ele>
+<name>N220</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.693704641279254" lon="13.817832713447615">
+<ele>1777.42</ele>
+<name>N221</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69295996996839" lon="13.815424029458393">
+<ele>1702.42</ele>
+<name>N222</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70077770029507" lon="13.817033009182698">
+<ele>1848.21</ele>
+<name>N223</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.698911668637734" lon="13.817568381968886">
+<ele>1807.48</ele>
+<name>N224</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69886461807492" lon="13.819115553987793">
+<ele>1827.34</ele>
+<name>N226</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70007391152104" lon="13.822966930626746">
+<ele>1868.95</ele>
+<name>N227</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69659938429968" lon="13.823711535588851">
+<ele>1850.38</ele>
+<name>N228</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69567394980543" lon="13.818587858558358">
+<ele>1785.53</ele>
+<name>N231</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70083122507103" lon="13.82048401406248">
+<ele>1878.61</ele>
+<name>N232</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.696501676459334" lon="13.824713326878197">
+<ele>1855.37</ele>
+<name>N233</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69739146678003" lon="13.821108058809342">
+<ele>1861.64</ele>
+<name>N235</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.693673874029926" lon="13.8183398423079">
+<ele>1793.84</ele>
+<name>N236</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69979627326047" lon="13.823093139301434">
+<ele>1853.83</ele>
+<name>N237</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69902297513102" lon="13.818765435163463">
+<ele>1825.33</ele>
+<name>N238</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69587698436721" lon="13.819956030521531">
+<ele>1811.33</ele>
+<name>N239</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.698336523225784" lon="13.823765757014328">
+<ele>1872.06</ele>
+<name>N240</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.697998960802586" lon="13.815443165003579">
+<ele>1791.63</ele>
+<name>N241</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.693102250997946" lon="13.815260882218025">
+<ele>1695.45</ele>
+<name>N242</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70018213402778" lon="13.822991152114335">
+<ele>1873.49</ele>
+<name>N243</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69647516762475" lon="13.822128308860963">
+<ele>1852.91</ele>
+<name>N244</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69726456775289" lon="13.821017622920253">
+<ele>1856.28</ele>
+<name>N246</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69500770548553" lon="13.825559881732085">
+<ele>1860.92</ele>
+<name>N247</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69779884151674" lon="13.824857439393622">
+<ele>1877.09</ele>
+<name>N248</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69811231213777" lon="13.823837442105267">
+<ele>1868.23</ele>
+<name>N249</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69204749253645" lon="13.815937787217901">
+<ele>1715.61</ele>
+<name>N250</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70015466950081" lon="13.821192376301337">
+<ele>1869.77</ele>
+<name>N251</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69965495823179" lon="13.824229260999783">
+<ele>1872.24</ele>
+<name>N252</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69171593275772" lon="13.825700433563231">
+<ele>1829.84</ele>
+<name>N253</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69564131302769" lon="13.819788088461987">
+<ele>1819.21</ele>
+<name>N254</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.6936095289265" lon="13.824338525634797">
+<ele>1880.36</ele>
+<name>N255</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.700858641398796" lon="13.815285075330246">
+<ele>1865.59</ele>
+<name>N256</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.6971296754141" lon="13.815782730633172">
+<ele>1761.41</ele>
+<name>N257</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69291070905124" lon="13.823754519756248">
+<ele>1874.93</ele>
+<name>N259</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69913609560403" lon="13.82101541075051">
+<ele>1844.98</ele>
+<name>N260</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70041872954965" lon="13.822372696193034">
+<ele>1878.67</ele>
+<name>N261</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69371205248761" lon="13.81855221494712">
+<ele>1805.06</ele>
+<name>N262</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.694196329312206" lon="13.821020157546501">
+<ele>1845.74</ele>
+<name>N263</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69739131706849" lon="13.816723103550444">
+<ele>1762.87</ele>
+<name>N264</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70020752280768" lon="13.824590043506491">
+<ele>1872.57</ele>
+<name>N265</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70136920480886" lon="13.824683890266956">
+<ele>1917.58</ele>
+<name>N266</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70181028374873" lon="13.818569170604556">
+<ele>1865.21</ele>
+<name>N268</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69857015708965" lon="13.824613521672845">
+<ele>1881.05</ele>
+<name>N269</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69598893829436" lon="13.818594070256289">
+<ele>1781.56</ele>
+<name>N270</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69919632417975" lon="13.825132590161294">
+<ele>1888.03</ele>
+<name>N271</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.692733298632355" lon="13.818747575312168">
+<ele>1793.56</ele>
+<name>N272</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69667628306078" lon="13.820684359350805">
+<ele>1826.56</ele>
+<name>N273</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.692886202313424" lon="13.82575411953358">
+<ele>1829.67</ele>
+<name>N275</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69871229116144" lon="13.820051987574004">
+<ele>1835.79</ele>
+<name>N276</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69422000732289" lon="13.818074283156998">
+<ele>1790.42</ele>
+<name>N277</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70179029179694" lon="13.821875279525548">
+<ele>1850.74</ele>
+<name>N278</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69654070596562" lon="13.817128860937496">
+<ele>1722.57</ele>
+<name>N279</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.699520283718655" lon="13.81638169453326">
+<ele>1825.78</ele>
+<name>N280</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69612985154048" lon="13.816551730225394">
+<ele>1720.04</ele>
+<name>N281</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70068849356688" lon="13.823233004066402">
+<ele>1886.89</ele>
+<name>N284</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.692063990037745" lon="13.822787380486272">
+<ele>1854.51</ele>
+<name>N285</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69987627285824" lon="13.817746499997867">
+<ele>1831.18</ele>
+<name>N286</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69627783679543" lon="13.82306570351226">
+<ele>1862.6</ele>
+<name>N287</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.699853001576145" lon="13.824238136416525">
+<ele>1878.56</ele>
+<name>N288</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.699371065102525" lon="13.81849099857874">
+<ele>1823.05</ele>
+<name>N289</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.696906310047645" lon="13.822931606573386">
+<ele>1864.16</ele>
+<name>N290</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70147160113398" lon="13.818883394805992">
+<ele>1868.04</ele>
+<name>N291</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69340283819751" lon="13.81735975890566">
+<ele>1756.51</ele>
+<name>N292</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69759478305502" lon="13.816385294544705">
+<ele>1765.52</ele>
+<name>N293</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69690102503275" lon="13.82417123090136">
+<ele>1855.68</ele>
+<name>N294</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70006985574272" lon="13.824326561828425">
+<ele>1877.59</ele>
+<name>N295</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70198130913758" lon="13.823830383860557">
+<ele>1894.15</ele>
+<name>N296</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69639648115968" lon="13.815359514008135">
+<ele>1741.78</ele>
+<name>N297</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.698785216411444" lon="13.820143641431105">
+<ele>1835.69</ele>
+<name>N299</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.6951154638301" lon="13.817654218441414">
+<ele>1770.47</ele>
+<name>N300</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.699983977231874" lon="13.823848655993098">
+<ele>1873.73</ele>
+<name>N301</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69979113633873" lon="13.825225855128926">
+<ele>1878.25</ele>
+<name>N302</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70051463650582" lon="13.821197589660574">
+<ele>1863.84</ele>
+<name>N304</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70064530410256" lon="13.818155638307429">
+<ele>1850.78</ele>
+<name>N305</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.699671226045616" lon="13.82142986372117">
+<ele>1859.92</ele>
+<name>N306</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70137233988837" lon="13.820605098323046">
+<ele>1876.98</ele>
+<name>N307</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.697108180549584" lon="13.823313576553415">
+<ele>1861.92</ele>
+<name>N308</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69877989061973" lon="13.81787791732982">
+<ele>1809.05</ele>
+<name>N309</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.701246065484874" lon="13.822327403650712">
+<ele>1873.5</ele>
+<name>N310</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69134891213033" lon="13.81887212808942">
+<ele>1778.15</ele>
+<name>N311</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69447374447521" lon="13.817375523922024">
+<ele>1765.98</ele>
+<name>N312</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69573145196421" lon="13.825063830110688">
+<ele>1863.0</ele>
+<name>N313</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69869556214655" lon="13.816680261026255">
+<ele>1797.32</ele>
+<name>N314</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70028443726424" lon="13.818936870132003">
+<ele>1851.25</ele>
+<name>N315</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70181883927134" lon="13.820275123892602">
+<ele>1880.45</ele>
+<name>N316</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69755845148546" lon="13.818971784782223">
+<ele>1809.12</ele>
+<name>N317</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.699518159414794" lon="13.817048176869458">
+<ele>1819.91</ele>
+<name>N318</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69365956649736" lon="13.825710101139016">
+<ele>1858.54</ele>
+<name>N319</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70151395601904" lon="13.82476061149268">
+<ele>1919.4</ele>
+<name>N320</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69582250124708" lon="13.82516840636303">
+<ele>1864.02</ele>
+<name>N323</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.700899727447755" lon="13.817523422655816">
+<ele>1854.86</ele>
+<name>N326</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.7016426993402" lon="13.822398445012197">
+<ele>1869.31</ele>
+<name>N328</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.695883667462866" lon="13.816237435299923">
+<ele>1705.47</ele>
+<name>N330</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.701052851472255" lon="13.82454438180137">
+<ele>1905.47</ele>
+<name>N331</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.700505135263285" lon="13.819398397638128">
+<ele>1858.89</ele>
+<name>N332</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70134882768931" lon="13.81744661996839">
+<ele>1862.03</ele>
+<name>N333</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.691580058315765" lon="13.818600374985406">
+<ele>1774.12</ele>
+<name>N334</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.695796381472434" lon="13.819118202055387">
+<ele>1792.76</ele>
+<name>N335</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70165107111182" lon="13.820585481619197">
+<ele>1879.78</ele>
+<name>N336</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.700507615062" lon="13.816146081065456">
+<ele>1858.45</ele>
+<name>N337</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69651900151882" lon="13.818515455555318">
+<ele>1778.32</ele>
+<name>N340</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69204077106309" lon="13.81703073525949">
+<ele>1743.33</ele>
+<name>N341</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.698528333449275" lon="13.815297888415719">
+<ele>1796.24</ele>
+<name>N342</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69119708145458" lon="13.81898216929555">
+<ele>1780.21</ele>
+<name>N343</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69496616625805" lon="13.818883726055532">
+<ele>1809.66</ele>
+<name>N344</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69886303761493" lon="13.823340729232283">
+<ele>1871.29</ele>
+<name>N345</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70003926640933" lon="13.822221296872732">
+<ele>1871.15</ele>
+<name>N346</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69451967249219" lon="13.81572188638922">
+<ele>1703.01</ele>
+<name>N347</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70128723091503" lon="13.817581304502214">
+<ele>1861.44</ele>
+<name>N348</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.701200204016764" lon="13.81525067766781">
+<ele>1878.91</ele>
+<name>N349</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.694395254614" lon="13.817617191672952">
+<ele>1777.26</ele>
+<name>N350</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69754409361672" lon="13.82458327259878">
+<ele>1867.84</ele>
+<name>N351</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69866203482036" lon="13.8256777334378">
+<ele>1894.88</ele>
+<name>N352</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69414955106359" lon="13.818222475941583">
+<ele>1791.97</ele>
+<name>N353</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.698197793964724" lon="13.825155025509346">
+<ele>1889.17</ele>
+<name>N354</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.698688194079395" lon="13.82471749613848">
+<ele>1883.47</ele>
+<name>N355</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.693554735076795" lon="13.824259794417088">
+<ele>1882.08</ele>
+<name>N356</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69276228355745" lon="13.818067245597513">
+<ele>1772.61</ele>
+<name>N357</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69214594787713" lon="13.82463796131154">
+<ele>1855.15</ele>
+<name>N358</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.700966541988535" lon="13.823146771813436">
+<ele>1887.58</ele>
+<name>N359</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69963816822033" lon="13.819964450331574">
+<ele>1854.6</ele>
+<name>N360</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.6991887724013" lon="13.822640312052325">
+<ele>1869.86</ele>
+<name>N361</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.6959605815658" lon="13.816715494240766">
+<ele>1728.06</ele>
+<name>N362</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.692566155669944" lon="13.824375306652758">
+<ele>1864.23</ele>
+<name>N363</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69617332049049" lon="13.81815008632362">
+<ele>1773.46</ele>
+<name>N365</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.699323070827376" lon="13.82433002438307">
+<ele>1874.31</ele>
+<name>N368</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70052728813825" lon="13.82506269686091">
+<ele>1889.02</ele>
+<name>N369</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69414247890194" lon="13.816663339990518">
+<ele>1737.24</ele>
+<name>N370</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70079498326576" lon="13.815219872681668">
+<ele>1865.32</ele>
+<name>N371</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69589547094559" lon="13.815637418832296">
+<ele>1706.67</ele>
+<name>N372</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70059714934594" lon="13.819596254363988">
+<ele>1859.63</ele>
+<name>N373</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.692805367230534" lon="13.82050510792736">
+<ele>1829.86</ele>
+<name>N374</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69946244363439" lon="13.8221276604529">
+<ele>1861.18</ele>
+<name>N375</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69078891864981" lon="13.817792004311814">
+<ele>1764.08</ele>
+<name>N376</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69194135083345" lon="13.823989548412458">
+<ele>1845.8</ele>
+<name>N377</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.692160098034485" lon="13.82338492355182">
+<ele>1858.17</ele>
+<name>N378</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70021086971028" lon="13.822284075727342">
+<ele>1873.99</ele>
+<name>N379</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69635110056884" lon="13.818812462284653">
+<ele>1780.44</ele>
+<name>N380</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.698322532186815" lon="13.815409178190004">
+<ele>1792.42</ele>
+<name>N381</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69692546713229" lon="13.821291828709251">
+<ele>1843.45</ele>
+<name>N382</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69874685043466" lon="13.819038242699339">
+<ele>1826.61</ele>
+<name>N384</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.692899664149785" lon="13.823554863240117">
+<ele>1881.28</ele>
+<name>N385</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70021012303413" lon="13.815219796475885">
+<ele>1847.66</ele>
+<name>N386</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70076931871641" lon="13.823217855969949">
+<ele>1886.07</ele>
+<name>N387</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.698791754789795" lon="13.823408975790311">
+<ele>1871.95</ele>
+<name>N388</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69266628522434" lon="13.817483029797925">
+<ele>1754.83</ele>
+<name>N389</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.700619701846776" lon="13.825300541510597">
+<ele>1889.78</ele>
+<name>N390</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.692912757832985" lon="13.823954378647096">
+<ele>1870.7</ele>
+<name>N391</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69611487880398" lon="13.818591225059714">
+<ele>1777.51</ele>
+<name>N392</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69517882827395" lon="13.819438681281529">
+<ele>1819.97</ele>
+<name>N393</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69259033614702" lon="13.8170982663716">
+<ele>1742.58</ele>
+<name>N394</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69655714664999" lon="13.820473799262107">
+<ele>1819.48</ele>
+<name>N395</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69999582611732" lon="13.817997044110966">
+<ele>1835.16</ele>
+<name>N396</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69952633577325" lon="13.821339828767847">
+<ele>1854.75</ele>
+<name>N397</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69719414449056" lon="13.822045473646076">
+<ele>1857.9</ele>
+<name>N399</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.695934831056334" lon="13.816836026850607">
+<ele>1733.08</ele>
+<name>N400</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70194630807515" lon="13.825683944023966">
+<ele>1925.81</ele>
+<name>N401</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.700987202695735" lon="13.819027627971584">
+<ele>1864.5</ele>
+<name>N404</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69239392880257" lon="13.818995123867504">
+<ele>1789.84</ele>
+<name>N406</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.70201498833864" lon="13.824482762807683">
+<ele>1908.79</ele>
+<name>N407</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69311710101543" lon="13.816699867598311">
+<ele>1732.23</ele>
+<name>N408</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.696605542703544" lon="13.825190798285869">
+<ele>1863.46</ele>
+<name>N409</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69814840360997" lon="13.817718925026673">
+<ele>1785.84</ele>
+<name>N410</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69212315843989" lon="13.823292466997062">
+<ele>1855.91</ele>
+<name>N411</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.6994199758907" lon="13.82412791567274">
+<ele>1872.5</ele>
+<name>N412</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69329000569191" lon="13.816016273564628">
+<ele>1707.52</ele>
+<name>N415</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69722676526665" lon="13.823470845310254">
+<ele>1861.58</ele>
+<name>N416</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.7001104276482" lon="13.816021785698723">
+<ele>1843.12</ele>
+<name>N418</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.69363416276677" lon="13.819726766693105">
+<ele>1837.81</ele>
+<name>N419</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.699130882298654" lon="13.824014459620843">
+<ele>1881.92</ele>
+<name>N422</name>
+<sym>Circle, Green</sym></wpt>
+<wpt lat="47.695002088616356" lon="13.81800329757263">
+<ele>1777.42</ele>
+<name>N424</name>
+<sym>Circle, Green</sym></wpt></gpx>
