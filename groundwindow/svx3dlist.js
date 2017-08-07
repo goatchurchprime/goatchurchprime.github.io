@@ -1,9 +1,10 @@
 LoadSvx3dList([
     {"svxname":"CUCC Loser", "svxjs":"caves/expoloser.js"},
-    // {"svxname":"Leck Fell Caves", "svxjs":"caves/leckfell.js"},
-    // {"svxname":"Three Counties", "svxjs":"caves/threecounties.js"},
-    // {"svxname":"Leck Kingsdale", "svxjs":"caves/leckking.js"},
-    // {"svxname":"big china cave", "svxjs":"caves/erin2.js"},
-    // {"svxname":"Sky dusky", "svxjs":"caves/skydusky.js"},
-    {"svxname":"rectangular test", "svxjs":"test.js"}
+    {"svxname":"rectangular test", "svxjs":"test.js"},
+    {"svxname":"OUCC Draenen", "svxjs":"caves/ouccdraenen.js"},
+    
+    {"Dsvxname":"all.svx", "svxjs":"caves/all.js"},
+    {"Dsvxname":"Leck Fell Caves", "svxjs":"caves/leckfell.js"},
+    {"Dsvxname":"big china cave", "svxjs":"caves/erin2.js"},
+    {"Dsvxname":"Sky dusky", "svxjs":"caves/skydusky.js"}
 ]); 

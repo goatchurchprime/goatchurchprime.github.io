@@ -9,6 +9,7 @@ var PositionObject =
     gslatitude: 0, 
     gslongitude: 0, 
     gsaltitude: 0,
+    geoidaltitude: 0, // wgs84 altitude (from html5) to msl altitude correction at cave location
     
     gsmdisplacementx: 0,
     gsmdisplacementy: 0, 
@@ -214,17 +215,18 @@ var PositionObject =
         var z = ralt; 
         console.assert((x !== undefined) && (x !== NaN)); 
         this.cameraactualposition.set(-(x+this.gsmdisplacementx), (z+this.gsmdisplacementz), (y+this.gsmdisplacementy)); 
-        if (PlotGraphics.camera !== null) 
+        if (PlotGraphics.camera !== undefined) 
             PlotGraphics.camera.position.set(this.cameraactualposition.x, this.cameraactualposition.y+this.Zhopdisplacement(), this.cameraactualposition.z); 
     }, 
 
     geo_success: function(position) 
     { 
         if (this.geosuccesscount == 0) {
-            var earthrad = 6378137; 
+            var earthrad = 6378137; // official wgs84 value
             var nyfac = 2*Math.PI*earthrad/360; 
             var exfac = nyfac*Math.cos(this.gslatitude*Math.PI/180); 
-            svxviewcurrentgps = { latp0: position.coords.latitude, lngp0: position.coords.longitude, altp0: position.coords.altitude, 
+            svxviewcurrentgps = { latp0: position.coords.latitude, lngp0: position.coords.longitude, 
+                                  altp0: (position.coords.altitude ? position.coords.altitude+this.geoidaltitude : position.coords.altitude), 
                                   nyfac: nyfac, nxfac: 0, eyfac: 0, exfac: exfac }; 
         }
         this.geosuccesscount++; 
@@ -243,7 +245,7 @@ var PositionObject =
                     quantshowshow("Moving GPS origin to the caves as dist="+distcave.toFixed(3)+"km>20km"); 
                     console.log("Moving GPS origin to the caves as dist="+distcave.toFixed(3)+"km>20km"); 
                     document.getElementById("reset31").className = "selected"; 
-                    quantshowhidedelay(4500); 
+                    quantshowhidedelay(9500); 
                 }
             }
             this.geosuccesscountpostsvx++; 
@@ -251,8 +253,8 @@ var PositionObject =
         
         document.getElementById('gpsrec').textContent = "Lat:"+position.coords.latitude.toFixed(7)+" Lng:"+position.coords.longitude.toFixed(7)+
                                                         " (~"+position.coords.accuracy.toFixed(0)+"m)"+
-                                                        " Alt:"+position.coords.altitude.toFixed(1)+
-                                                        " (~"+position.coords.altitudeAccuracy.toFixed(0)+"m)"; 
+                                                        " Alt:"+(position.coords.altitude|0).toFixed(1)+
+                                                        " (~"+(position.coords.altitudeAccuracy|0).toFixed(0)+"m)"; 
         document.getElementById('gpsrecV').textContent = " "+(position.coords.speed|0).toFixed(1)+"m/s "+(position.coords.heading|0).toFixed(1)+"D"; 
         document.getElementById('testout2').textContent = "#"+(this.geosuccesscount); 
 
@@ -262,17 +264,17 @@ var PositionObject =
         this.geosetdirect(position.coords.longitude, position.coords.latitude, (position.coords.altitude != 0 ? position.coords.altitude : undefined), position.coords.accuracy, position.coords.altitudeAccuracy); 
     },
     
-    geo_error: function() 
+    geo_error: function(positionError) 
     {
         this.geoerrorcount++; 
-        document.getElementById('gpsrec').textContent = "gps errror"; 
+        document.getElementById('gpsrec').textContent = "gps errror:"+positionError.code+" "+positionError.message; 
         document.getElementById('testout2').textContent = "#E"+(this.geoerrorcount); 
     }
 }
 
 
 //var ifakegpsstart = 0, fakegpslongitude = 0.823994+0.001, fakegpslatitude = 43.033223, fakegpsaltitude = 500;  
-var ifakegpsstart = 0, fakegpslongitude = -2.971909, fakegpslatitude = 53.396103+1, fakegpsaltitude = 90;  
+var ifakegpsstart = 0, fakegpslongitude = 0.82225744, fakegpslatitude = 43.0327787, fakegpsaltitude = 477;  
 function fakegpsgenerator()
 {
     var ioffs = 30, ifac = 1.0/6; 
@@ -300,3 +302,4 @@ function callbacknextblock()
         setTimeout(callbacknextblock, 300); 
     }
 }
+

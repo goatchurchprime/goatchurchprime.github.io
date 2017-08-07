@@ -110,17 +110,11 @@ var PickingObject = {
 
         if (blockname !== null) {
             console.log("blockname", blockname); 
-            if (this.minisvxents < svx3d.nentrances) {
-                this.vStart.fromArray(PlotGeometryObject.entgeometry.attributes.position.array, this.minisvxents*9);
-                console.log(this.vStart, PlotGraphics.camera.position); 
-                var srelpos = "East:"+(this.vStart.x-PlotGraphics.camera.position.x).toFixed(0)+" North:"+(this.vStart.z-PlotGraphics.camera.position.z).toFixed(0)+" Depth:"+(PlotGraphics.camera.position.y-this.vStart.y).toFixed(0); 
-                quantshowtextelement.textContent = "Entrance of:"+blockname+" sel:"+selblockname+" "+srelpos; 
-            }
+            if (this.minisvxents < svx3d.nentrances)
+                quantshowtextelement.textContent = "Entrance of:"+blockname+" sel:"+selblockname; 
             else
-                quantshowtextelement.textContent = "svxblock: "+blockname; 
+                quantshowtextelement.textContent = "Block of: "+blockname; 
             quantshowhidedelay(5000); 
-        } else {
-            quantshowhidedelay(1500); 
         }
         this.setselectedblock(selblockname); 
     },

@@ -62,10 +62,6 @@ var PlotGraphics =
         this.camera.position.set(0, 0, 0); 
         this.scene.add(this.camera); 
 
-        if (THREE.DeviceOrientationControls === undefined) {
-            alert("THREE.DeviceOrientationControls failed to load"); 
-        }
-        
         this.controls = new THREE.DeviceOrientationControls(this.camera, true);
         this.controls.connect();
         this.controls.update();
@@ -96,7 +92,6 @@ var PlotGraphics =
         this.backgroundvideo.height = PlotGraphics.vizcontainer.offsetHeight; 
         this.backgroundvideo.autoplay = true; 
         
-        // this selects the face camera in chrome, but back camera (the one we want) in firefox
         navigator.getUserMedia({"audio":false, "video":true}, function(streamVideo) { 
             var pg = PlotGraphics; 
             pg.backgroundvideo.src = window.URL.createObjectURL(streamVideo); 

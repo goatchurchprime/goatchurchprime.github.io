@@ -21,7 +21,7 @@ var PokeUI = {
             this.touchStart.set(event.touches[0].pageX, event.touches[0].pageY); 
             this.touchmovestate = 1; // pre-single move, but don't know direction of drag
         } else if ((event.touches.length == 2) && (this.touchmovestate <= 1)) {
-            this.touchStart.set(event.touches[1].pageX - event.touches[0].pageX, event.touches[1].pageY - event.touches[0].pageY); 
+            this.touchStart.set(event.touches[1].pageX - event.touches[0].pageX, event.touches[1].pageX - event.touches[0].pageY); 
             this.touchmovevalueStart = (PlotGraphics.bshowvideobackground ? PlotGraphics.backgroundcamerascale : PlotGraphics.camera.fov); 
             quantshowshow("**"+this.touchmovevalueStart); 
             this.touchmovestate = 4; 
@@ -81,9 +81,8 @@ var PokeUI = {
                 this.touchEnd.set(event.touches[1].pageX - event.touches[0].pageX, event.touches[1].pageY - event.touches[0].pageY); 
                 touchmovestateN = 4; 
                 touchmovedistance = this.touchStart.length()/this.touchEnd.length(); 
-                if (this.bdraggsmmode) {
+                if (this.bdraggsmmode)
                     touchmovedistance = this.touchEnd.length() - this.touchStart.length(); 
-                }
             } 
         }
             
@@ -128,8 +127,8 @@ var PokeUI = {
         event.preventDefault(); 
         //if (this.touchmovestate == 2)
         //    controls.alphalock = false; 
-        if ((this.touchmovestate > 0) && (this.touchmovestate != 5))
-            quantshowhidedelay(1501); 
+        if (this.touchmovestate > 0)
+            quantshowhidedelay(1500); 
         this.touchmovestate = 0; 
     }, 
     
@@ -137,6 +136,7 @@ var PokeUI = {
     keyaltstep: 10.0, 
     keydowncontrols: function(event)
     {
+        event.stopPropagation(); 
         var mv = { }; 
         if (event.keyCode == 37)       mv[event.shiftKey ? "x" : "rx"] = -1;   // left cursor
         else if (event.keyCode == 39)  mv[event.shiftKey ? "x" : "rx"] = 1;    // right cursor
@@ -171,7 +171,7 @@ var PokeUI = {
             if ((this.maxaccz > 0.0) && (PositionObject.hopmode == 0)) {
                 if (this.hopsuppresstime > PlotGraphics.clock.elapsedTime) { 
                     PositionObject.ZhopGo((this.maxaccz-5.5)*(this.maxaccz-5.5)*300); 
-                    //document.getElementById('debugtext').textContent = this.maxaccz.toFixed(3); 
+                    document.getElementById('debugtext').textContent = this.maxaccz.toFixed(3); 
                 }
             } else if (this.maxaccz < 0.0) {
                 if (PositionObject.hopmode == 2) {
