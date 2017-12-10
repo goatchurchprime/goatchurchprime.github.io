@@ -158,7 +158,7 @@ console.log("setselblock ", blockname, bselindexlo, bselindexhi, svx3d.legblocks
 console.log("selxsec ", bselxsecindexlo, bselxsecindexhi, PlotGeometryObject.passagetubematerial.uniforms.selindexlo.value, PlotGeometryObject.passagetubematerial.uniforms.selindexhi.value); 
         }
         
-        if (svx3d.legentrances !== undefined) {
+        if (svx3d.nentrances != 0) {
             var bentselindexlo = 0; 
             while ((bentselindexlo < svx3d.nentrances) && !matchblockname(svx3d.legentrances[bentselindexlo*3+2]))
                 bentselindexlo++; 
@@ -174,9 +174,13 @@ console.log("entsec", bentselindexlo, bentselindexhi);
             PlotGeometryObject.enttrianglematerial.uniforms.selindexlo.value = bentselindexlo; 
             PlotGeometryObject.enttrianglematerial.uniforms.selindexhi.value = bentselindexhi; 
         }
+
         
-        for (var i = 0; i < svx3d.nentrances; i++) 
-            PlotGeometryObject.textlabelmaterials[i+svx3d.landmarks.length].uniforms.bselindex.value = (((i >= bentselindexlo) && (i < bentselindexhi)) ? 1.0 : 0.0); 
+// trying to remove the textlabelmaterials list
+        //for (var i = 0; i < svx3d.nentrances; i++) 
+        //    PlotGeometryObject.textlabelmaterials[i+svx3d.landmarks.length].uniforms.bselindex.value = (((i >= bentselindexlo) && (i < bentselindexhi)) ? 1.0 : 0.0); 
+        for (var i = 0; i < PlotGeometryObject.entlabelscard.children.length; i++) 
+            PlotGeometryObject.entlabelscard.children[i].material.uniforms.bselindex.value = (((i >= bentselindexlo) && (i < bentselindexhi)) ? 1.0 : 0.0); 
 
     }
     
