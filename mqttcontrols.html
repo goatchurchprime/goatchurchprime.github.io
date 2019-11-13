@@ -5,7 +5,7 @@
 <title> MQTT Publish Message</title>
 </head>
 <style>
-p#arrows span { border: thin red solid; padding: 7px }
+p#arrows span { border: thin red solid; padding: 7px; font-size:80px; cursor: pointer }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.js" type="text/javascript"></script>
 <script>
@@ -17,17 +17,19 @@ var defaultwebsocketaddr = "test.mosquitto.org:8080";
 
 // keys left:37, up:38, right:30, down:40
 var keysheld = { 37:0, 38:0, 39:0, 40:0 }
-window.onkeydown = function(e) { 
-    if ((e.keyCode >= 37) && (e.keyCode <= 40) && !keysheld[e.keyCode]) {
-        document.getElementById("key"+e.keyCode).style.background="pink"; 
-        keysheld[e.keyCode] = 1; 
+
+function keydown(keyCode) { 
+    if ((keyCode >= 37) && (keyCode <= 40) && !keysheld[keyCode]) {
+        document.getElementById("key"+keyCode).style.background="pink"; 
+        keysheld[keyCode] = 1; 
         sendcontrol(); 
     }
 }
-window.onkeyup = function(e) { 
-    if ((e.keyCode >= 37) && (e.keyCode <= 40)) {
-        document.getElementById("key"+e.keyCode).style.background=""; 
-        keysheld[e.keyCode] = 0; 
+ 
+function keyup(keyCode) { 
+    if ((keyCode >= 37) && (keyCode <= 40)) {
+        document.getElementById("key"+keyCode).style.background=""; 
+        keysheld[keyCode] = 0; 
         sendcontrol(); 
     }
 }
@@ -82,6 +84,12 @@ function sendcontrolF() {
 
 window.onload = function() { 
     document.getElementById("mqttwebsocket").value = defaultwebsocketaddr; 
+    window.onkeydown = function(e) { keydown(e.keyCode); }
+    window.onkeyup = function(e) { keyup(e.keyCode); }
+    for (var i = 37; i <= 40; i++) { (function(i) {
+        document.getElementById("key"+i).onmousedown = function() { console.log("mousedown "+i); keydown(i); }
+        document.getElementById("key"+i).onmouseup = function() { console.log("mouseup "+i); keyup(i); }
+    })(i)}; 
 } 
 
 // called when a message arrives
@@ -91,12 +99,12 @@ window.onload = function() {
 
 MQTT WebSocket: <input type="text" id="mqttwebsocket" value="----"><br><br>
 
-<p><b>Instructions:</b> Click here, and then use your computer cursor keys (up down left right) to steer the robot that is carrying the phone.</p>
+<p><b>Instructions:</b> Click on this page, and <b>then</b> use your computer cursor keys (&larr; &rarr; &uarr; &darr;) to steer the robot that is carrying the phone.</p>
 <p id="arrows">
-    <span id="key37">&lt;&lt;</span> 
-    <span id="key38">^^</span> 
-    <span id="key40">VV</span> 
-    <span id="key39">&gt;&gt;</span>
+    <span id="key37">&larr;</span> 
+    <span id="key38">&uarr;</span> 
+    <span id="key40">&darr;</span> 
+    <span id="key39">&rarr;</span>
 </p>
 </body>
 <hr>
