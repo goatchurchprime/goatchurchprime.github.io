@@ -108,5 +108,6 @@ MQTT WebSocket: <input type="text" id="mqttwebsocket" value="----"><br><br>
 </p>
 </body>
 <hr>
-<div id=pubmsg></div>
+<p>Monitor the messages using the command:</p>
+<pre>mosquitto_sub -h test.mosquitto.org -v -t "miniwheels1/#"</pre>
 </html>
