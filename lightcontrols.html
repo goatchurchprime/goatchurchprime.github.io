@@ -25,6 +25,7 @@ var defaultwebsocketaddr = "test.mosquitto.org:8080";
 
 // keys left:37, up:38, right:30, down:40
 var keysheld = { 37:0, 38:0, 39:0, 40:0 }
+var timeout = 5000; 
 
 function showkeycolour() {
     for (var i = 37; i <= 40; i++) 
@@ -105,7 +106,7 @@ window.onload = function() {
 </script>
 
 <body>
-<h1>Running the Wheeliepad mini</h1>
+<h1>Running the Wheeliephone</h1>
 
 MQTT WebSocket: <input type="text" id="mqttwebsocket" value="----"><br><br>
 
@@ -119,8 +120,8 @@ MQTT WebSocket: <input type="text" id="mqttwebsocket" value="----"><br><br>
 </body>
 <hr>
 <p>Monitor the messages using the command:</p>
-<p><b>mosquitto_sub -h test.mosquitto.org -v -t "miniwheels1/#"</b></p>
-<p>Signals on "miniwheels1/wheels/rec": <span id="miniwheels1wheelsrec" style="background:yellow">---</span></p>
+<p><b>mosquitto_sub -h test.mosquitto.org -v -t "miniwheels2/#"</b></p>
+<p>Signals on "miniwheels2/wheels": <span id="miniwheels1wheelsrec" style="background:yellow">---</span></p>
 
 <div id="colourfoot"></div>
 </html>
