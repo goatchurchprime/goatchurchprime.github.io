@@ -40,6 +40,7 @@ function keyup(keyCode) {
 
 function onMessageArrived(msg) {
     console.log(msg); 
+    document.getElementById("miniwheels1wheelsrec").textContent = msg.payloadString; 
 }
 
 function sendcontrolI() {
@@ -128,5 +129,7 @@ MQTT WebSocket: <input type="text" id="mqttwebsocket" value="----"><br><br>
 </body>
 <hr>
 <p>Monitor the messages using the command:</p>
+<pre>mosquitto_sub -h test.mosquitto.org -v -t "miniwheels1/#"</pre>
+<p>Signals on "miniwheels1/wheels/rec": <span id="miniwheels1wheelsrec" style="background:yellow">---</span></p>
 <pre>mosquitto_sub -h test.mosquitto.org -v -t "miniwheels1/#"</pre>
 </html>
