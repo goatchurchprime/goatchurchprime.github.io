@@ -16,7 +16,6 @@ div#colourfoot { position: absolute; bottom: 0; left: 0; right: 0; height: 15%; 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.js" type="text/javascript"></script>
 <script>
     
-    
 // Define some MQTT variables
 var client = null; 
 var wheelietopic = "miniwheels2/wheels";
@@ -91,7 +90,6 @@ function sendcontrolF() {
     var message = new Paho.MQTT.Message(msg); 
     message.destinationName = wheelietopic; 
     client.send(message);
-    receiveChannel
     sendcontrolFtimeout = setTimeout(sendcontrolF, timeout); 
 }
 
