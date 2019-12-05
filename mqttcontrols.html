@@ -67,10 +67,6 @@ function sendcontrolF() {
         document.getElementById("mqttwebsocket").disabled = true; 
         client.onMessageArrived = onMessageArrived; 
     }
-    if (!client.isConnected()) {
-        client.connect({onSuccess:sendcontrolI});
-        return; 
-    }
 
     //left:37, up:38, right:39, down:40
     var leftpwm = 0,   rightpwm = 0; 
@@ -92,6 +88,13 @@ function sendcontrolF() {
         leftpwm = 800; leftfore = 1;  rightpwm = 800; rightback = 1;  wtimeout = 50;  timeout = 100
     } else if (!keysheld[37] && keysheld[39]) {
         leftpwm = 800; leftback = 1;  rightpwm = 800; rightfore = 1;  wtimeout = 50;  timeout = 100
+    }
+
+    document.getElementById("colourfoot").style["background-color"] = "#"+(rightfore ? "FF" : (rightback ? "00" : "80")) + "80" + (leftfore ? "FF" : (leftback ? "00" : "80")); 
+
+    if (!client.isConnected()) {
+        client.connect({onSuccess:sendcontrolI});
+        return; 
     }
 
     var msg = [rightpwm, rightback, rightfore, leftpwm, leftfore, leftback, wtimeout].join(" "); 
@@ -129,7 +132,8 @@ MQTT WebSocket: <input type="text" id="mqttwebsocket" value="----"><br><br>
 </body>
 <hr>
 <p>Monitor the messages using the command:</p>
-<pre>mosquitto_sub -h test.mosquitto.org -v -t "miniwheels1/#"</pre>
+<p><b>mosquitto_sub -h test.mosquitto.org -v -t "miniwheels1/#"</b></p>
 <p>Signals on "miniwheels1/wheels/rec": <span id="miniwheels1wheelsrec" style="background:yellow">---</span></p>
-<pre>mosquitto_sub -h test.mosquitto.org -v -t "miniwheels1/#"</pre>
+
+<div id="colourfoot" style="position: absolute; bottom: 0; left: 0; right: 0; height: 50px; background-color: red;"></div>
 </html>
