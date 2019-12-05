@@ -110,8 +110,8 @@ window.onload = function() {
     window.onkeydown = function(e) { keydown(e.keyCode); }
     window.onkeyup = function(e) { keyup(e.keyCode); }
     for (var i = 37; i <= 40; i++) { (function(i) {
-        document.getElementById("key"+i).onmousedown = function() { console.log("mousedown "+i); keydown(i); }
-        document.getElementById("key"+i).onmouseup = function() { console.log("mouseup "+i); keyup(i); }
+        document.getElementById("key"+i).addEventListener("pointerdown", function() { console.log("mousedown "+i); keydown(i); }); 
+        document.getElementById("key"+i).addEventListener("pointerup", function() { console.log("mouseup "+i); keyup(i); }); 
     })(i)}; 
 } 
 
@@ -135,5 +135,5 @@ MQTT WebSocket: <input type="text" id="mqttwebsocket" value="----"><br><br>
 <p><b>mosquitto_sub -h test.mosquitto.org -v -t "miniwheels1/#"</b></p>
 <p>Signals on "miniwheels1/wheels/rec": <span id="miniwheels1wheelsrec" style="background:yellow">---</span></p>
 
-<div id="colourfoot" style="position: absolute; bottom: 0; left: 0; right: 0; height: 50px; background-color: red;"></div>
+<div id="colourfoot" style="position: absolute; bottom: 0; left: 0; right: 0; height: 10%; background-color: red;"></div>
 </html>
