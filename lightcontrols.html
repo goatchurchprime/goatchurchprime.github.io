@@ -52,7 +52,7 @@ function onMessageArrived(msg) {
     document.getElementById("miniwheels1wheelsrec").textContent = msg.payloadString; 
     var mkeysheld = msg.payloadString.split(" "); 
     for (var i = 37; i <= 40; i++)
-        keysheld = parseInt(mkeysheld[i-37]); 
+        keysheld[i] = parseInt(mkeysheld[i-37]); 
     showkeycolour(); 
 }
 
