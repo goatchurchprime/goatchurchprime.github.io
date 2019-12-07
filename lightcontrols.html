@@ -58,7 +58,7 @@ function onMessageArrived(msg) {
     if (msg.payloadString.length <= 1) {
         directcolour = null; 
     } else if (msg.payloadString[0] == "#") { 
-        directcolour = msg.payloadString.length; 
+        directcolour = msg.payloadString; 
     } else {
         var mkeysheld = msg.payloadString.split(" "); 
         for (var i = 37; i <= 40; i++)
