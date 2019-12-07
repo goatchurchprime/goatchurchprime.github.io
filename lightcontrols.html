@@ -25,12 +25,17 @@ var defaultwebsocketaddr = "test.mosquitto.org:8080";
 
 // keys left:37, up:38, right:30, down:40
 var keysheld = { 37:0, 38:0, 39:0, 40:0 }
+var directcolour = null; 
 var timeout = 5000; 
 
 function showkeycolour() {
-    for (var i = 37; i <= 40; i++) 
-        document.getElementById("key"+i).style.background = (keysheld[i] ? "pink" : ""); 
-    document.getElementById("colourfoot").style["background-color"] = "#"+(keysheld[38] ? "FF" : (keysheld[40] ? "00" : "80")) + "80" + (keysheld[37] ? "FF" : (keysheld[39] ? "00" : "80")); 
+    if (directcolour === null) {
+        for (var i = 37; i <= 40; i++) 
+            document.getElementById("key"+i).style.background = (keysheld[i] ? "pink" : ""); 
+        document.getElementById("colourfoot").style["background-color"] = "#"+(keysheld[38] ? "FF" : (keysheld[40] ? "00" : "80")) + "80" + (keysheld[37] ? "FF" : (keysheld[39] ? "00" : "80")); 
+    } else {
+        document.getElementById("colourfoot").style["background-color"] = directcolour; 
+    }
 }
 
 function keydown(keyCode) { 
@@ -50,9 +55,15 @@ function keyup(keyCode) {
 function onMessageArrived(msg) {
     console.log(msg); 
     document.getElementById("miniwheels1wheelsrec").textContent = msg.payloadString; 
-    var mkeysheld = msg.payloadString.split(" "); 
-    for (var i = 37; i <= 40; i++)
-        keysheld[i] = parseInt(mkeysheld[i-37]); 
+    if (msg.payloadString.length <= 1) {
+        directcolour = null; 
+    } else if (msg.payloadString[0] == "#") { 
+        directcolour = msg.payloadString.length; 
+    } else {
+        var mkeysheld = msg.payloadString.split(" "); 
+        for (var i = 37; i <= 40; i++)
+            keysheld[i] = parseInt(mkeysheld[i-37]); 
+    }
     showkeycolour(); 
 }
 
