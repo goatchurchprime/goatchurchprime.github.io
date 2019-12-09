@@ -8,9 +8,11 @@
 
 #arrows { text-align: justify; -ms-text-justify: distribute-all-lines; text-justify: distribute-all-lines; }
 #arrows > div { border: thin red solid; padding: 7px; font-size:80px; curs    vertical-align: top; display: inline-block; *display: inline; zoom: 1; }
-#arrows:after { content: ''; width: 100%; display: inline-block; font-size: 0; line-height: 0; }
+#arrows:after { content: ''; width: 100%; display: inline-block; font-size: 0; line-height: 0; vertical-align: top }
 
-div#colourfoot { position: absolute; bottom: 0; left: 0; right: 0; height: 15%; background-color: red; }
+div#colourfoot { position: absolute; bottom: 0; left: 0; right: 0; height: 25%; background-color: red; padding: 0; margin: 0}
+div#colourfoot div { width:24%; height: 90%; background-color: white; display: inline-block; border:0; margin:0; padding: 0 }
+
 
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.js" type="text/javascript"></script>
@@ -36,6 +38,15 @@ function showkeycolour() {
     } else {
         document.getElementById("colourfoot").style["background-color"] = directcolour; 
     }
+    
+    
+    for (var i = 37; i <= 40; i++) {
+        var e = document.getElementById("s"+(i-36)); 
+        if (e !== undefined) {
+            e.style.background = (keysheld[i] ? "white" : "black"); 
+        }
+    }
+    
 }
 
 function keydown(keyCode) { 
@@ -144,5 +155,10 @@ MQTT WebSocket: <input type="text" id="mqttwebsocket" value="----"><br><br>
 <p><b>mosquitto_sub -h test.mosquitto.org -v -t "miniwheels2/#"</b></p>
 <p>Signals on "miniwheels2/wheels": <span id="miniwheels1wheelsrec" style="background:yellow">---</span></p>
 
-<div id="colourfoot"></div>
+<div id="colourfoot">
+  <div id="s1"></div>
+  <div id="s2"></div>
+  <div id="s3"></div>
+  <div id="s4"></div>
+</div>
 </html>
