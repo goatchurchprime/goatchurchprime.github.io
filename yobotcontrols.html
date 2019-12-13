@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<title> MQTT Publish Message Yo!Bot</title>
+</head>
+<style>
+
+#arrows { text-align: justify; -ms-text-justify: distribute-all-lines; text-justify: distribute-all-lines; }
+#arrows > div { border: thin red solid; padding: 7px; font-size:80px; curs    vertical-align: top; display: inline-block; *display: inline; zoom: 1; }
+#arrows:after { content: ''; width: 100%; display: inline-block; font-size: 0; line-height: 0; vertical-align: top }
+
+div#colourfoot { position: absolute; bottom: 0; left: 0; right: 0; height: 25%; background-color: red; padding: 0; margin: 0}
+div#colourfoot div { width:24%; height: 90%; background-color: white; display: inline-block; border:0; margin:0; padding: 0 }
+
+
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.js" type="text/javascript"></script>
+<script>
+    
+// Define some MQTT variables
+var client = null; 
+var wheelietopic = "miniwheels2/wheels";
+
+var defaultwebsocketaddr = "test.mosquitto.org:8080"; 
+//defaultwebsocketaddr = "sensorcity.io:1880";
+
+// keys left:37, up:38, right:30, down:40
+var keysheld = { 37:0, 38:0, 39:0, 40:0 }
+var directcolour = null; 
+var timeout = 5000; 
+
+function showkeycolour() {
+    if (directcolour === null) {
+        for (var i = 37; i <= 40; i++) 
+            document.getElementById("key"+i).style.background = (keysheld[i] ? "pink" : ""); 
+        document.getElementById("colourfoot").style["background-color"] = "#"+(keysheld[38] ? "FF" : (keysheld[40] ? "00" : "80")) + "80" + (keysheld[37] ? "FF" : (keysheld[39] ? "00" : "80")); 
+    } else {
+        document.getElementById("colourfoot").style["background-color"] = directcolour; 
+    }
+    
+    
+    for (var i = 37; i <= 40; i++) {
+        var e = document.getElementById("s"+(i-36)); 
+        if (e !== undefined) {
+            e.style.background = (keysheld[i] ? "white" : "black"); 
+        }
+    }
+    
+}
+
+function keydown(keyCode) { 
+    if ((keyCode >= 37) && (keyCode <= 40) && !keysheld[keyCode]) {
+        keysheld[keyCode] = 1; 
+        sendcontrol(); 
+    }
+}
+ 
+function keyup(keyCode) { 
+    if ((keyCode >= 37) && (keyCode <= 40)) {
+        keysheld[keyCode] = 0; 
+        sendcontrol(); 
+    }
+}
+
+function onMessageArrived(msg) {
+    console.log(msg); 
+    document.getElementById("miniwheels1wheelsrec").textContent = msg.payloadString; 
+    if (msg.payloadString.length <= 1) {
+        directcolour = null; 
+    } else if (msg.payloadString[0] == "#") { 
+        directcolour = msg.payloadString; 
+    } else {
+        var mkeysheld = msg.payloadString.split(" "); 
+        for (var i = 37; i <= 40; i++)
+            keysheld[i] = parseInt(mkeysheld[i-37]); 
+    }
+    showkeycolour(); 
+}
+
+function sendcontrolInit() {
+    client.subscribe(wheelietopic); 
+    var msg = new Paho.MQTT.Message("0 0 0 0"); 
+    msg.destinationName = wheelietopic; 
+    client.send(msg);
+    sendcontrol(); 
+}
+
+function sendcontrol() {
+    if (sendcontrolFtimeout !== null) 
+        clearTimeout(sendcontrolFtimeout); 
+    sendcontrolFtimeout = setTimeout(sendcontrolF, 1); 
+}
+
+var sendcontrolFtimeout = null; 
+function sendcontrolF() {
+    sendcontrolFtimeout = null; 
+    
+    if (client === null) {
+        var websocketaddr = document.getElementById("mqttwebsocket").value.split(":"); 
+        client = new Paho.MQTT.Client(websocketaddr[0], parseInt(websocketaddr[1]), "");
+        document.getElementById("mqttwebsocket").disabled = true; 
+        client.onMessageArrived = onMessageArrived; 
+    }
+
+    showkeycolour(); 
+    if (!client.isConnected()) {
+        client.connect({onSuccess:sendcontrolInit});
+        return; 
+    }
+
+    var msg = [keysheld[37], keysheld[38], keysheld[39], keysheld[40]].join(" "); 
+    var message = new Paho.MQTT.Message(msg); 
+    message.destinationName = wheelietopic; 
+    client.send(message);
+    sendcontrolFtimeout = setTimeout(sendcontrolF, timeout); 
+}
+
+window.onload = function() { 
+    document.getElementById("mqttwebsocket").value = defaultwebsocketaddr; 
+    window.onkeydown = function(e) { keydown(e.keyCode); }
+    window.onkeyup = function(e) { keyup(e.keyCode); }
+    for (var i = 37; i <= 40; i++) { (function(i) {
+        document.getElementById("key"+i).addEventListener("pointerdown", function() { console.log("mousedown "+i); keydown(i); }); 
+        document.getElementById("key"+i).addEventListener("pointerup", function() { console.log("mouseup "+i); keyup(i); }); 
+    })(i)}; 
+} 
+
+
+// wakelock hack from https://stackoverflow.com/questions/11529247/in-html5-how-can-i-keep-an-android-device-s-screen-on
+function Utilbase64(mimeType, base64) { return 'data:' + mimeType + ';base64,' + base64; };
+var video = document.createElement('video');
+video.setAttribute('loop', '');
+function addSourceToVideo(element, type, dataURI) { var source = document.createElement('source'); source.src = dataURI; source.type = 'video/' + type; element.appendChild(source); }
+addSourceToVideo(video,'webm', Utilbase64('video/webm', 'GkXfo0AgQoaBAUL3gQFC8oEEQvOBCEKCQAR3ZWJtQoeBAkKFgQIYU4BnQI0VSalmQCgq17FAAw9CQE2AQAZ3aGFtbXlXQUAGd2hhbW15RIlACECPQAAAAAAAFlSua0AxrkAu14EBY8WBAZyBACK1nEADdW5khkAFVl9WUDglhohAA1ZQOIOBAeBABrCBCLqBCB9DtnVAIueBAKNAHIEAAIAwAQCdASoIAAgAAUAmJaQAA3AA/vz0AAA='));
+addSourceToVideo(video, 'mp4', Utilbase64('video/mp4', 'AAAAHGZ0eXBpc29tAAACAGlzb21pc28ybXA0MQAAAAhmcmVlAAAAG21kYXQAAAGzABAHAAABthADAowdbb9/AAAC6W1vb3YAAABsbXZoZAAAAAB8JbCAfCWwgAAAA+gAAAAAAAEAAAEAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAIVdHJhawAAAFx0a2hkAAAAD3wlsIB8JbCAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAQAAAAAAIAAAACAAAAAABsW1kaWEAAAAgbWRoZAAAAAB8JbCAfCWwgAAAA+gAAAAAVcQAAAAAAC1oZGxyAAAAAAAAAAB2aWRlAAAAAAAAAAAAAAAAVmlkZW9IYW5kbGVyAAAAAVxtaW5mAAAAFHZtaGQAAAABAAAAAAAAAAAAAAAkZGluZgAAABxkcmVmAAAAAAAAAAEAAAAMdXJsIAAAAAEAAAEcc3RibAAAALhzdHNkAAAAAAAAAAEAAACobXA0dgAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAIAAgASAAAAEgAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABj//wAAAFJlc2RzAAAAAANEAAEABDwgEQAAAAADDUAAAAAABS0AAAGwAQAAAbWJEwAAAQAAAAEgAMSNiB9FAEQBFGMAAAGyTGF2YzUyLjg3LjQGAQIAAAAYc3R0cwAAAAAAAAABAAAAAQAAAAAAAAAcc3RzYwAAAAAAAAABAAAAAQAAAAEAAAABAAAAFHN0c3oAAAAAAAAAEwAAAAEAAAAUc3RjbwAAAAAAAAABAAAALAAAAGB1ZHRhAAAAWG1ldGEAAAAAAAAAIWhkbHIAAAAAAAAAAG1kaXJhcHBsAAAAAAAAAAAAAAAAK2lsc3QAAAAjqXRvbwAAABtkYXRhAAAAAQAAAABMYXZmNTIuNzguMw=='));
+video.play();
+</script>
+
+<body>
+<h1>Wheeliephone for Yo!Bot</h1>
+
+MQTT WebSocket: <input type="text" id="mqttwebsocket" value="----"><br><br>
+
+<p><b>Instructions:</b> Click on this page, and <b>then</b> use your computer cursor keys (&larr; &rarr; &uarr; &darr;) to steer the robot that is carrying the phone.</p>
+<div id="arrows">
+    <div id="key37">&larr;</div> 
+    <div id="key38">&uarr;</div> 
+    <div id="key40">&darr;</div> 
+    <div id="key39">&rarr;</div>
+</div>
+</body>
+<hr>
+<p>Monitor the messages using the command:</p>
+<p><b>mosquitto_sub -h test.mosquitto.org -v -t "miniwheels2/#"</b></p>
+<p>Signals on "miniwheels2/wheels": <span id="miniwheels1wheelsrec" style="background:yellow">---</span></p>
+
+<div id="colourfoot">
+  <div id="s1"></div>
+  <div id="s2"></div>
+  <div id="s3"></div>
+  <div id="s4"></div>
+</div>
+</html>
