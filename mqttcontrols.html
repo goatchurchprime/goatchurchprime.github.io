@@ -121,7 +121,7 @@ function devorientation(event) {
 }
 
 window.onload = function() { 
-    window.addEventListener("deviceorientation", devorientation, false);
+    window.addEventListener("deviceorientation", devorientation);
 
     document.getElementById("mqttwebsocket").value = defaultwebsocketaddr; 
     window.onkeydown = function(e) { keydown(e.keyCode); }
