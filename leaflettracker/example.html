@@ -34,28 +34,39 @@
 <script>
 var map; 
 
-const host = 'wss://test.mosquitto.org:8080/';
-//const host = 'ws://mosquitto.doesliverpool.xyz:1884/';
-var hashdict = decodeHash(); 
+const mqttsecurehost = 'wss://mqtt.dynamicdevices.co.uk:8083';
+const mqttinsecurehost = 'ws://test.mosquitto.org:8080/';
+
+var hashdict = decodeHash();
 const uniqcode = Math.random().toString(16).substr(2, 8);
 const clientId = 'mqttjs_' + uniqcode;
 const personname = hashdict['person'] || ('person_'+uniqcode);
 console.log('Person name: '+personname);
 const defaultlatlng = [53.396,-2.971]; 
 
+var personlatlngs = { }  // { "personname" : marker }
 var personmarkers = { }  // { "personname" : marker }
+var persontargetmarkers = { }  // { "personname" : marker }
+
+
 function getPersonMarker(lpersonname) {
-    if (personmarkers[lpersonname] === undefined) {
-        var personicon = L.divIcon({ className: 'custom-div-icon',
-            html: "<div style='background-color:#c30b82;' class='marker-pin'></div><i class='material-icons'>"+lpersonname+"</i>",
-            iconSize: [30, 42],
-            iconAnchor: [15, 42]
-        });
-        personmarkers[lpersonname] = L.marker(defaultlatlng, {icon:personicon, draggable:true});
-        personmarkers[lpersonname].personname = lpersonname; 
-        personmarkers[lpersonname].on("click", function(e) { console.log("mouseclick ", e, " on ", this.personname); })
-    }
-    return personmarkers[lpersonname]; 
+    var personmarker = personmarkers[lpersonname];
+    if (personmarker !== undefined)
+        return personmarker;
+    var personicon = L.divIcon({ className: 'custom-div-icon',
+        html: "<div style='background-color:#c30b82;' class='marker-pin'></div><i class='material-icons'>"+lpersonname+"</i>",
+        iconSize: [30, 42],
+        iconAnchor: [15, 42]
+    });
+    personmarker = L.marker(defaultlatlng, {icon:personicon, draggable:true});
+    personmarker.personname = lpersonname; 
+    personmarker.on("click", function(e) { console.log("mouseclick ", e, " on ", this.personname); })
+    personmarker.on("dragend", function(e) { console.log("mouseclick ", e, " on ", this.personname); 
+        
+        })
+    
+    personmarkers[lpersonname] = personmarker;
+    return personmarker; 
 }
 
 function updatePersonLocation(lpersonname, lat, lng) {
@@ -64,6 +75,7 @@ function updatePersonLocation(lpersonname, lat, lng) {
 
 const topicstatus = 'leaflettracker/'+personname+'/status'; 
 const topiclocation = 'leaflettracker/'+personname+'/location'; 
+const topictarget = 'leaflettracker/'+personname+'/target'; 
 
 const mqttoptions = { keepalive: 60, clientId: clientId, protocolId: 'MQTT', protocolVersion: 4, clean: true, reconnectPeriod: 1000, connectTimeout: 30 * 1000,
     will: { topic: topicstatus, payload: 'offline', qos: 0, retain: true },
@@ -77,6 +89,7 @@ function onConnect()
     console.log('Client connected:' + clientId);
     client.subscribe('leaflettracker/+/location');
     client.subscribe('leaflettracker/+/status');
+    client.subscribe('leaflettracker/+/target');
     client.publish(topicstatus, 'online', { retain: true });
 }
 
@@ -87,7 +100,10 @@ function onMessage(topic, message, packet)
     var tpc = topic.split('/');
     if (tpc[2] == 'location') {
         var lpersonname = tpc[1]; 
-        updatePersonLocation(lpersonname, parseFloat(msg[0]), parseFloat(msg[1])); 
+        var lat = parseFloat(msg[0]);
+        var lng = parseFloat(msg[1]);
+        personlatlngs[lpersonname] = [lat, lng];
+        updatePersonLocation(lpersonname, lat, lng); 
     }
     if (tpc[2] == 'status') {
         var personmarker = getPersonMarker(tpc[1]); 
@@ -100,8 +116,10 @@ function onMessage(topic, message, packet)
 }
 
 
-console.log('Connecting mqtt client');
-const client = mqtt.connect(host, mqttoptions);
+var mqtturl = (window.location.protocol == "https:" ? mqttsecurehost : mqttinsecurehost); 
+
+console.log('MQTT broker: '+mqtturl);
+const client = mqtt.connect(mqtturl, mqttoptions);
 client.on('error', (err) => { console.log('Connection error: ', err); client.end() });
 client.on('reconnect', () => { console.log('Reconnecting...') });
 client.on('message', onMessage); 
@@ -112,6 +130,8 @@ function onLocationFound(e) {
     //L.marker(e.latlng).addTo(map)
     //    .bindPopup("You are within " + radius + " meters from this point").openPopup();
     //L.circle(e.latlng, radius).addTo(map);
+    getPersonMarker(personname).addTo(map); 
+
     console.log(e);
     client.publish(topiclocation, e.latitude+' '+e.longitude+' '+e.accuracy, {retain:true});
 }
