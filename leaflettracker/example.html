@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+	
+<title>Mobile tutorial - Leaflet</title>
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+<script src="leaflet-providers.js"></script>
+<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+<script src="utils.js"></script>
+
+<style>
+    html, body { height: 100%; margin: 0; }
+    #map { width: 600px; height: 400px; }
+</style>
+<style>
+    body { padding: 0; margin: 0; } 
+    #map { height: 100%; width: 100vw; }
+</style>
+<style>
+    .marker-pin { width: 30px; height: 30px; border-radius: 50% 50% 50% 0; background: #c30b82; position: absolute; transform: rotate(-45deg); left: 50%; top: 50%; margin: -15px 0 0 -15px; }
+    .marker-pin::after { content: ''; width: 24px; height: 24px; margin: 3px 0 0 3px; background: #fff; position: absolute; border-radius: 50%; }
+    .custom-div-icon i { position: absolute; width: 22px; font-size: 22px; left: 0; right: 0; margin: 5px auto; text-align: center; }
+</style>
+
+</head>
+
+<script>
+var map; 
+
+const host = 'ws://test.mosquitto.org:8080/';
+//const host = 'ws://mosquitto.doesliverpool.xyz:1884/';
+var hashdict = decodeHash(); 
+const uniqcode = Math.random().toString(16).substr(2, 8);
+const clientId = 'mqttjs_' + uniqcode;
+const personname = hashdict['person'] || ('person_'+uniqcode);
+console.log('Person name: '+personname);
+const defaultlatlng = [53.396,-2.971]; 
+
+var personmarkers = { }  // { "personname" : marker }
+function getPersonMarker(lpersonname) {
+    if (personmarkers[lpersonname] === undefined) {
+        var personicon = L.divIcon({ className: 'custom-div-icon',
+            html: "<div style='background-color:#c30b82;' class='marker-pin'></div><i class='material-icons'>"+lpersonname+"</i>",
+            iconSize: [30, 42],
+            iconAnchor: [15, 42]
+        });
+        personmarkers[lpersonname] = L.marker(defaultlatlng, {icon:personicon, draggable:true});
+        personmarkers[lpersonname].personname = lpersonname; 
+        personmarkers[lpersonname].on("click", function(e) { console.log("mouseclick ", e, " on ", this.personname); })
+    }
+    return personmarkers[lpersonname]; 
+}
+
+function updatePersonLocation(lpersonname, lat, lng) {
+    getPersonMarker(lpersonname).setLatLng([lat, lng]); 
+}
+
+const topicstatus = 'leaflettracker/'+personname+'/status'; 
+const topiclocation = 'leaflettracker/'+personname+'/location'; 
+
+const mqttoptions = { keepalive: 60, clientId: clientId, protocolId: 'MQTT', protocolVersion: 4, clean: true, reconnectPeriod: 1000, connectTimeout: 30 * 1000,
+    will: { topic: topicstatus, payload: 'offline', qos: 0, retain: true },
+};
+
+// wicon
+//var x = L.marker([53.39,-2.972], { 'icon':wicon }).addTo(map)
+
+function onConnect() 
+{
+    console.log('Client connected:' + clientId);
+    client.subscribe('leaflettracker/+/location');
+    client.subscribe('leaflettracker/+/status');
+    client.publish(topicstatus, 'online', { retain: true });
+}
+
+function onMessage(topic, message, packet) 
+{
+    var msg = message.toString().split(' ');
+    console.log('MQTTrec: ' + topic + ' ' + msg);
+    var tpc = topic.split('/');
+    if (tpc[2] == 'location') {
+        var lpersonname = tpc[1]; 
+        updatePersonLocation(lpersonname, parseFloat(msg[0]), parseFloat(msg[1])); 
+    }
+    if (tpc[2] == 'status') {
+        var personmarker = getPersonMarker(tpc[1]); 
+        var bonline = (msg[0] !== 'offline'); 
+        if (bonline && (!personmarker._map))
+            personmarker.addTo(map); 
+        if (!bonline && (personmarker._map))
+            personmarker.remove(); 
+    }
+}
+
+
+console.log('Connecting mqtt client');
+const client = mqtt.connect(host, mqttoptions);
+client.on('error', (err) => { console.log('Connection error: ', err); client.end() });
+client.on('reconnect', () => { console.log('Reconnecting...') });
+client.on('message', onMessage); 
+client.on('connect', onConnect);
+
+function onLocationFound(e) {
+    //var radius = e.accuracy / 2;
+    //L.marker(e.latlng).addTo(map)
+    //    .bindPopup("You are within " + radius + " meters from this point").openPopup();
+    //L.circle(e.latlng, radius).addTo(map);
+    console.log(e);
+    client.publish(topiclocation, e.latitude+' '+e.longitude+' '+e.accuracy, {retain:true});
+}
+
+function onLocationError(e) {
+    alert(e.message);
+}
+</script>
+
+<body>
+<div id='map'></div>
+</body>
+
+<script>
+map = L.map('map').fitWorld();
+L.tileLayer.provider('OpenStreetMap.Mapnik').addTo(map);
+map.on('locationfound', onLocationFound);
+map.on('locationerror', onLocationError);
+
+map.setView([53.395279, -2.972217], 18);
+map.locate({maxZoom: 16, watch:true});
+
+// mosquitto_pub -h test.mosquitto.org -t "leaflettracker/becka/location" -m "53.396 -2.974" -r
+//[53.395279, -2.972217]
+
+</script>
+
+</html>

@@ -64,14 +64,14 @@ function sendcontrol() {
 }
 
 var cmdeffect = { 
-    "Stop":       { "leftpwm":0,    "leftfore":0, "leftback":0, "rightpwm":0,    "rightfore":0, "rightback":0, "wtimeout":10,  "timeout":5000, "colour":"#808080" }, 
-    "Fore":       { "leftpwm":1023, "leftfore":1, "leftback":0, "rightpwm":1023, "rightfore":1, "rightback":0, "wtimeout":200, "timeout":250,  "colour":"#FF0000" }, 
-    "ForeSlow":   { "leftpwm":800,  "leftfore":1, "leftback":0, "rightpwm":800,  "rightfore":1, "rightback":0, "wtimeout":200, "timeout":250,  "colour":"#008080" }, 
-    "ForeLeft":   { "leftpwm":800,  "leftfore":1, "leftback":0, "rightpwm":1023, "rightfore":1, "rightback":0, "wtimeout":200, "timeout":250,  "colour":"#FF8000" }, 
-    "ForeRight":  { "leftpwm":1023, "leftfore":1, "leftback":0, "rightpwm":800,  "rightfore":1, "rightback":0, "wtimeout":200, "timeout":250,  "colour":"#800080" }, 
-    "Back":       { "leftpwm":800,  "leftfore":0, "leftback":1, "rightpwm":800,  "rightfore":0, "rightback":1, "wtimeout":200, "timeout":250,  "colour":"#00FFFF" }, 
-    "TurnLeft":   { "leftpwm":800,  "leftfore":1, "leftback":0, "rightpwm":800,  "rightfore":0, "rightback":1, "wtimeout":50,  "timeout":100,  "colour":"#00FF00" }, 
-    "TurnRight":  { "leftpwm":800,  "leftfore":0, "leftback":1, "rightpwm":800,  "rightfore":1, "rightback":0, "wtimeout":50,  "timeout":100,  "colour":"#0000FF" }
+    "Stop":       { "leftpwm":0,    "leftfore":0, "leftback":0, "rightpwm":0,    "rightfore":0, "rightback":0, "wtimeout":10,  "timeout":5000, "colour":"#FF0000" }, 
+    "Fore":       { "leftpwm":1023, "leftfore":1, "leftback":0, "rightpwm":1023, "rightfore":1, "rightback":0, "wtimeout":200, "timeout":250,  "colour":"#FFBF00" }, 
+    "ForeSlow":   { "leftpwm":800,  "leftfore":1, "leftback":0, "rightpwm":800,  "rightfore":1, "rightback":0, "wtimeout":200, "timeout":250,  "colour":"#7FFF00" }, 
+    "ForeLeft":   { "leftpwm":800,  "leftfore":1, "leftback":0, "rightpwm":1023, "rightfore":1, "rightback":0, "wtimeout":200, "timeout":250,  "colour":"#00FF3F" }, 
+    "ForeRight":  { "leftpwm":1023, "leftfore":1, "leftback":0, "rightpwm":800,  "rightfore":1, "rightback":0, "wtimeout":200, "timeout":250,  "colour":"#00FFFF" }, 
+    "Back":       { "leftpwm":800,  "leftfore":0, "leftback":1, "rightpwm":800,  "rightfore":0, "rightback":1, "wtimeout":200, "timeout":250,  "colour":"#003FFF" }, 
+    "TurnLeft":   { "leftpwm":800,  "leftfore":1, "leftback":0, "rightpwm":800,  "rightfore":0, "rightback":1, "wtimeout":50,  "timeout":100,  "colour":"#7F00FF" }, 
+    "TurnRight":  { "leftpwm":800,  "leftfore":0, "leftback":1, "rightpwm":800,  "rightfore":1, "rightback":0, "wtimeout":50,  "timeout":100,  "colour":"#FF00BF" }
 }; 
 
 var calibratecmdseq = [ "Stop", "Fore", "ForeSlow", "ForeLeft", "ForeRight", "Back", "TurnLeft", "TurnRight" ]; 
@@ -79,20 +79,60 @@ var calibratecycleFtimeout = null;
 var calibratecycleI = 0; 
 function calibratecycleF() {
     sendcontrolFtimeout = null; 
+    calibratecycleI += 1; 
     var ltimeout = 300; 
-    if (calibratecycleI < 10) {
+    if (calibratecycleI < 8) {
         document.getElementById("colourfoot").style["background-color"] = ((calibratecycleI % 2) == 1 ? "#000000" : "#FFFFFF"); 
-        ltimeout = (calibratecycleI == 9 ? 1000 : 100); 
-    } else if (calibratecycleI < 10 + calibratecmdseq.length) {
-        document.getElementById("colourfoot").style["background-color"] = cmdeffect[calibratecmdseq[calibratecycleI-10]].colour; 
+        ltimeout = ((calibratecycleI == 7) || (calibratecycleI == 1) ? 900 : 300); 
+    } else if (calibratecycleI < 8 + calibratecmdseq.length) {
+        document.getElementById("colourfoot").style["background-color"] = cmdeffect[calibratecmdseq[calibratecycleI-8]].colour; 
     } else {
-        document.getElementById("colourfoot").style["background-color"] = "#000000"; 
+        document.getElementById("colourfoot").style["background-color"] = cmdeffect["Stop"].colour; 
         ltimeout = 0; 
     }
-    calibratecycleI += 1; 
     if (ltimeout !== 0)
         sendcontrolFtimeout = setTimeout(calibratecycleF, ltimeout); 
 }
+
+
+function rgbhex(r, g, b) {
+    r = parseInt(r*255); 
+    g = parseInt(g*255); 
+    b = parseInt(b*255); 
+    return "#" + (r<16?"0":"")+r.toString(16).toUpperCase() + (g<16?"0":"")+g.toString(16).toUpperCase() + (b<16?"0":"")+b.toString(16).toUpperCase(); 
+}
+
+function hrgb(h) {
+    i = parseInt(h*6); 
+    f = (h*6) - i; 
+    i %= 6; 
+    if (i == 0) return rgbhex(1, f, 0); 
+    if (i == 1) return rgbhex(1-f, 1, 0); 
+    if (i == 2) return rgbhex(0, 1, f); 
+    if (i == 3) return rgbhex(0, 1-f, 1); 
+    if (i == 4) return rgbhex(f, 0, 1); 
+    if (i == 5) return rgbhex(1, 0, 1-f); 
+}
+
+// second version that cycles through the Hue values to find the widest spacing
+function calibratecycleF() {
+    sendcontrolFtimeout = null; 
+    calibratecycleI += 1; 
+    var ltimeout = 300; 
+    var huesteps = 50; 
+    if (calibratecycleI < 8) {
+        document.getElementById("colourfoot").style["background-color"] = ((calibratecycleI % 2) == 1 ? "#000000" : "#FFFFFF"); 
+        ltimeout = ((calibratecycleI == 7) || (calibratecycleI == 1) ? 900 : 300); 
+    } else if (calibratecycleI < 8 + huesteps) {
+        document.getElementById("colourfoot").style["background-color"] = hrgb((calibratecycleI - 8)/huesteps); 
+    } else {
+        document.getElementById("colourfoot").style["background-color"] = cmdeffect["Stop"].colour; 
+        ltimeout = 0; 
+    }
+    if (ltimeout !== 0)
+        sendcontrolFtimeout = setTimeout(calibratecycleF, ltimeout); 
+}
+
 
 function calibratecycle() {
     console.log("calibrate called"); 
@@ -174,6 +214,7 @@ window.onload = function() {
         document.getElementById("key"+i).addEventListener("pointerup", function() { console.log("mouseup "+i); keyup(i); }); 
     })(i)}; 
     document.getElementById("calibrate").addEventListener("click", calibratecycle);
+    document.getElementById("colourfoot").style["background-color"] = cmdeffect["Stop"].colour; 
 } 
 </script>
 
