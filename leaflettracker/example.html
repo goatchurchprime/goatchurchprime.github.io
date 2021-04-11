@@ -77,8 +77,10 @@ function onPersonMarkerDragEnd(e)
     var ll = personmarker.getLatLng();
     console.log("persondragend ", e, " on ", lpersonname, );
     client.publish(topictarget, ll.lat + ' ' + ll.lng);
-    personmarker.setLatLng(personlatlngs[lpersonname]);
+    if (personlatlngs[lpersonname] !== undefined)
+        personmarker.setLatLng(personlatlngs[lpersonname]);
 }
+
 function onPersonTargetDragEnd(e) 
 {
     var lpersonname = this.personname; 
