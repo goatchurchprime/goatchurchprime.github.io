@@ -46,6 +46,7 @@ var querydict = decodeQuery();
 
 const uniqcode = Math.random().toString(16).substr(2, 8);
 const clientId = 'mqttjs_' + uniqcode;
+var retainflagfornamedperson = (querydict['person'] !== undefined)
 const personname = querydict['person'] || ('person_'+uniqcode);
 console.log('Person name: '+personname);
 const defaultlatlng = [53.396,-2.971]; 
@@ -119,7 +120,7 @@ function updatePersonLocation(lpersonname, lat, lng) {
 
 
 const mqttoptions = { keepalive: 60, clientId: clientId, protocolId: 'MQTT', protocolVersion: 4, clean: true, reconnectPeriod: 1000, connectTimeout: 30 * 1000,
-    will: { topic: topicstatus, payload: 'offline', qos: 0, retain: true },
+    will: { topic: topicstatus, payload: 'offline', qos: 0, retain: retainflagfornamedperson },
 };
 
 // wicon
@@ -131,13 +132,17 @@ function onConnect()
     client.subscribe('leaflettracker/+/location');
     client.subscribe('leaflettracker/+/status');
     client.subscribe('leaflettracker/+/target');
-    client.publish(topicstatus, 'online #'+uniqcode.substr(0, 6), { retain: true });
+    client.publish(topicstatus, 'online #'+uniqcode.substr(0, 6), { retain: retainflagfornamedperson });
 }
 
 function onMessage(topic, message, packet) 
 {
     var msg = message.toString().split(' ');
     console.log('MQTTrec: ' + topic + ' ' + msg);
+    if (message.length == 0) {
+        console.log("skipping blank message"); 
+        return; 
+    }
     var tpc = topic.split('/');
     if (tpc[2] == 'location') {
         var lpersonname = tpc[1]; 
@@ -204,6 +209,16 @@ client.on('reconnect', () => { console.log('Reconnecting...') });
 client.on('message', onMessage); 
 client.on('connect', onConnect);
 
+function clearretainedmqttvalues()
+{
+    var lpersonlist = Object.keys(personmarkers);
+    for (var i = 0; i < lpersonlist.length; i++) {
+        var lpersonname = lpersonlist[i]; 
+        client.publish('leaflettracker/'+lpersonname+'/location', '', {retain:true});
+        client.publish('leaflettracker/'+lpersonname+'/status', '', {retain:true});
+    }
+}
+
 function onLocationFound(e) {
     //var radius = e.accuracy / 2;
     //L.marker(e.latlng).addTo(map)
@@ -212,7 +227,7 @@ function onLocationFound(e) {
     getPersonMarker(personname).addTo(map); 
 
     console.log(e);
-    client.publish(topiclocation, e.latitude+' '+e.longitude+' '+e.accuracy, {retain:true});
+    client.publish(topiclocation, e.latitude+' '+e.longitude+' '+e.accuracy, {retain:retainflagfornamedperson});
 }
 
 function onLocationError(e) {
@@ -227,6 +242,7 @@ function onLocationError(e) {
         <label for="person"><b>name</b></label>
         <input type="text" placeholder="enter name" name="person" required>
         <button type="submit" class="btn">Set name</button>
+        <button id="clear-retain" class="btn">Clear retain</button>
     </h1>
   </form>
 </div>
@@ -247,7 +263,8 @@ map.locate({maxZoom: 16, watch:true});
 
 if (querydict['person'] === undefined)
     document.getElementById("myForm").style.display = "block";
-
+document.getElementById("clear-retain").addEventListener("click", clearretainedmqttvalues); 
+ 
 </script>
 
 </html>
