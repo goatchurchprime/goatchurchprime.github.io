@@ -146,16 +146,16 @@ function onMessage(topic, message, packet)
 {
     var msg = message.toString().split(' ');
     console.log('MQTTrec: ' + topic + ' ' + msg);
-    if (message.length == 0) {
-        console.log("skipping blank message"); 
-        return; 
-    }
     // leaflettrackerroot / person|road / name / status|target|location
     var tpc = topic.split('/');
     var lttype = tpc[1]; 
     var ltname = tpc[2]; 
     var ltaction = tpc[3]; 
     if (lttype == 'person') {
+        if (message.length == 0) {
+            console.log("skipping blank message"); 
+            return; 
+        }
         if (ltaction == 'location') {
             var lat = parseFloat(msg[0]);
             var lng = parseFloat(msg[1]);
@@ -219,7 +219,12 @@ function onMessage(topic, message, packet)
                 polyline.setStyle({"color":roadcolorunselected}); 
                 if (!polyline._map)
                     polyline.addTo(map); 
+            } else if (msg[0] == '') {
+                polyline.setStyle({"color":roadcolorunselected}); 
+                if (polyline._map)
+                    polyline.remove(); 
             }
+
         }
     }
 }
