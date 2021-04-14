@@ -14,6 +14,7 @@
 <script src="leaflet-providers.js"></script>
 <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 <script src="utils.js"></script>
+<script src="wavertree_roads.js"></script>  <!-- var osmroads = { id: {highway, name, nodes:[ [lat,lon] ] } -->
 
 <style>
     html, body { height: 100%; margin: 0; }
@@ -24,6 +25,8 @@
     #map { height: 100%; width: 100vw; }
     .form-popup { display: none; position: fixed; top: 0; left: 15px; right: 15px; top: 10%; bottom: 10%; border: 3px solid #f1f1f1; z-index: 1000; }
     .form-container { padding: 10px; background-color: white; height: 100%; width: 100% }
+
+    .controlbuttons { position:fixed; padding: 10px; background-color: white; height: 15%; width: 50%; right:0; top:0; z-index: 1000 }
 
 </style>
 <style>
@@ -221,6 +224,30 @@ function clearretainedmqttvalues()
     }
 }
 
+function roadclicked(e) 
+{
+    console.log(this.osmid, this.options["color"], (this.options["color"] == "red" ? "blue" : "red")); 
+    this.setStyle({"color":(this.options["color"] == "red" ? "blue" : "red")}); 
+}
+
+function loadroads()
+{
+    var roadids = Object.keys(osmroads); 
+    var bounds = null; 
+    for (var i = 0; i < roadids.length; i++) {
+        var roadid = roadids[i];
+        var osmroad = osmroads[roadid]; 
+        console.log(osmroad); 
+        var latlngs = osmroad["nodes"]; 
+        var polyline = L.polyline(latlngs, {color: 'red'}).addTo(map);
+        polyline["osmid"] = roadid; 
+        bounds = polyline.getBounds();
+        polyline.on('click', roadclicked);
+        osmroad["polyline"] = polyline
+    }
+    map.fitBounds(bounds)
+}
+
 function onLocationFound(e) {
     //var radius = e.accuracy / 2;
     //L.marker(e.latlng).addTo(map)
@@ -244,10 +271,16 @@ function onLocationError(e) {
         <label for="person"><b>name</b></label>
         <input type="text" placeholder="enter name" name="person" required>
         <button type="submit" class="btn">Set name</button>
-        <button id="clear-retain" class="btn">Clear retain</button>
     </h1>
   </form>
 </div>
+<form class="controlbuttons">
+    <h1>
+        <button type="button" id="clear-retain" class="btn">Clear retain</button>
+        <button type="button" id="load-roads" class="btn">Load roads</button>
+    </h1>
+</form>
+
 <div id='map'></div>
 </body>
 
@@ -266,7 +299,8 @@ map.locate({maxZoom: 16, watch:true});
 if (querydict['person'] === undefined)
     document.getElementById("myForm").style.display = "block";
 document.getElementById("clear-retain").addEventListener("click", clearretainedmqttvalues); 
- 
+document.getElementById("load-roads").addEventListener("click", loadroads); 
+
 </script>
 
 </html>
