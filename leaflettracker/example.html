@@ -26,7 +26,7 @@
     .form-popup { display: none; position: fixed; top: 0; left: 15px; right: 15px; top: 10%; bottom: 10%; border: 3px solid #f1f1f1; z-index: 1000; }
     .form-container { padding: 10px; background-color: white; height: 100%; width: 100% }
 
-    .controlbuttons { position:fixed; padding: 10px; background-color: white; height: 15%; width: 50%; right:0; top:0; z-index: 1000 }
+    .controloptions { position:fixed; padding: 10px; background-color: white; right:0; top:0; z-index: 1000 }
 
 </style>
 <style>
@@ -60,8 +60,9 @@ var personlatlngs = { }  // { "personname" : [lat,lng] }
 var personmarkers = { }  // { "personname" : marker }
 var persontargetmarkers = { }  // { "personname" : marker }
 
-const topicstatus = 'leaflettracker/'+personname+'/status'; 
-const topiclocation = 'leaflettracker/'+personname+'/location'; 
+var leaflettrackerroot = 'leaflettracker'; 
+var topicstatus = leaflettrackerroot+'/person/'+personname+'/status'; 
+var topiclocation = leaflettrackerroot+'/person/'+personname+'/location'; 
 
 function getMarkerHtml(lpersonname, bgcolour)
 {
@@ -76,7 +77,7 @@ function onPersonMarkerDragEnd(e)
 {
     var lpersonname = this.personname; 
     var personmarker = personmarkers[lpersonname];
-    var topictarget = 'leaflettracker/'+lpersonname+'/target'; 
+    var topictarget = leaflettrackerroot+'/person/'+lpersonname+'/target'; 
     var ll = personmarker.getLatLng();
     console.log("persondragend ", e, " on ", lpersonname, );
     client.publish(topictarget, ll.lat + ' ' + ll.lng);
@@ -88,7 +89,7 @@ function onPersonTargetDragEnd(e)
 {
     var lpersonname = this.personname; 
     var persontarget = persontargetmarkers[lpersonname];
-    var topictarget = 'leaflettracker/'+lpersonname+'/target'; 
+    var topictarget = leaflettrackerroot+'/person/'+lpersonname+'/target'; 
     var ll = persontarget.getLatLng();
     console.log("persontargetdragend ", e, " on ", lpersonname);
     client.publish(topictarget, ll.lat + ' ' + ll.lng);
@@ -134,9 +135,10 @@ const mqttoptions = { keepalive: 60, clientId: clientId, protocolId: 'MQTT', pro
 function onConnect() 
 {
     console.log('Client connected:' + clientId);
-    client.subscribe('leaflettracker/+/location');
-    client.subscribe('leaflettracker/+/status');
-    client.subscribe('leaflettracker/+/target');
+    client.subscribe('leaflettracker/person/+/location');
+    client.subscribe('leaflettracker/person/+/status');
+    client.subscribe('leaflettracker/person/+/target');
+    client.subscribe('leaflettracker/road/+/status');
     client.publish(topicstatus, 'online #'+uniqcode.substr(0, 6), { retain: retainflagfornamedperson });
 }
 
@@ -148,59 +150,77 @@ function onMessage(topic, message, packet)
         console.log("skipping blank message"); 
         return; 
     }
+    // leaflettrackerroot / person|road / name / status|target|location
     var tpc = topic.split('/');
-    if (tpc[2] == 'location') {
-        var lpersonname = tpc[1]; 
-        var lat = parseFloat(msg[0]);
-        var lng = parseFloat(msg[1]);
-        if (personlatlngs[lpersonname] === undefined) {
-            if (personlist.length == 0)
-                map.setView([lat, lng], 16);
-            personlist.push(lpersonname); 
-        }
-        personlatlngs[lpersonname] = [lat, lng];
-        updatePersonLocation(lpersonname, lat, lng); 
-    }
-    if (tpc[2] == 'status') {
-        var lpersonname = tpc[1]; 
-        var personmarker = getPersonMarker(lpersonname); 
-        if (msg[0] == 'online') {
-            if (msg[1] && msg[1][0] == "#") {
-                personmarker.personcolour = msg[1]; 
-                var icon = personmarker.getIcon(); 
-                icon.options.html = getMarkerHtml(lpersonname, personmarker.personcolour); 
-                personmarker.setIcon(icon); 
+    var lttype = tpc[1]; 
+    var ltname = tpc[2]; 
+    var ltaction = tpc[3]; 
+    if (lttype == 'person') {
+        if (ltaction == 'location') {
+            var lat = parseFloat(msg[0]);
+            var lng = parseFloat(msg[1]);
+            if (personlatlngs[ltname] === undefined) {
+                if (personlist.length == 0)
+                    map.setView([lat, lng], 16);
+                personlist.push(ltname); 
             }
-            if (!personmarker._map)
-                personmarker.addTo(map); 
+            personlatlngs[ltname] = [lat, lng];
+            updatePersonLocation(ltname, lat, lng); 
         }
-        if (msg[0] == 'offline') {
-            if (personmarker._map)
-                personmarker.remove(); 
+        if (ltaction == 'status') {
+            var personmarker = getPersonMarker(ltname); 
+            if (msg[0] == 'online') {
+                if (msg[1] && msg[1][0] == "#") {
+                    personmarker.personcolour = msg[1]; 
+                    var icon = personmarker.getIcon(); 
+                    icon.options.html = getMarkerHtml(ltname, personmarker.personcolour); 
+                    personmarker.setIcon(icon); 
+                }
+                if (!personmarker._map)
+                    personmarker.addTo(map); 
+            }
+            if (msg[0] == 'offline') {
+                if (personmarker._map)
+                    personmarker.remove(); 
+            }
         }
-    }
-    if (tpc[2] == 'target') {
-        var lpersonname = tpc[1]; 
-        var personmarker = personmarkers[lpersonname]; 
-        var persontargetmarker = persontargetmarkers[lpersonname]; 
-        var lat = parseFloat(msg[0]);
-        var lng = parseFloat(msg[1]);
-        if (persontargetmarker === undefined) {
-            var targeticon = L.divIcon({ className: 'custom-div-icon',
-                html: getTargetMarkerHtml(personmarker.personcolour),
-                iconSize: [15, 21],
-                iconAnchor: [15, 42]
-            }); 
-            persontargetmarker = L.marker(defaultlatlng, {icon:targeticon, draggable:true});
-            persontargetmarker.personname = lpersonname;
+        if (ltaction == 'target') {
+            var personmarker = personmarkers[ltname]; 
+            var persontargetmarker = persontargetmarkers[ltname]; 
+            var lat = parseFloat(msg[0]);
+            var lng = parseFloat(msg[1]);
+            if (persontargetmarker === undefined) {
+                var targeticon = L.divIcon({ className: 'custom-div-icon',
+                    html: getTargetMarkerHtml(personmarker.personcolour),
+                    iconSize: [15, 21],
+                    iconAnchor: [15, 42]
+                }); 
+                persontargetmarker = L.marker(defaultlatlng, {icon:targeticon, draggable:true});
+                persontargetmarker.personname = ltname;
 
-            persontargetmarker.addTo(map); 
-            persontargetmarker.on("dragend", onPersonTargetDragEnd); 
+                persontargetmarker.addTo(map); 
+                persontargetmarker.on("dragend", onPersonTargetDragEnd); 
 
-            persontargetmarkers[lpersonname] = persontargetmarker; 
+                persontargetmarkers[ltname] = persontargetmarker; 
+            }
+            console.log("ttttt "+persontargetmarker+"  " +lat+" "+lng); 
+            persontargetmarker.setLatLng([lat, lng]);
+            
+        } 
+    } else if (lttype == 'road') {
+        var osmroad = osmroads[ltname]; 
+        if (osmroad !== undefined) {
+            var polyline = osmroad["polyline"]; 
+            if (msg[0] == 'rtarget') {
+                polyline.setStyle({"color":roadcolorselected}); 
+                if (!polyline._map)
+                    polyline.addTo(map); 
+            } else if (msg[0] == 'claimed') {
+                polyline.setStyle({"color":roadcolorunselected}); 
+                if (!polyline._map)
+                    polyline.addTo(map); 
+            }
         }
-        console.log("ttttt "+persontargetmarker+"  " +lat+" "+lng); 
-        persontargetmarker.setLatLng([lat, lng]);
     }
 }
 
@@ -217,35 +237,94 @@ client.on('connect', onConnect);
 function clearretainedmqttvalues()
 {
     var lpersonlist = Object.keys(personmarkers);
+    var roadids = Object.keys(osmroads); 
+
+    console.log("clearing retained persons ", lpersonlist.length, "roads", roadids.length); 
     for (var i = 0; i < lpersonlist.length; i++) {
         var lpersonname = lpersonlist[i]; 
-        client.publish('leaflettracker/'+lpersonname+'/location', '', {retain:true});
-        client.publish('leaflettracker/'+lpersonname+'/status', '', {retain:true});
+        client.publish('leaflettracker/person/'+lpersonname+'/location', '', {retain:true});
+        client.publish('leaflettracker/person/'+lpersonname+'/target', '', {retain:true});
+        client.publish('leaflettracker/person/'+lpersonname+'/status', '', {retain:true});
+    }
+
+    for (var i = 0; i < roadids.length; i++) {
+        var roadid = roadids[i];
+        client.publish('leaflettracker/road/'+roadid+'/status', '', {retain:true});
     }
 }
 
+var roadcolorunselected = '#00FFFF80'; 
+var roadcolorselected = '#0000FF80'; 
+var roadcolorchecked = '#FFFF0080'; 
+var roadlinewidth = 7; 
+
 function roadclicked(e) 
 {
-    console.log(this.osmid, this.options["color"], (this.options["color"] == "red" ? "blue" : "red")); 
-    this.setStyle({"color":(this.options["color"] == "red" ? "blue" : "red")}); 
+    if (this.options["color"] == roadcolorchecked) {
+        ; 
+    } else if (this.options["color"] == roadcolorunselected) {
+        var topicroadstatus = leaflettrackerroot+'/road/'+this.osmid+'/status'; 
+        console.log("roadclicked ", topicroadstatus, "rtarget"); 
+        client.publish(topicroadstatus, 'rtarget', {retain:retainflagfornamedperson});
+        this.setStyle({"color":roadcolorchecked}); 
+    } else if (this.options["color"] == roadcolorselected) {
+        var topicroadstatus = leaflettrackerroot+'/road/'+this.osmid+'/status'; 
+        console.log("roadclicked ", topicroadstatus, "claimed"); 
+        client.publish(topicroadstatus, 'claimed', {retain:retainflagfornamedperson});
+        this.setStyle({"color":roadcolorchecked}); 
+    }
 }
 
 function loadroads()
 {
     var roadids = Object.keys(osmroads); 
     var bounds = null; 
+    console.log("loading roads:", roadids.length); 
     for (var i = 0; i < roadids.length; i++) {
         var roadid = roadids[i];
         var osmroad = osmroads[roadid]; 
-        console.log(osmroad); 
         var latlngs = osmroad["nodes"]; 
-        var polyline = L.polyline(latlngs, {color: 'red'}).addTo(map);
+        var options = {color: roadcolorunselected, weight:roadlinewidth}
+        var polyline = L.polyline(latlngs, options);
         polyline["osmid"] = roadid; 
         bounds = polyline.getBounds();
         polyline.on('click', roadclicked);
         osmroad["polyline"] = polyline
     }
     map.fitBounds(bounds)
+}
+
+function setunselectedroads(bshow) 
+{
+    var roadids = Object.keys(osmroads); 
+    for (var i = 0; i < roadids.length; i++) {
+        var roadid = roadids[i];
+        var osmroad = osmroads[roadid]; 
+        var polyline = osmroad["polyline"]; 
+        var bshowline = (bshow || (polyline.options["color"] != roadcolorunselected)); 
+        if (bshowline) {
+            if (!polyline._map)
+                polyline.addTo(map); 
+        } else {
+            polyline.remove(); 
+        }
+    }
+}
+
+function fcontrolselect() 
+{
+    var controlselect = document.getElementById("controlselect"); 
+    console.log("fcontrolselect", controlselect.selectedIndex); 
+    var controlselectname = controlselect.options[Math.max(0, controlselect.selectedIndex)].value; 
+    if (controlselectname == "normal") {        
+        setunselectedroads(false); 
+    } else if (controlselectname == "addstreets") {
+        setunselectedroads(true); 
+    } else if (controlselectname == "clearall") {
+        if (confirm("Are you sure you want to clear all retained mqtt?")) 
+            clearretainedmqttvalues(); 
+        controlselect.selectedIndex = 0; 
+    }
 }
 
 function onLocationFound(e) {
@@ -274,12 +353,13 @@ function onLocationError(e) {
     </h1>
   </form>
 </div>
-<form class="controlbuttons">
-    <h1>
-        <button type="button" id="clear-retain" class="btn">Clear retain</button>
-        <button type="button" id="load-roads" class="btn">Load roads</button>
-    </h1>
-</form>
+<div class="controloptions">
+  <select id="controlselect">
+    <option value="normal" selected>normal</option>
+    <option value="addstreets">addstreets</option>
+    <option value="clearall">clearall</option>
+  </select>
+</div>
 
 <div id='map'></div>
 </body>
@@ -293,14 +373,14 @@ map.on('locationerror', onLocationError);
 map.setView([53.395279, -2.972217], 18);
 map.locate({maxZoom: 16, watch:true});
 
-// mosquitto_pub -h test.mosquitto.org -t "leaflettracker/becka/location" -m "53.396 -2.974" -r
+// mosquitto_pub -h test.mosquitto.org -t "leaflettracker/person/becka/location" -m "53.396 -2.974" -r
 //[53.395279, -2.972217]
 
 if (querydict['person'] === undefined)
     document.getElementById("myForm").style.display = "block";
-document.getElementById("clear-retain").addEventListener("click", clearretainedmqttvalues); 
-document.getElementById("load-roads").addEventListener("click", loadroads); 
-
+//document.getElementById("clear-retain").addEventListener("click", clearretainedmqttvalues); 
+document.getElementById("controlselect").addEventListener("change", fcontrolselect); 
+loadroads(); 
 </script>
 
 </html>
