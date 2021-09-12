@@ -14,7 +14,8 @@
 <script src="leaflet-providers.js"></script>
 <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 <script src="utils.js"></script>
-<script src="wavertree_roads.js"></script>  <!-- var osmroads = { id: {highway, name, nodes:[ [lat,lon] ] } -->
+<!-- <script src="wavertree_roads.js"></script>  var osmroads = { id: {highway, name, nodes:[ [lat,lon] ] } -->
+<script src="everton_roads.js"></script>  <!-- var osmroads = { id: {highway, name, nodes:[ [lat,lon] ] } -->
 
 <style>
     html, body { height: 100%; margin: 0; }
@@ -44,6 +45,7 @@ var map;
 
 const mqttsecurehost = 'wss://mqtt.dynamicdevices.co.uk:8083';
 const mqttinsecurehost = 'ws://test.mosquitto.org:8080/';
+//const mqttinsecurehost = 'ws://mqtt.dynamicdevices.co.uk:8080';
 
 var querydict = decodeQuery();
 
