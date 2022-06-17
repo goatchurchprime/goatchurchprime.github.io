@@ -44,8 +44,10 @@
 var map; 
 
 const mqttsecurehost = 'wss://mqtt.dynamicdevices.co.uk:8083';
-const mqttinsecurehost = 'ws://broker.mqttdashboard.com:8000/';
+//const mqttinsecurehost = 'ws://broker.mqttdashboard.com:8000/';
 //const mqttinsecurehost = 'ws://mqtt.dynamicdevices.co.uk:8080';
+const mqttinsecurehost = 'ws://test.mosquitto.org:8080';
+
 
 var querydict = decodeQuery();
 
@@ -346,7 +348,8 @@ function onLocationFound(e) {
 }
 
 function onLocationError(e) {
-    alert(e.message);
+    //alert(e.message);
+    console.log(e.message)
 }
 </script>
 
