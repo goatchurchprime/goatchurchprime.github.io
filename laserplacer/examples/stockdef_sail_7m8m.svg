@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="-100.0 -100.0 6000 1600">
+    <rect x="0.0" y="0.0" width="15000.0" height="1420.0" stroke="blue" stroke-width="3.00" />
+    <line x1="7000.0" y1="0.0" x2="7000.0" y2="1420.0" stroke="green" stroke-width="2.00" />
+    <line x1="8000.0" y1="0.0" x2="8000.0" y2="1420.0" stroke="green" stroke-width="2.00" />
+	<text x="10.0" y="10.0">PenCutSeqsTo = LaserPLT</text>
+	<text x="10.0" y="20.0">defaultfilename = pencut.anc</text>
+	<text x="10.0" y="30.0">curvetolerance = 0.2</text>
+</svg>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="-100.0 -100.0 600 160">
+    <rect x="50.0" y="50.0" width="400.0" height="200.0" stroke="blue" stroke-width="3.00" />
+	<text x="10.0" y="10.0">PenCutSeqsTo = KinetiC</text>
+	<text x="10.0" y="20.0">defaultfilename = kineticcut.nc</text>
+	<text x="10.0" y="30.0">curvetolerance = 0.2</text>
+	<text x="10.0" y="40.0">zclear = 20.1</text>
+	<text x="10.0" y="50.0">zengrave = 15.1</text>
+	<text x="10.0" y="60.0">zcut = 10.1</text>
+	<text x="10.0" y="70.0">feed = 550</text>
+</svg>

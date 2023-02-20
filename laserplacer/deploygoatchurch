@@ -1,0 +1,6 @@
+cp *.js ../goatchurch.bitbucket.io/
+cp *.html ../goatchurch.bitbucket.io/
+cd ../goatchurch.bitbucket.io
+git commit .
+git push
+

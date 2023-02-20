@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script type="text/javascript" src="raphael220_D.js"></script>    
+<script type="text/javascript" src="visualsettings.js?180311"></script>
+<script type="text/javascript" src="polygonsorting.js?180311"></script>    
+<script type="text/javascript" src="svgfileprocess.js?180311"></script>    
+<script type="text/javascript" src="svgfileprocessimport.js?180311"></script>    
+<script type="text/javascript" src="svgfileprocessgrouping.js?180311"></script>    
+<script type="text/javascript" src="pencutseqtocode.js?180311"></script>    
+<script type="text/javascript" src="svgfileprocessexport.js?180311"></script>    
+<script type="text/javascript" src="svgfileprocesstunnel.js?180311"></script>    
+<script type="text/javascript" src="svgizingtext.js?180311"></script>
+<script type="text/javascript" src="viewcontrols.js?180311"></script>    
+<script type="text/javascript" src="collisiontests.js?180311"></script>
+
+<!--<script type="text/javascript" src="extmodules/browserified-polygon-offset.js"></script>-->
+<script type="text/javascript" src="extmodules/martinez.min.js"></script>
+
+<meta charset="utf-8">
+<title>Laser placer V2018.07.16</title>
+<script>
+
+
+var filenamelist = { }; 
+
+var svgprocesses = { };         // indexed by fadivid (type SVGfileprocess)
+var mainthingsposition = {svgprocesses:[]};  // loaded and applied to files as their names match
+
+var fadividlast = null; 
+var Dsvgprocess = undefined; // most recent one (for debugging)
+var pathselected = null; 
+var opts; 
+var ylo, yhi; 
+var perprods; 
+var Lgrouppath = [ ]; 
+
+
+var Deee; 
+
+var dropsvgherenote = null; 
+function setup()
+{
+	readwindowurlhash(); 
+	console.log(hashoptions); 
+	window.addEventListener("resize", setraphsize);
+	
+	document.getElementById("thinnerstrokes").onclick = function() { scalestrokewidths(0.5); }; 
+	document.getElementById("thickerstrokes").onclick = function() { scalestrokewidths(2); }; 
+	document.getElementById("togglebackgroundcolour").onclick = function() { setbackgroundcolour(true); }; 
+	document.getElementById("rotatelock15").onclick = function() { this.classList.toggle("selected");  hashoptions["r"] = (this.classList.contains("selected") ? "15" : "0"); writewindowurlhash(); }; 
+	
+	setbackgroundcolour(false); 
+	document.getElementById("closehelp").onclick = hidehelparea; 
+	if (hashoptions["h"] === "0")
+		hidehelparea(); 
+	if (hashoptions["r"] === "15")
+		document.getElementById("rotatelock15").classList.add("selected"); 
+		
+    document.getElementById("exportSVG").onclick = exportSVG; 
+    document.getElementById("exportPLT").onclick = exportPLT; 
+    //document.getElementById("movecollide").onclick = MoveCollide; 
+    //document.getElementById("nest1").onclick = Nest1; 
+    document.getElementById("files").onchange = function(e) { importSVGfiles(e.target.files); };  
+    
+    document.getElementById("svgizetext").onclick = function() { 
+		importSVGfiles([{type:'svgizedtext', svgtext:document.getElementById("texttosvgize").value()}]); 
+    }; 
+
+	setfiledragoverfunctions(document.getElementById("paper1")); 
+    document.getElementById("thingpos").onclick = exportThingPositions; 
+	document.getElementById("importedthingpos").hidden = true; 
+    
+    // setup the raphael paper and bits
+    paper1 = Raphael("paper1", 1300, 800);
+    fixedscalebar = paper1.rect(50,100,200,3).attr({stroke:"#00e", fill:"cyan"}); 
+    fixedscalebartext= paper1.text(50, 90, "200mm").attr("stroke", "#00e"); 
+    setraphsize(); 
+	setviewboxfrompaperscale(); 
+    
+    // can't reference directly as context will be canvas instead of zoomfuncsobj
+    paper1.canvas.onwheel = function(e) { zoomfuncsobj.scrollwheelzoom(e) };
+	paper1.canvas.onmousedown = function(e) { zoomfuncsobj.mousedownoffshape(e) }; 
+	paper1.canvas.onmousemove = function(e) { zoomfuncsobj.mousemoveoffshape(e) }; 
+	paper1.canvas.onmouseup = function(e) { zoomfuncsobj.mouseupoffshape(e) }; 
+
+	paper1.canvas.oncontextmenu = function (e) { e.preventDefault(); }
+	
+    dropsvgherenote = paper1.text(200, 60, "Drop SVG here").attr({fill: "orange"}).transform("s3").attr("fill-opacity", 0.3); 
+    setraphsize(); 
+}
+
+
+Raphael(setup); 
+</script>
+
+<style>
+div#wholewindow { position: fixed; left: 0; top: 0; right:0; bottom: 0; overflow:auto; }
+div#filearea { z-index: 10; position: fixed; bottom:10px; right:10px; background:white; border: thin blue solid }
+div#paper1 { position: fixed; left: 0; right: 0; }
+
+div#helparea { z-index: 10; position: fixed; top:60px; right:10px; width: 700px; background:white; border: thin blue solid }
+
+#err { color:red }
+
+div#filearea  { cursor:pointer; }
+div#filearea  input[type="button"] { padding:0; margin:0; }
+div#filearea  input[type="button"].selected { background: #ff2;}
+div#filearea .tfscale { width: 30px; height: 15px; border: thin black solid; padding:0; margin: 0 }
+div#filearea .fprocessstatus:hover { background: red; cursor: pointer }
+div#filearea input[type="text"] { width: 25px; height: 15px; border: thin black solid; padding:0; margin: 0 }
+
+div#filearea .layerclasslist { display: none }
+div#filearea .layerclasslist ul { padding: 0; margin: 0; list-style-type: none; margin-left: 5px}
+div#filearea .layerclasslist ul div { display: inline-block; vertical-align: middle; height: 23px; border: 1px white solid }
+div#filearea .layerclasslist ul div.wingding3stoggle { text-align: center; background:#ddd; width: 25px; user-select: none; }
+div#filearea .layerclasslist ul div.wingding3stoggle:hover { background: #ffc}
+div#filearea .layerclasslist ul div.layerclasscol { width: 20px; border: 1px black solid; }
+div#filearea .layerclasslist ul div.layerclassname { padding-left: 10px; font-style: italic; } 
+
+div#filearea .layerparamslist { display: none }
+div#filearea .layerparamslist ul { padding: 0; margin: 0; list-style-type: none; margin-left: 5px}
+div#filearea .layerparamslist ul div.valueparamkey { display: inline-block; margin-left:10px; margin-right: 5px; text-align: left; background:#ddd; width: 200px; user-select: none; }
+div#filearea .layerparamslist ul input { margin-left:5px; width: 150px; }
+
+
+div#filearea .dposition { color: green }
+div#filearea .dposition span { border-left: thin black solid }
+div#filearea .dposition span.locked { background: #aaa }
+div#filearea .dposition span.moving { font-weight: bold }
+div#filearea select#importedthingpos { Dvisibility: hidden }
+
+#thinnerstrokes, #thickerstrokes, #togglebackgroundcolour, #rotatelock15 { border: 0; padding: 0; color: blue }
+#rotatelock15.selected { background: #ee5 }
+
+#texttosvgize { height: 1em }
+
+</style>
+
+</head>
+<body>
+
+<div id="wholewindow">
+  <div id="helparea">
+	  <input type="button" value="close help" id="closehelp">
+	  <h4>Purpose:</h4>
+	  <p>This is browser application is for collecting, arranging pieces and generating a cut file for 
+	  a laser cutter.  It may become useful for planning and operating devices remotely as it is 
+	  build using free internet technology.</p>
+	  
+	  <h4>Instructions:</h4>
+
+	  <p>Drag and drop an SVG file into this working area to decode all its lines.</p>
+
+	  <p>You can drag the diagram with the left mouse button.  You can rotate it 
+	  by holding Control-key down when you start dragging.  If you click and drag outside the 
+	  diagram you change the view.  The scroll wheel also changes the view by zooming in and out.</p>
+
+	  <p>Now look at the <b>FileArea</b> where there is a dropdown to the left of your file name which has automatically 
+	  selected what type of layer categorization to use on your paths (by colour, by class (=dxflayer if you have used dxf2svg.py), 
+	  or by a combination).  The number says how many of that type were found.  You can toggle the state of the layers by:
+	  hide:&#9898; or visible:&#9899;;  cut:&#x2700;; or draw:&#x270E;; slot:&#x2701; or border:&#x2B20;.</p>
+	  <p>Use the dropdown to hide the layers, delete the file, or <b>group</b> the contours up into the different components 
+	  and their etching lines so you can place them on a <b>stockdef</b> object.</p>
+	  
+	  <p>The <b>stockdef</b> type svg file defines the cutting sheet on which you place your shapes.  It has a 
+	  button called [GenPath] which will download your anc file.</p>
+	  
+	  <p>The buttons [<<] and [>>] change the line width, [.*.] toggles the background colour.</p>
+	  <p>The code is at <a href="https://bitbucket.org/goatchurch/laserplacer/">bitbucket/laserplacer</a></p>
+	  
+	  <p>You can use the command line program <a href="https://github.com/goatchurchprime/dxf2svg">dxf2svg</a> to 
+	  convert a DXF into the appropriate SVG file (preserving classnames, which can be useful).</p>
+  </div>
+  <div id="filearea">
+    FileArea<input type="button" value="thingpos" id="thingpos" title="Download positions of everything in a JSON file"/><select id="importedthingpos"></select>
+  </div>
+  
+  <div id="panelheader">
+    <input type="button" value="exportSVG" id="exportSVG"/>
+    <input type="button" value="exportPLT" id="exportPLT"/>
+    <!--input type="button" value="MOVE!" id="movecollide"-->
+    <!--input type="button" value="Nest1" id="nest1"-->
+    <input type="file" id="files" name="files[]" multiple />
+    <span id="readingcancel">0/0</span>
+    <input type="button" value="<<" id="thinnerstrokes" title="Thinner strokes"/>
+    <input type="button" value=">>" id="thickerstrokes" title="Thicker strokes"/>
+    <input type="button" value=".*." id="togglebackgroundcolour" title="Toggle background colour" style="background: #eee"/>
+    <input type="button" value="Rot15" id="rotatelock15" title="Lock rotations to 15deg intervals"/>
+    
+    <textarea id="texttosvgize">svgizing letters here</textarea>
+    <input type="button" value="svgizetext" id="svgizetext"/>
+    <a href="https://bitbucket.org/goatchurch/laserplacer/">[source]</a>
+	V2018.03.11
+  </div>
+  
+  <div style="border: thin black solid; background: #e8e8e8" id="paper1">
+  </div>
+    
+</div>
+  
+</body>
+</html>
