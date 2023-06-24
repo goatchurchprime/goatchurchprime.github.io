@@ -35,7 +35,10 @@
             mkdir -p $out/bin
             cp SpectrumAnalyser $out/bin
           '';
-          
+
+        meta = { 
+           mainProgram = "SpectrumAnalyser";
+        };  
       };
 
     # Specify the default package
